@@ -1,7 +1,9 @@
 /*
   CwruStim.cpp - Library for muscle stim board for HNPv2 Project.
-  Created by Lu Li (lxl361@case), Jul, 2015.
-  Version 1.0
+  Created by Lu Li (lxl361@case), Aug, 2015.
+  Version 1.1
+  Online Doc: https://goo.gl/s20iH4
+  Repo: https://github.com/lilulab/CwruStim_beta
 */
 
 #include "Arduino.h"
@@ -16,24 +18,8 @@ int Stim::_command = 0;
 int Stim::_dir = 1;
 int Stim::_min = 0x00;
 int Stim::_max = 0xFA;
-//String _serlInput = "12345678", serlError = "0234AA06";
-uint8_t Stim::_halt_rset[6] = {0x04, 0x80, 0x04, 0x01, 0x01, 0x75};
-uint8_t Stim::_del_sched[6] = {0x04, 0x80, 0x12, 0x01, 0x01, 0x67};
-uint8_t Stim::_chan_set1[12] = {0x04, 0x80, 0x47, 0x07, 0x00, 0x64, 0xFA, 0x00, 0x64, 0x11, 0x01, 0x57};
-uint8_t Stim::_chan_set2[12] = {0x04, 0x80, 0x47, 0x07, 0x00, 0x64, 0xFA, 0x00, 0x64, 0x11, 0x23, 0x35};
-uint8_t Stim::_chan_set3[12] = {0x04, 0x80, 0x47, 0x07, 0x00, 0x64, 0xFA, 0x00, 0x64, 0x11, 0x45, 0x13};
-
-uint8_t Stim::_crt_sched[8] = {0x04, 0x80, 0x10, 0x03, 0xAA, 0x00, 0x1D, 0xA0};
-uint8_t Stim::_crt_evnt1[14] = {0x04, 0x80, 0x15, 0x09, 0x01, 0x00, 0x00, 0x00, 0x03, 0x00, 0x00, 0x00, 0x00, 0x59}; 
-uint8_t Stim::_crt_evnt2[14] = {0x04, 0x80, 0x15, 0x09, 0x01, 0x00, 0x05, 0x00, 0x03, 0x01, 0x00, 0x00, 0x00, 0x53}; 
-uint8_t Stim::_crt_evnt3[14] = {0x04, 0x80, 0x15, 0x09, 0x01, 0x00, 0x0A, 0x00, 0x03, 0x02, 0x00, 0x00, 0x00, 0x4D};
-uint8_t Stim::_sync_msg1[6] = {0x04, 0x80, 0x1B, 0x01, 0xAA, 0xB4};
-
-uint8_t Stim::_chngevnt1[9] = {0x04, 0x80, 0x19, 0x04, 0x01, 0x00, 0x3C, 0x00, 0x00};
 
 // Stim constructor and UART selector
-
-
 Stim::Stim(int uart_channel_id) {
 	// Initialize the NTREK ECB to connect the Stim Board
 	// Check which UART channel is needed
@@ -100,27 +86,10 @@ int Stim::init(int mode) {
 // Configure Stim Board via UART
 int Stim::config(int setting) {
 
-	/* // Magic Numbers Method
 	// //Serial.println("Enter Stim Config");
 
-	// delay(50);
-	// this->serial_write_array (_halt_rset,sizeof(_halt_rset)/sizeof(uint8_t));
-	// //this->serial_write_array (del_sched);
-	
-	// this->serial_write_array (_chan_set1,sizeof(_chan_set1)/sizeof(uint8_t));
-	// this->serial_write_array (_chan_set2,sizeof(_chan_set2)/sizeof(uint8_t));
-	// this->serial_write_array (_chan_set3,sizeof(_chan_set3)/sizeof(uint8_t));
-	// this->serial_write_array (_crt_sched,sizeof(_crt_sched)/sizeof(uint8_t));
-	// this->serial_write_array (_crt_evnt1,sizeof(_crt_evnt1)/sizeof(uint8_t));
-	// this->serial_write_array (_crt_evnt2,sizeof(_crt_evnt2)/sizeof(uint8_t));
-	// this->serial_write_array (_crt_evnt3,sizeof(_crt_evnt3)/sizeof(uint8_t));
-	// this->serial_write_array (_sync_msg1,sizeof(_sync_msg1)/sizeof(uint8_t));
-
-	// _chngevnt1[5] = _min + 1;
-
-	// _setting = setting;
+	_setting = setting;
 	// //Serial.println("Exit Stim Config");
-	*/ // Magic Numbers Method
 
 	// Channels setup
 	//cmd_chan_set(port_chn_id, amp_limit, pw_limit, ip_delay, asp_ratio, anode_cathode);
@@ -219,10 +188,6 @@ int Stim::start(uint8_t sync_signal) {
 
 // Update Stim pattern via UART
 int Stim::update(int command) {
-	// if((_chngevnt1[5] + _dir) > _max | (_chngevnt1[5] + _dir) < _min) { _dir = -_dir; }
-	// _chngevnt1[5]+=_dir;
-	// //chngevnt1[chngevnt1.length-1] = checksum(chngevnt1);
-	// this->serial_write_array (_chngevnt1,sizeof(_chngevnt1)/sizeof(uint8_t));
 
 	// STIM_COMMAND_DEMO
 	switch (command) {
@@ -300,28 +265,16 @@ int Stim::update(int command) {
 	return 1;
 }
 
+// UART write array
 int Stim::serial_write_array(uint8_t buf[], int length) {
-	//Serial.write (buf,sizeof(buf)/sizeof(uint8_t));
-	//Serial.write (buf,sizeof(buf)/sizeof( int));
-	//Serial.write (buf,4);
-	//Serial.println(buf);
-
-	// ToDo: switch different UART channel.
 	
 	// for(int i = 0; i<length; i++){
 	// 	Serial.write(buf[i]);
 	// 	//Serial.print(buf[i],HEX);
 	// 	//Serial.print(" ");
 	// }
-	//Serial.println(".");
 
-	// Serial.print("sizeof(buf)=");Serial.print(sizeof(buf));Serial.println(".");
-	// Serial.print("sizeof(int)=");Serial.print(sizeof(uint8_t));Serial.println(".");
-	// Serial.print("sizeof_rest=");Serial.print(sizeof(buf)/sizeof(uint8_t));Serial.println(".");
-	// int size1 = sizeof buf;
-	// Serial.print("sizeof_2ndm=");Serial.print(size1);Serial.println(".");
-
-
+	// Select UART Channel
 	switch (_uart_channel_id) {
 
 		case STIM_CHANNEL_UART0:
@@ -355,6 +308,7 @@ int Stim::serial_write_array(uint8_t buf[], int length) {
 	return Serial;
 }
 
+// Retun check sum byte
 uint8_t Stim::checksum(uint8_t vals[], int length){
   uint8_t csum = 0;
   for(int i=0; i<length-1; i++) {

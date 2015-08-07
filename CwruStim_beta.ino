@@ -1,3 +1,11 @@
+/*
+  CwruStim_beta.ino - Beta Code for muscle stim board for HNPv2 Project.
+  Created by Lu Li (lxl361@case), Aug, 2015.
+  Version 1.1
+  Online Doc: https://goo.gl/s20iH4
+  Repo: https://github.com/lilulab/CwruStim_beta
+*/
+
 #include "CwruStim.h"
 
 Stim stim(STIM_CHANNEL_UART0);
