@@ -46,7 +46,7 @@ Stim::Stim(int uart_channel_id) {
 		case STIM_CHANNEL_UART0:
 			//Use UART1(TX1&RX1) port to connect Stim Board
 			//Serial.begin(9600);
-			while (!Serial) {_stim_error |= STIM_ERROR_CANNOT_OPEN_SERIAL;} //Set Error bit
+			while (!Serial) {_stim_error |= STIM_ERROR_SERIAL_ERROR;} //Set Error bit
 			if (Serial) _stim_error &= ~STIM_NO_ERROR; //Clear Error bit
 			break;
 
@@ -56,20 +56,20 @@ Stim::Stim(int uart_channel_id) {
 			case STIM_CHANNEL_UART1:
 				//Use UART1(TX1&RX1) port to connect Stim Board
 				Serial1.begin(9600);
-				while (!Serial1) {_stim_error |= STIM_ERROR_CANNOT_OPEN_SERIAL;} //Set Error bit
+				while (!Serial1) {_stim_error |= STIM_ERROR_SERIAL_ERROR;} //Set Error bit
 				if (Serial1) _stim_error &= ~STIM_NO_ERROR; //Clear Error bit
 				break;
 
 			case STIM_CHANNEL_UART3:
 				//Use UART3(TX3&RX3) port to connect Stim Board
 				Serial3.begin(9600);
-				while (!Serial3) {_stim_error |= STIM_ERROR_CANNOT_OPEN_SERIAL;} //Set Error bit
+				while (!Serial3) {_stim_error |= STIM_ERROR_SERIAL_ERROR;} //Set Error bit
 				if (Serial3) {_stim_error &= ~STIM_NO_ERROR;} //Clear Error bit
 				break;
 		#endif
 
 		default:
-			_stim_error |= STIM_ERROR_CANNOT_OPEN_SERIAL;
+			_stim_error |= STIM_ERROR_SERIAL_ERROR;
 			break;
 		//Serial.print("_stim_error=");//Serial.print(_stim_error,BIN);//Serial.println(".");
 		//Serial.println("exit Stim constructor");
@@ -88,7 +88,7 @@ int Stim::init(int mode) {
 
 	delay(50); //wait UECU power up
 
-    // Reset Halt Message to run UECU
+    // Reset Halt Message to reset Stim board
 	this->cmd_halt_rset(UECU_RESET);
 
 	// Delete Schedule
@@ -161,7 +161,7 @@ int Stim::config(int setting) {
 
 	// Create Schedule
 	// this->cmd_crt_sched(sync_signal, duration);
-	this->cmd_crt_sched(0xAA, 29);	// Sync signal = 0xAA, duration 29msec.
+	this->cmd_crt_sched(UECU_SYNC_MSG, 29);	// Sync signal = 0xAA, duration 29msec.
 
 	// Create Events
 	// this->cmd_crt_evnt(sched_id, delay, priority, event_type, port_chn_id);
@@ -174,7 +174,7 @@ int Stim::config(int setting) {
 						0,	// port_chn_id = 0;
 						0,	// pulse_width set to 0,
                       	0,	// amplitude set to 0,
-                      	0);	// zone not implemented);
+                      	0);	// zone not implemented;
 
 	// Create Event 2 for port_chn_id 0 in sched_id 1 
 	this->cmd_crt_evnt( 1,	// sched_id = 1
@@ -184,7 +184,7 @@ int Stim::config(int setting) {
 						1,	// port_chn_id = 1;
 						0,	// pulse_width set to 0,
                       	0,	// amplitude set to 0,
-                      	0);	// zone not implemented);
+                      	0);	// zone not implemented;
 
 	// Create Event 3 for port_chn_id 0 in sched_id 1 
 	this->cmd_crt_evnt( 1,	// sched_id = 1
@@ -194,7 +194,7 @@ int Stim::config(int setting) {
 						2,	// port_chn_id = 2;
 						0,	// pulse_width set to 0,
                       	0,	// amplitude set to 0,
-                      	0);	// zone not implemented);
+                      	0);	// zone not implemented;
 
 	// Create Event 4 for port_chn_id 0 in sched_id 1 
 	this->cmd_crt_evnt( 1,	// sched_id = 1
@@ -204,22 +204,97 @@ int Stim::config(int setting) {
 						3,	// port_chn_id = 3;
 						0,	// pulse_width set to 0,
                       	0,	// amplitude set to 0,
-                      	0);	// zone not implemented);
-
-	// Send Sync to start
-	this->cmd_sync_msg(0xAA); // Sent Sync_message 0xAA to start schedule.
+                      	0);	// zone not implemented;
 
 	return 1;
 }
 
+// Start Stim board using sync signal command
+int Stim::start(uint8_t sync_signal) {
+
+	// Send Sync to start
+	//this->cmd_sync_msg(0xAA); // Sent Sync_message 0xAA to start schedule.
+	this->cmd_sync_msg(sync_signal); // Sent Sync_message to start schedule.
+}
+
 // Update Stim pattern via UART
 int Stim::update(int command) {
-	if((_chngevnt1[5] + _dir) > _max | (_chngevnt1[5] + _dir) < _min) { _dir = -_dir; }
-	_chngevnt1[5]+=_dir;
-	//chngevnt1[chngevnt1.length-1] = checksum(chngevnt1);
-	this->serial_write_array (_chngevnt1,sizeof(_chngevnt1)/sizeof(uint8_t));
+	// if((_chngevnt1[5] + _dir) > _max | (_chngevnt1[5] + _dir) < _min) { _dir = -_dir; }
+	// _chngevnt1[5]+=_dir;
+	// //chngevnt1[chngevnt1.length-1] = checksum(chngevnt1);
+	// this->serial_write_array (_chngevnt1,sizeof(_chngevnt1)/sizeof(uint8_t));
 
-	delay(50);
+	// STIM_COMMAND_DEMO
+	switch (command) {
+
+		case STIM_COMMAND_ZERO_ALL:
+
+			// Pulse width 0us, Amplitude 0mA
+
+			// this->cmd_set_evnt( event_id, pulse_width, amplitude, zone);
+			// Change Event 1 for port_chn_id 0 in sched_id 1 
+			this->cmd_set_evnt(	1,	//event_id
+								0,//pulse_width = 100us
+								0,	//amplitude = 60mA
+								0);	// zone not implemented
+
+			// Change Event 2 for port_chn_id 1 in sched_id 1 
+			this->cmd_set_evnt(	2,	//event_id
+								0,//pulse_width = 100us
+								0,	//amplitude = 60mA
+								0);	// zone not implemented	
+
+			// Change Event 3 for port_chn_id 2 in sched_id 1 
+			this->cmd_set_evnt(	3,	//event_id
+								0,//pulse_width = 100us
+								0,	//amplitude = 60mA
+								0);	// zone not implemented	
+
+			// Change Event 4 for port_chn_id 3 in sched_id 1 
+			this->cmd_set_evnt(	4,	//event_id
+								0,//pulse_width = 100us
+								0,	//amplitude = 60mA
+								0);	// zone not implemented
+
+			delay(50); // delay 50ms
+			break;
+
+		case STIM_COMMAND_DEMO:
+
+			// Pulse width 100us, Amplitude 60mA
+
+			// this->cmd_set_evnt( event_id, pulse_width, amplitude, zone);
+			// Change Event 1 for port_chn_id 0 in sched_id 1 
+			this->cmd_set_evnt(	1,	//event_id
+								100,//pulse_width = 100us
+								60,	//amplitude = 60mA
+								0);	// zone not implemented
+
+			// Change Event 2 for port_chn_id 1 in sched_id 1 
+			this->cmd_set_evnt(	2,	//event_id
+								100,//pulse_width = 100us
+								60,	//amplitude = 60mA
+								0);	// zone not implemented	
+
+			// Change Event 3 for port_chn_id 2 in sched_id 1 
+			this->cmd_set_evnt(	3,	//event_id
+								100,//pulse_width = 100us
+								60,	//amplitude = 60mA
+								0);	// zone not implemented	
+
+			// Change Event 4 for port_chn_id 3 in sched_id 1 
+			this->cmd_set_evnt(	4,	//event_id
+								100,//pulse_width = 100us
+								60,	//amplitude = 60mA
+								0);	// zone not implemented
+
+			//delay(50); // delay 50ms
+			break;
+
+		default:
+			_stim_error |= STIM_ERROR_COMMAND_ERROR;
+			break;
+	}
 
 	_command = command;
 	return 1;
@@ -233,11 +308,11 @@ int Stim::serial_write_array(uint8_t buf[], int length) {
 
 	// ToDo: switch different UART channel.
 	
-	for(int i = 0; i<length; i++){
-		Serial.write(buf[i]);
-		//Serial.print(buf[i],HEX);
-		//Serial.print(" ");
-	}
+	// for(int i = 0; i<length; i++){
+	// 	Serial.write(buf[i]);
+	// 	//Serial.print(buf[i],HEX);
+	// 	//Serial.print(" ");
+	// }
 	//Serial.println(".");
 
 	// Serial.print("sizeof(buf)=");Serial.print(sizeof(buf));Serial.println(".");
@@ -246,7 +321,37 @@ int Stim::serial_write_array(uint8_t buf[], int length) {
 	// int size1 = sizeof buf;
 	// Serial.print("sizeof_2ndm=");Serial.print(size1);Serial.println(".");
 
-	delay(50);
+
+	switch (_uart_channel_id) {
+
+		case STIM_CHANNEL_UART0:
+			for(int i = 0; i<length; i++){
+				Serial.write(buf[i]);
+			}
+			break;
+
+		#if defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__)
+		//Code in here will only be compiled if an Arduino Mega is used.
+
+			case STIM_CHANNEL_UART1:
+				for(int i = 0; i<length; i++){
+					Serial1.write(buf[i]);
+				}
+				break;
+
+			case STIM_CHANNEL_UART3:
+				for(int i = 0; i<length; i++){
+					Serial3.write(buf[i]);
+				}
+				break;
+		#endif
+
+		default:
+			_stim_error |= STIM_ERROR_SERIAL_ERROR;
+			break;
+	}
+
+	//delay(50);
 	return Serial;
 }
 
@@ -397,7 +502,8 @@ int Stim::cmd_crt_evnt( uint8_t sched_id,
 // UECU Change Event Parameter Command
 int Stim::cmd_set_evnt( uint8_t event_id,
                         uint8_t pulse_width,
-                        uint8_t amplitude) {
+                        uint8_t amplitude,
+                        uint8_t zone) {
 	// calculate message size
 	int size = CHANGE_EVENT_PARAMS_MSG_LEN + UECU_MSG_EXTRAL_LEN;
 	// build message content
@@ -409,7 +515,7 @@ int Stim::cmd_set_evnt( uint8_t event_id,
 		event_id,
 		pulse_width,
 		amplitude,
-		0x00, //Param?
+		zone, //Param[3] not implemented
 		0x00
 	};
 
