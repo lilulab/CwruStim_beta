@@ -17,7 +17,6 @@ initialFNS_manual2users
 % Determine absolute max pulse width levels for each channel:
 stim_patterns.max_pw = uint8(maxPW);
 
-% Resize matrices for use in Simulink model:
 % left step percentage gait cycle
 stim_patterns.step_lft_pct = uint8(GCl);
 
@@ -60,25 +59,69 @@ stim_patterns.sit_pw = uint8(sitstimpw);
 fid = fopen('StimPattern.h', 'w');
 
 % print a comment title, followed by a blank line
-fprintf(fid, '// StimPattern.h - Head file for storage Stim Patterns.\n');
-fprintf(fid, '// Created by Lu Li (lxl361@case), SEP, 2015.\n');
-fprintf(fid, '// Version 1.0\n');
-fprintf(fid, '// Repo: https://github.com/lilulab/CwruStim_beta\n\n');
+fprintf(fid, '// StimPattern.h - Head file for storage Stim Patterns.\r\n');
+fprintf(fid, '// Created by Lu Li (lxl361@case), SEP, 2015.\r\n');
+fprintf(fid, '// Version 1.0\r\n');
+fprintf(fid, '// Repo: https://github.com/lilulab/CwruStim_beta\r\n\r\n');
 
 % print include
-fprintf(fid, '#include <stdint.h>;\n\n');
+fprintf(fid, '#include <stdint.h>;\r\n\r\n');
 
-% print values
-fprintf(fid, 'int8_t max_pw = [');
-temp_size = size(stim_patterns.max_pw);
-for i=1:temp_size(1)-1
-    fprintf(fid, '%d, ', stim_patterns.max_pw(i));
-end
-fprintf(fid, '%d];\n\n', stim_patterns.max_pw(temp_size(1)));
+% clear memory size counter.
+Mem_size = 0;
 
-fprintf(fid, '// File End\n\n');
+% Print data array
+% Mem_size = Mem_size + printCppArray( file_id, data_src, data_type )
 
+% Determine absolute max pulse width levels for each channel:
+Mem_size = Mem_size + printCppArray( fid, stim_patterns.max_pw, 'uint8_t' );
+
+% left step percentage gait cycle
+Mem_size = Mem_size + printCppArray( fid, stim_patterns.step_lft_pct, 'uint8_t' );
+
+% left step pulse width (ms)
+Mem_size = Mem_size + printCppArray( fid, stim_patterns.step_lft_pw, 'uint8_t' );
+
+% right step percentage gait cycle
+Mem_size = Mem_size + printCppArray( fid, stim_patterns.step_rst_pct, 'uint8_t' );
+
+% right step pulse width (ms)
+Mem_size = Mem_size + printCppArray( fid, stim_patterns.step_rst_pw, 'uint8_t' );
+
+% right off percentage gait cycle
+%GCro
+
+% right off pulse width (ms)
+%PWro
+
+% left down percentage gait cycle
+%GCld
+
+% left down pulse width (ms)
+%PWld
+
+% stand percentage
+Mem_size = Mem_size + printCppArray( fid, stim_patterns.stand_pct, 'uint8_t' );
+
+% stand pulse width (ms)
+Mem_size = Mem_size + printCppArray( fid, stim_patterns.stand_pw, 'uint8_t' );
+
+% sit percentage
+Mem_size = Mem_size + printCppArray( fid, stim_patterns.sit_pct, 'uint8_t' );
+
+% sit pulse width (ms)
+Mem_size = Mem_size + printCppArray( fid, stim_patterns.sit_pw, 'uint8_t' );
+
+% print file ending
+fprintf(fid, '// File End\r\n\r\n');
+
+% close file
 fclose(fid);
-
-print_c_array(123);
+disp('-------------------------------------------------------------');
+disp('Stim Pattern C Head File saved.');
+str = ['    - Use EEPROM memory total size = ',num2str(Mem_size(1)),'KB.'];
+disp(str);
+disp('Note:');
+disp('    - Arduino Uno:    1KB EEPROM storage.');
+disp('    - Arduino Mega:   4KB EEPROM storage.');
 
