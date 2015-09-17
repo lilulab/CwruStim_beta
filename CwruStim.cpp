@@ -74,11 +74,27 @@ int Stim::init(int mode) {
 
 	delay(50); //wait UECU power up
 
-    // Reset Halt Message to reset Stim board
-	this->cmd_halt_rset(UECU_RESET);
+	switch (mode) {
+		case STIM_MODE_SURF:
+			// Set message destination address
+			MSG_DES_ADDR = MSG_DES_ADDR_SURF;
+		    // Reset Halt Message to reset Stim board
+			this->cmd_halt_rset(UECU_RESET);
 
-	// Delete Schedule
-	this->cmd_del_sched(1); // Delete schedule 1
+			// Delete Schedule
+			this->cmd_del_sched(1); // Delete schedule 1
+			break;
+		case STIM_MODE_PERC:
+			// Do nothing, since Perc board don't need to channel setup
+			// Set message destination address
+			MSG_DES_ADDR = MSG_DES_ADDR_PERC;
+			break;
+		case STIM_MODE_DEFAULT:
+			return -1;
+			break;
+		default:
+			break;
+		}
 
 	return 1;
 }
@@ -91,89 +107,101 @@ int Stim::config(int setting) {
 	_setting = setting;
 	// //Serial.println("Exit Stim Config");
 
-	// Channels setup
-	//cmd_chan_set(port_chn_id, amp_limit, pw_limit, ip_delay, asp_ratio, anode_cathode);
-	
-	// Bipolar 01
-	this->cmd_chan_set(	0,		// port_chn_id =  0
-						100,	// amp_limit = 100mA
-						0xFA,	// pw_limit = 250usec
-						100,	// ip_delay = 100usec
-						0x11, 	// asp_ratio = 1:1
-						0x01);	//anode = 0, cathode = 1, for bipolar mode);
+	// For Surface board
+	if (_mode == STIM_MODE_SURF)
+	{
+		// Channels setup
+		//cmd_chan_set(port_chn_id, amp_limit, pw_limit, ip_delay, asp_ratio, anode_cathode);
+		
+		// Bipolar 01
+		this->cmd_chan_set(	0,		// port_chn_id =  0
+							100,	// amp_limit = 100mA
+							0xFA,	// pw_limit = 250usec
+							100,	// ip_delay = 100usec
+							0x11, 	// asp_ratio = 1:1
+							0x01);	//anode = 0, cathode = 1, for bipolar mode);
 
-	// Bipolar 23
-	this->cmd_chan_set(	1,		// port_chn_id =  0
-						100,	// amp_limit = 100mA
-						0xFA,	// pw_limit = 250usec
-						100,	// ip_delay = 100usec
-						0x11, 	// asp_ratio = 1:1
-						0x23);	//anode = 2, cathode = 3, for bipolar mode);
+		// Bipolar 23
+		this->cmd_chan_set(	1,		// port_chn_id =  0
+							100,	// amp_limit = 100mA
+							0xFA,	// pw_limit = 250usec
+							100,	// ip_delay = 100usec
+							0x11, 	// asp_ratio = 1:1
+							0x23);	//anode = 2, cathode = 3, for bipolar mode);
 
-	// Bipolar 45
-	this->cmd_chan_set(	2,		// port_chn_id =  0
-						100,	// amp_limit = 100mA
-						0xFA,	// pw_limit = 250usec
-						100,	// ip_delay = 100usec
-						0x11, 	// asp_ratio = 1:1
-						0x45);	//anode = 0, cathode = 1, for bipolar mode);
+		// Bipolar 45
+		this->cmd_chan_set(	2,		// port_chn_id =  0
+							100,	// amp_limit = 100mA
+							0xFA,	// pw_limit = 250usec
+							100,	// ip_delay = 100usec
+							0x11, 	// asp_ratio = 1:1
+							0x45);	//anode = 0, cathode = 1, for bipolar mode);
 
-	// Bipolar 67
-	this->cmd_chan_set(	3,		// port_chn_id =  0
-						100,	// amp_limit = 100mA
-						0xFA,	// pw_limit = 250usec
-						100,	// ip_delay = 100usec
-						0x11, 	// asp_ratio = 1:1
-						0x67);	//anode = 0, cathode = 1, for bipolar mode);
+		// Bipolar 67
+		this->cmd_chan_set(	3,		// port_chn_id =  0
+							100,	// amp_limit = 100mA
+							0xFA,	// pw_limit = 250usec
+							100,	// ip_delay = 100usec
+							0x11, 	// asp_ratio = 1:1
+							0x67);	//anode = 0, cathode = 1, for bipolar mode);
 
 
 
-	// Create Schedule
-	// this->cmd_crt_sched(sync_signal, duration);
-	this->cmd_crt_sched(UECU_SYNC_MSG, 29);	// Sync signal = 0xAA, duration 29msec.
+		// Create Schedule
+		// this->cmd_crt_sched(sync_signal, duration);
+		this->cmd_crt_sched(UECU_SYNC_MSG, 29);	// Sync signal = 0xAA, duration 29msec.
 
-	// Create Events
-	// this->cmd_crt_evnt(sched_id, delay, priority, event_type, port_chn_id);
+		// Create Events
+		// this->cmd_crt_evnt(sched_id, delay, priority, event_type, port_chn_id);
 
-	// Create Event 1 for port_chn_id 0 in sched_id 1 
-	this->cmd_crt_evnt( 1,	// sched_id = 1
-						0,	// delay = 0msec
-						0,	// priority = 0
-						3,	// event_type = 3, for for Stimulus Event
-						0,	// port_chn_id = 0;
-						0,	// pulse_width set to 0,
-                      	0,	// amplitude set to 0,
-                      	0);	// zone not implemented;
+		// Create Event 1 for port_chn_id 0 in sched_id 1 
+		this->cmd_crt_evnt( 1,	// sched_id = 1
+							0,	// delay = 0msec
+							0,	// priority = 0
+							3,	// event_type = 3, for for Stimulus Event
+							0,	// port_chn_id = 0;
+							0,	// pulse_width set to 0,
+	                      	0,	// amplitude set to 0,
+	                      	0);	// zone not implemented;
 
-	// Create Event 2 for port_chn_id 0 in sched_id 1 
-	this->cmd_crt_evnt( 1,	// sched_id = 1
-						0,	// delay = 0msec
-						0,	// priority = 0
-						3,	// event_type = 3, for for Stimulus Event
-						1,	// port_chn_id = 1;
-						0,	// pulse_width set to 0,
-                      	0,	// amplitude set to 0,
-                      	0);	// zone not implemented;
+		// Create Event 2 for port_chn_id 0 in sched_id 1 
+		this->cmd_crt_evnt( 1,	// sched_id = 1
+							0,	// delay = 0msec
+							0,	// priority = 0
+							3,	// event_type = 3, for for Stimulus Event
+							1,	// port_chn_id = 1;
+							0,	// pulse_width set to 0,
+	                      	0,	// amplitude set to 0,
+	                      	0);	// zone not implemented;
 
-	// Create Event 3 for port_chn_id 0 in sched_id 1 
-	this->cmd_crt_evnt( 1,	// sched_id = 1
-						0,	// delay = 0msec
-						0,	// priority = 0
-						3,	// event_type = 3, for for Stimulus Event
-						2,	// port_chn_id = 2;
-						0,	// pulse_width set to 0,
-                      	0,	// amplitude set to 0,
-                      	0);	// zone not implemented;
+		// Create Event 3 for port_chn_id 0 in sched_id 1 
+		this->cmd_crt_evnt( 1,	// sched_id = 1
+							0,	// delay = 0msec
+							0,	// priority = 0
+							3,	// event_type = 3, for for Stimulus Event
+							2,	// port_chn_id = 2;
+							0,	// pulse_width set to 0,
+	                      	0,	// amplitude set to 0,
+	                      	0);	// zone not implemented;
 
-	// Create Event 4 for port_chn_id 0 in sched_id 1 
-	this->cmd_crt_evnt( 1,	// sched_id = 1
-						0,	// delay = 0msec
-						0,	// priority = 0
-						3,	// event_type = 3, for for Stimulus Event
-						3,	// port_chn_id = 3;
-						0,	// pulse_width set to 0,
-                      	0,	// amplitude set to 0,
-                      	0);	// zone not implemented;
+		// Create Event 4 for port_chn_id 0 in sched_id 1 
+		this->cmd_crt_evnt( 1,	// sched_id = 1
+							0,	// delay = 0msec
+							0,	// priority = 0
+							3,	// event_type = 3, for for Stimulus Event
+							3,	// port_chn_id = 3;
+							0,	// pulse_width set to 0,
+	                      	0,	// amplitude set to 0,
+	                      	0);	// zone not implemented;
+	} 
+	// For Perc board
+	else if (_mode = STIM_MODE_PERC){
+		// Create Schedule
+		// Create Event 1-12
+	}
+	else{
+		return -1;
+	}
 
 	return 1;
 }
@@ -285,7 +313,6 @@ int Stim::serial_write_array(uint8_t buf[], int length) {
 
 		#if defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__)
 		//Code in here will only be compiled if an Arduino Mega is used.
-
 			case STIM_CHANNEL_UART1:
 				for(int i = 0; i<length; i++){
 					Serial1.write(buf[i]);
