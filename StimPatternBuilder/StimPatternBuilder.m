@@ -74,19 +74,19 @@ Mem_size = 0;
 % Mem_size = Mem_size + printCppArray( file_id, data_src, data_type )
 
 % Determine absolute max pulse width levels for each channel:
-Mem_size = Mem_size + printCppArray( fid, stim_patterns.max_pw, 'uint8_t' );
+Mem_size = Mem_size + printCppArray( fid, 'max_pw' , stim_patterns.max_pw, 'uint8_t' );
 
 % left step percentage gait cycle
-Mem_size = Mem_size + printCppArray( fid, stim_patterns.step_lft_pct, 'uint8_t' );
+Mem_size = Mem_size + printCppArray( fid, 'step_lft_pct' , stim_patterns.step_lft_pct, 'uint8_t' );
 
 % left step pulse width (ms)
-Mem_size = Mem_size + printCppArray( fid, stim_patterns.step_lft_pw, 'uint8_t' );
+Mem_size = Mem_size + printCppArray( fid, 'step_lft_pw' , stim_patterns.step_lft_pw, 'uint8_t' );
 
 % right step percentage gait cycle
-Mem_size = Mem_size + printCppArray( fid, stim_patterns.step_rst_pct, 'uint8_t' );
+Mem_size = Mem_size + printCppArray( fid, 'step_rst_pct' , stim_patterns.step_rst_pct, 'uint8_t' );
 
 % right step pulse width (ms)
-Mem_size = Mem_size + printCppArray( fid, stim_patterns.step_rst_pw, 'uint8_t' );
+Mem_size = Mem_size + printCppArray( fid, 'step_rst_pw' , stim_patterns.step_rst_pw, 'uint8_t' );
 
 % right off percentage gait cycle
 %GCro
@@ -101,16 +101,16 @@ Mem_size = Mem_size + printCppArray( fid, stim_patterns.step_rst_pw, 'uint8_t' )
 %PWld
 
 % stand percentage
-Mem_size = Mem_size + printCppArray( fid, stim_patterns.stand_pct, 'uint8_t' );
+Mem_size = Mem_size + printCppArray( fid, 'stand_pct' , stim_patterns.stand_pct, 'uint8_t' );
 
 % stand pulse width (ms)
-Mem_size = Mem_size + printCppArray( fid, stim_patterns.stand_pw, 'uint8_t' );
+Mem_size = Mem_size + printCppArray( fid, 'stand_pw' , stim_patterns.stand_pw, 'uint8_t' );
 
 % sit percentage
-Mem_size = Mem_size + printCppArray( fid, stim_patterns.sit_pct, 'uint8_t' );
+Mem_size = Mem_size + printCppArray( fid, 'sit_pct' , stim_patterns.sit_pct, 'uint8_t' );
 
 % sit pulse width (ms)
-Mem_size = Mem_size + printCppArray( fid, stim_patterns.sit_pw, 'uint8_t' );
+Mem_size = Mem_size + printCppArray( fid, 'sit_pw' , stim_patterns.sit_pw, 'uint8_t' );
 
 % print file ending
 fprintf(fid, '// File End\r\n\r\n');

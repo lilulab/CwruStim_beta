@@ -1,10 +1,12 @@
-function [ data_len ] = printCppArray( file_id, data_src, data_type )
+function [ data_len ] = printCppArray( file_id, var_name, data_src, data_type )
 %UNTITLED2 Summary of this function goes here
 %   Detailed explanation goes here
 
 % print array header
 fprintf(file_id, data_type);
-fprintf(file_id, ' max_pw = [');
+fprintf(file_id, ' ');
+fprintf(file_id, var_name);
+fprintf(file_id, ' = [');
 
 % get size of the data set
 data_len = size(data_src);
