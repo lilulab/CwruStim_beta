@@ -8,10 +8,10 @@
 
 #include "CwruStim.h"
 
-Stim stim(STIM_CHANNEL_UART0);
+Stim stim(STIM_CHANNEL_UART1);
 
-static int led_pin = 13; // for official Arduino boards
-//static int led_pin = 40 // for official N-TREK boards
+//static int led_pin = 13; // for official Arduino boards
+static int led_pin = 40; // for official N-TREK boards
 
 // Pulse width and Amplitude value
 uint8_t pulse_width[4] = {0,0,0,0};

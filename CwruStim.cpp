@@ -31,7 +31,7 @@ Stim::Stim(int uart_channel_id) {
 
 		case STIM_CHANNEL_UART0:
 			//Use UART1(TX1&RX1) port to connect Stim Board
-			//Serial.begin(9600);
+			Serial.begin(9600);
 			while (!Serial) {_stim_error |= STIM_ERROR_SERIAL_ERROR;} //Set Error bit
 			if (Serial) _stim_error &= ~STIM_NO_ERROR; //Clear Error bit
 			break;
@@ -93,6 +93,7 @@ int Stim::init(int mode) {
 			return -1;
 			break;
 		default:
+			return -1;
 			break;
 		}
 
@@ -155,49 +156,200 @@ int Stim::config(int setting) {
 		// this->cmd_crt_evnt(sched_id, delay, priority, event_type, port_chn_id);
 
 		// Create Event 1 for port_chn_id 0 in sched_id 1 
-		this->cmd_crt_evnt( 1,	// sched_id = 1
+		this->cmd_crt_evnt( 
+						  1,	// sched_id = 1
 							0,	// delay = 0msec
 							0,	// priority = 0
 							3,	// event_type = 3, for for Stimulus Event
 							0,	// port_chn_id = 0;
 							0,	// pulse_width set to 0,
-	                      	0,	// amplitude set to 0,
-	                      	0);	// zone not implemented;
+	            0,	// amplitude set to 0,
+	            0);	// zone not implemented;
 
 		// Create Event 2 for port_chn_id 0 in sched_id 1 
-		this->cmd_crt_evnt( 1,	// sched_id = 1
+		this->cmd_crt_evnt( 
+						  1,	// sched_id = 1
 							0,	// delay = 0msec
 							0,	// priority = 0
 							3,	// event_type = 3, for for Stimulus Event
 							1,	// port_chn_id = 1;
 							0,	// pulse_width set to 0,
-	                      	0,	// amplitude set to 0,
-	                      	0);	// zone not implemented;
+	            0,	// amplitude set to 0,
+	            0);	// zone not implemented;
 
 		// Create Event 3 for port_chn_id 0 in sched_id 1 
-		this->cmd_crt_evnt( 1,	// sched_id = 1
+		this->cmd_crt_evnt( 
+						  1,	// sched_id = 1
 							0,	// delay = 0msec
 							0,	// priority = 0
 							3,	// event_type = 3, for for Stimulus Event
 							2,	// port_chn_id = 2;
 							0,	// pulse_width set to 0,
-	                      	0,	// amplitude set to 0,
-	                      	0);	// zone not implemented;
+	            0,	// amplitude set to 0,
+	            0);	// zone not implemented;
 
 		// Create Event 4 for port_chn_id 0 in sched_id 1 
-		this->cmd_crt_evnt( 1,	// sched_id = 1
+		this->cmd_crt_evnt( 
+						  1,	// sched_id = 1
 							0,	// delay = 0msec
 							0,	// priority = 0
 							3,	// event_type = 3, for for Stimulus Event
 							3,	// port_chn_id = 3;
 							0,	// pulse_width set to 0,
-	                      	0,	// amplitude set to 0,
-	                      	0);	// zone not implemented;
+	            0,	// amplitude set to 0,
+	            0);	// zone not implemented;
 	} 
 	// For Perc board
 	else if (_mode = STIM_MODE_PERC){
-		// Create Schedule
-		// Create Event 1-12
+		// Create Schedule ------------------------------
+		// crt_sched	: 01 80 10 03 AA 00 1D A3 
+
+		// this->cmd_crt_sched(sync_signal, duration);
+		this->cmd_crt_sched(UECU_SYNC_MSG, 29);	// Sync signal = 0xAA, duration 29msec (0d29 = 0x1D).
+
+		// Create Event 1-12  ----------------------------------
+		// crt_evnt1	: 01 80 15 09 01 00 00 00 03 00 50 10 00 FB
+		// crt_evnt2	: 01 80 15 09 01 00 05 00 03 01 80 15 00 C0
+		// ...
+		// crt_evnt12	: 01 80 15 09 01 00 0F 00 03 0B F0 26 00 2B
+
+		// this->cmd_crt_evnt(sched_id, delay, priority, event_type, port_chn_id);
+		// Create Event 1 for port_chn_id 0 in sched_id 1 
+		this->cmd_crt_evnt( 
+						  1,	// sched_id = 1
+							0,	// delay = 0msec
+							0,	// priority = 0
+							3,	// event_type = 3, for for Stimulus Event
+							0,	// port_chn_id = 0;
+							0x50,	// pulse_width set to 0,
+	            0x10,	// amplitude set to 0,
+	            0);	// zone not implemented;
+
+		// Create Event 2 for port_chn_id 0 in sched_id 1 
+		this->cmd_crt_evnt( 
+						  1,	// sched_id = 1
+							0x05,	// delay = 5msec
+							0,	// priority = 0
+							3,	// event_type = 3, for for Stimulus Event
+							1,	// port_chn_id = 1;
+							0x80,	// pulse_width set to 0,
+	            0x15,	// amplitude set to 0,
+	            0);	// zone not implemented;
+
+		// Create Event 3 for port_chn_id 0 in sched_id 1 
+		this->cmd_crt_evnt( 
+						  1,	// sched_id = 1
+							0x0A,	// delay = 10msec
+							0,	// priority = 0
+							3,	// event_type = 3, for for Stimulus Event
+							2,	// port_chn_id = 2;
+							0xB0,	// pulse_width set to 0,
+	            0x20,	// amplitude set to 0,
+	            0);	// zone not implemented;
+
+		// Create Event 4 for port_chn_id 0 in sched_id 1 
+		this->cmd_crt_evnt( 
+						  1,	// sched_id = 1
+							0x0F,	// delay = 15msec
+							0,	// priority = 0
+							3,	// event_type = 3, for for Stimulus Event
+							3,	// port_chn_id = 3;
+							0xF0,	// pulse_width set to 0,
+	            0x26,	// amplitude set to 0,
+	            0);	// zone not implemented;
+
+		// Create Event 5 for port_chn_id 0 in sched_id 1 
+		this->cmd_crt_evnt( 
+						  1,	// sched_id = 1
+							0,	// delay = 0msec
+							0,	// priority = 0
+							3,	// event_type = 3, for for Stimulus Event
+							4,	// port_chn_id = 4;
+							0x50,	// pulse_width set to 0,
+	            0x10,	// amplitude set to 0,
+	            0);	// zone not implemented;
+
+		// Create Event 6 for port_chn_id 0 in sched_id 1 
+		this->cmd_crt_evnt( 
+						  1,	// sched_id = 1
+							0x05,	// delay = 5msec
+							0,	// priority = 0
+							3,	// event_type = 3, for for Stimulus Event
+							5,	// port_chn_id = 5;
+							0x80,	// pulse_width set to 0,
+	            0x15,	// amplitude set to 0,
+	            0);	// zone not implemented;
+
+		// Create Event 7 for port_chn_id 0 in sched_id 1 
+		this->cmd_crt_evnt( 
+						  1,	// sched_id = 1
+							0x0A,	// delay = 10msec
+							0,	// priority = 0
+							3,	// event_type = 3, for for Stimulus Event
+							6,	// port_chn_id = 6;
+							0xB0,	// pulse_width set to 0,
+	            0x20,	// amplitude set to 0,
+	            0);	// zone not implemented;
+
+		// Create Event 8 for port_chn_id 0 in sched_id 1 
+		this->cmd_crt_evnt( 
+						  1,	// sched_id = 1
+							0x0F,	// delay = 15msec
+							0,	// priority = 0
+							3,	// event_type = 3, for for Stimulus Event
+							7,	// port_chn_id = 7;
+							0xF0,	// pulse_width set to 0,
+	            0x26,	// amplitude set to 0,
+	            0);	// zone not implemented;
+
+		// Create Event 9 for port_chn_id 0 in sched_id 1 
+		this->cmd_crt_evnt( 
+						  1,	// sched_id = 1
+							0,	// delay = 0msec
+							0,	// priority = 0
+							3,	// event_type = 3, for for Stimulus Event
+							8,	// port_chn_id = 8;
+							0x50,	// pulse_width set to 0,
+	            0x10,	// amplitude set to 0,
+	            0);	// zone not implemented;
+
+		// Create Event 10 for port_chn_id 0 in sched_id 1 
+		this->cmd_crt_evnt( 
+						  1,	// sched_id = 1
+							0x05,	// delay = 5msec
+							0,	// priority = 0
+							3,	// event_type = 3, for for Stimulus Event
+							9,	// port_chn_id = 9;
+							0x80,	// pulse_width set to 0,
+	            0x15,	// amplitude set to 0,
+	            0);	// zone not implemented;
+
+		// Create Event 11 for port_chn_id 0 in sched_id 1 
+		this->cmd_crt_evnt( 
+						  1,	// sched_id = 1
+							0x0A,	// delay = 10msec
+							0,	// priority = 0
+							3,	// event_type = 3, for for Stimulus Event
+							10,	// port_chn_id = 10;
+							0xB0,	// pulse_width set to 0,
+	            0x20,	// amplitude set to 0,
+	            0);	// zone not implemented;
+
+		// Create Event 12 for port_chn_id 0 in sched_id 1 
+		this->cmd_crt_evnt( 
+						  1,	// sched_id = 1
+							0x0F,	// delay = 15msec
+							0,	// priority = 0
+							3,	// event_type = 3, for for Stimulus Event
+							11,	// port_chn_id = 11;
+							0xF0,	// pulse_width set to 0,
+	            0x26,	// amplitude set to 0,
+	            0);	// zone not implemented;
+
+		// Create Sync Message ----------------------------------
+		// sync_msg1	: 01 80 1B 01 AA B7
+
+
 	}
 	else{
 		return -1;
@@ -337,9 +489,9 @@ int Stim::serial_write_array(uint8_t buf[], int length) {
 
 // Retun check sum byte
 uint8_t Stim::checksum(uint8_t vals[], int length){
-  uint8_t csum = 0;
+  uint16_t csum = 0;
   for(int i=0; i<length-1; i++) {
-    csum += vals[i];
+    csum += (uint16_t)vals[i];
   }
   csum = ((0x00FF & csum) + (csum >> 8))^0xFF;
   return csum;
@@ -471,7 +623,6 @@ int Stim::cmd_crt_evnt( uint8_t sched_id,
 		pulse_width, //Param[1]
 		amplitude, //Param[2]
 		zone, //Param[3] not implemented
-		0x00
 	};
 
 	// Insert checksum byte
