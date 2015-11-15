@@ -19,6 +19,13 @@ int Stim::_dir = 1;
 int Stim::_min = 0x00;
 int Stim::_max = 0xFA;
 
+// Sync messages
+int Stim::_PERC_8CH_SYNC_MSG[8] = {0xAA, 0xBB, 0xCC, 0xDD, 0xEE, 0xFF, 0x11, 0x22};
+
+// Inter phase interval
+// CHECKLIST: Need to update this later according to gait pattern file!
+int Stim::_PERC_8CH_IPI[8] = {30, 30, 30, 30, 30, 30, 30, 30};
+
 // Stim constructor and UART selector
 Stim::Stim(int uart_channel_id) {
 	// Initialize the NTREK ECB to connect the Stim Board
@@ -89,6 +96,12 @@ int Stim::init(int mode) {
 			// Set message destination address
 			MSG_DES_ADDR = MSG_DES_ADDR_PERC;
 			break;
+
+		case STIM_MODE_PERC_8CH_MULTI_SCHEDULE:		
+			// same as Perc normal
+			MSG_DES_ADDR = MSG_DES_ADDR_PERC;
+			break;
+
 		case STIM_MODE_DEFAULT:
 			return -1;
 			break;
@@ -364,7 +377,8 @@ int Stim::config(int setting) {
 			// QUESTION: setup 8 schedules than 8 events, or do it like below?
 
 			// Create schedule
-			this->cmd_crt_sched(PERC_8CH_SYNC_MSG[i], UECU_DELAY_SYNC);	// Sync signal, duration 30msec.
+			// CHECKLIST: Need to set IPI array first!
+			this->cmd_crt_sched(_PERC_8CH_SYNC_MSG[i], _PERC_8CH_IPI[i]);	// Sync signal, duration 30msec.
 
 			delay(UECU_DELAY_SETUP);
 
