@@ -351,6 +351,42 @@ int Stim::config(int setting) {
 
 
 	}
+
+	// multi scheduler for percutaneous stimulation board
+	else if (_mode = STIM_MODE_PERC_8CH_MULTI_SCHEDULE){
+		// Create Schedule ------------------------------
+		// crt_sched	: 01 80 10 03 AA 00 1D A3 
+
+		// this->cmd_crt_sched(sync_signal, duration);
+		// Create 8 schedules
+		for (int i=0; i<8; i++) {
+
+			// QUESTION: setup 8 schedules than 8 events, or do it like below?
+
+			// Create schedule
+			this->cmd_crt_sched(PERC_8CH_SYNC_MSG[i], UECU_DELAY_SYNC);	// Sync signal, duration 30msec.
+
+			delay(UECU_DELAY_SETUP);
+
+			// Create event 
+			// this->cmd_crt_evnt(sched_id, delay, priority, event_type, port_chn_id);
+			// Create Event 1 for port_chn_id 0 in sched_id 1 
+			this->cmd_crt_evnt( 
+							  i+1,	// sched_id 1 to 8
+								i*2,	// delay every 2ms. (0,2,4,6, ...)
+								0,	// priority = 0
+								3,	// event_type = 3, for for Stimulus Event
+								i,	// port_chn_id = 0;
+								0x00,	// pulse_width set to 0,
+		            0x26,	// amplitude set to 0,
+		            0);	// zone not implemented;
+		}
+
+		delay(UECU_DELAY_SETUP);
+
+		// TODO: Send 8 Sync msgs here or modify start func.
+
+	}
 	else{
 		return -1;
 	}
