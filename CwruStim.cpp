@@ -623,6 +623,7 @@ int Stim::cmd_crt_evnt( uint8_t sched_id,
 		pulse_width, //Param[1]
 		amplitude, //Param[2]
 		zone, //Param[3] not implemented
+		0x00
 	};
 
 	// Insert checksum byte
