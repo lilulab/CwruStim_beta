@@ -15,16 +15,12 @@ int Stim::_setting = 0;
 int Stim::_stim_error = 0;
 int Stim::_command = 0;
  
-int Stim::_dir = 1;
-int Stim::_min = 0x00;
-int Stim::_max = 0xFA;
-
 // Sync messages
-int Stim::_PERC_8CH_SYNC_MSG[8] = {0xAA, 0xBB, 0xCC, 0xDD, 0xEE, 0xFF, 0x11, 0x22};
+uint8_t Stim::_PERC_8CH_SYNC_MSG[8] = {0xAA, 0xBB, 0xCC, 0xDD, 0xEE, 0xFF, 0x11, 0x22};
 
 // Inter phase interval
 // CHECKLIST: Need to update this later according to gait pattern file!
-int Stim::_PERC_8CH_IPI[8] = {30, 30, 30, 30, 30, 30, 30, 30};
+uint16_t Stim::_PERC_8CH_IPI[8] = {30, 30, 30, 30, 30, 30, 30, 30};
 
 // Stim constructor and UART selector
 Stim::Stim(int uart_channel_id) {
@@ -394,7 +390,7 @@ int Stim::config(int setting) {
 								0x00,	// pulse_width set to 0,
 		            0x26,	// amplitude set to 0,
 		            0);	// zone not implemented;
-		}
+		} // end for loop
 
 		delay(UECU_DELAY_SETUP);
 
@@ -414,6 +410,20 @@ int Stim::start(uint8_t sync_signal) {
 	// Send Sync to start
 	//this->cmd_sync_msg(0xAA); // Sent Sync_message 0xAA to start schedule.
 	this->cmd_sync_msg(sync_signal); // Sent Sync_message to start schedule.
+}
+
+// Start multiple scheduler
+int Stim::start_multi_schedule(void) {
+
+	// Loop through 8 schedules
+	for (int i=0; i<8; i++) {
+		// Send Sync to start
+		this->cmd_sync_msg(_PERC_8CH_SYNC_MSG[i]); // Sent Sync_message to start schedule.
+
+		// Delay duration need to be save as IPI.
+		delay(_PERC_8CH_IPI[i]);
+	}
+
 }
 
 // Update Stim pattern via UART

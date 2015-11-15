@@ -16,6 +16,7 @@ static int led_pin = 40; // for official N-TREK boards
 // Pulse width and Amplitude value
 uint8_t pulse_width[8] = {0,0,0,0,0,0,0,0};
 uint8_t amplitude[8] = {0,0,0,0,0,0,0,0};
+uint16_t ipi[8] = {30, 30, 30, 30, 30, 30, 30, 30};
 
 void setup() {
 
@@ -40,9 +41,9 @@ void setup() {
   	*/
 
 	// Setup CwruStim Lib
-	stim.init(STIM_MODE_DEFAULT); // Initialize the Stim board and delete old schedule
-	stim.config(STIM_SETTING_DEFAULT); // Setup channels, schedule, and events
-	stim.start(UECU_SYNC_MSG); // Send start command (Sync message)
+	stim.init(STIM_MODE_PERC_8CH_MULTI_SCHEDULE); // Initialize the Stim board and delete old schedule
+	stim.config(STIM_MODE_PERC_8CH_MULTI_SCHEDULE); // Setup channels, schedule, and events
+	stim.start_multi_schedule();
 
 	// Stim Event update
 	stim.update(STIM_COMMAND_ZERO_ALL); // Set pulse width and amplitude to 0 for all four channels. 
@@ -60,11 +61,16 @@ void loop() {
 	// pulse_width[x] = ???;
 	// amplitude[x] = ???;
 
-	// stim.cmd_set_evnt( event_id, pulse_width, amplitude, zone);
-	stim.cmd_set_evnt( 1, pulse_width[0], amplitude[0], 0); // Change Event 1 for port_chn_id 0 in sched_id 1
-	stim.cmd_set_evnt( 2, pulse_width[1], amplitude[1], 0);	// Change Event 2 for port_chn_id 1 in sched_id 1
-	stim.cmd_set_evnt( 3, pulse_width[2], amplitude[2], 0);	// Change Event 3 for port_chn_id 2 in sched_id 1
-	stim.cmd_set_evnt( 4, pulse_width[3], amplitude[3], 0); // Change Event 4 for port_chn_id 3 in sched_id 1
+
+	for (int i=0; i<8; i++) {
+		// stim.cmd_set_evnt( event_id, pulse_width, amplitude, zone);
+		stim.cmd_set_evnt(i+1, pulse_width[i], amplitude[i], 0); // Change Event i+1 for port_chn_id i in sched_id i+1
+		
+		//stim.cmd_set_sched( sched_id, sync_signal, duration);
+		stim.cmd_set_sched(i+1, stim._PERC_8CH_SYNC_MSG[i], ipi[i]);
+	}
+
+
 
 	//delay(50); // delay 50ms, not requirement
 
