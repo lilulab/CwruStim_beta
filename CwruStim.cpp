@@ -20,7 +20,7 @@ uint8_t Stim::_PERC_8CH_SYNC_MSG[8] = {0xAA, 0xBB, 0xCC, 0xDD, 0xEE, 0xFF, 0x11,
 
 // Inter phase interval
 // CHECKLIST: Need to update this later according to gait pattern file!
-uint16_t Stim::_PERC_8CH_IPI[8] = {30, 30, 30, 30, 30, 30, 30, 30};
+uint16_t Stim::_PERC_8CH_IPI[8] = {30, 60, 30, 60, 30, 30, 30, 30};
 
 // Stim constructor and UART selector
 Stim::Stim(int uart_channel_id) {
@@ -381,7 +381,7 @@ int Stim::config(int setting) {
 
 			// this->cmd_crt_sched(sync_signal, duration);
 			// Create 8 schedules
-			for (int i=0; i<8; i++) {
+			for (uint8_t i=0; i<8; i++) {
 
 				// QUESTION: setup 8 schedules than 8 events, or do it like below?
 
@@ -401,9 +401,20 @@ int Stim::config(int setting) {
 									0,	// priority = 0
 									3,	// event_type = 3, for for Stimulus Event
 									i,	// port_chn_id = 0;
-									0x00,	// pulse_width set to 0,
+									// 0x00,	// pulse_width set to 0,
+									50,	// pulse_width set to 0,
 			            0x26,	// amplitude set to 0x26,
 			            0);	// zone not implemented;
+
+				Serial.print("In config loop, ");
+				Serial.print("i = ");
+				Serial.print(i,HEX);
+				Serial.print(";\t IPI = ");
+				Serial.println(_PERC_8CH_IPI[i],HEX);
+				Serial.println(" ");
+
+
+
 			} // end for loop
 
 			delay(UECU_DELAY_SETUP);
@@ -727,6 +738,15 @@ int Stim::cmd_set_evnt( uint8_t event_id,
 
 	// Insert checksum byte
 	msg[size-1] = this->checksum(msg,size);
+
+	Serial.print("In set event loop, ");
+	Serial.print("event_id = ");
+	Serial.print(event_id,HEX);
+	Serial.print(";\t pulse_width = ");
+	Serial.print(pulse_width,HEX);
+	Serial.print(";\t amplitude = ");
+	Serial.println(amplitude,HEX);
+
 
 	// Send message
 	return this->serial_write_array (msg,sizeof(msg)/sizeof(uint8_t));
