@@ -45,10 +45,20 @@ void setup() {
 
 	stim.init(STIM_MODE_PERC_8CH_MULTI_SCHEDULE); // Initialize the Stim board and delete old schedule
 	stim.config(STIM_MODE_PERC_8CH_MULTI_SCHEDULE); // Setup channels, schedule, and events
-	stim.start_multi_schedule();
+	//stim.start_multi_schedule();
+	stim.start(UECU_SYNC_MSG);
 
 	// Stim Event update
 	//stim.update(STIM_COMMAND_ZERO_ALL); // Set pulse width and amplitude to 0 for all four channels. 
+	
+	for (int i=0; i<8; i++) {	
+		//stim.cmd_set_sched( sched_id, sync_signal, duration);
+		stim.cmd_set_sched(i+1, stim._PERC_8CH_SYNC_MSG[i], ipi[i]);
+		delay(ipi[i]);
+		// stim.cmd_set_evnt( event_id, pulse_width, amplitude, zone);
+		stim.cmd_set_evnt(i+1, pulse_width[i], amplitude[i], 0); // Change Event i+1 for port_chn_id i in sched_id i+1
+		delay(UECU_DELAY_SETUP); // TODO: ask Jeremy about the mini interval for set event.
+	}
 }
 
 void loop() {
@@ -64,15 +74,6 @@ void loop() {
 	// amplitude[x] = ???;
 
 
-	for (int i=0; i<8; i++) {
-		// stim.cmd_set_evnt( event_id, pulse_width, amplitude, zone);
-		stim.cmd_set_evnt(i+1, pulse_width[i], amplitude[i], 0); // Change Event i+1 for port_chn_id i in sched_id i+1
-		delay(ipi[i]);
-		
-		//stim.cmd_set_sched( sched_id, sync_signal, duration);
-		stim.cmd_set_sched(i+1, stim._PERC_8CH_SYNC_MSG[i], ipi[i]);
-		delay(ipi[i]);
-	}
 
 
 

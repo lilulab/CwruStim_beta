@@ -387,7 +387,8 @@ int Stim::config(int setting) {
 
 				// Create schedule
 				// CHECKLIST: Need to set IPI array first!
-				this->cmd_crt_sched(_PERC_8CH_SYNC_MSG[i], _PERC_8CH_IPI[i]);	// Sync signal, duration 30msec.
+				//this->cmd_crt_sched(_PERC_8CH_SYNC_MSG[i], _PERC_8CH_IPI[i]);	// Sync signal, duration 30msec.
+				this->cmd_crt_sched(UECU_SYNC_MSG, _PERC_8CH_IPI[i]);	// Sync signal, duration 30msec.
 
 				delay(UECU_DELAY_SETUP);
 
