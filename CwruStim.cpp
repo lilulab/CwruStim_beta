@@ -20,7 +20,8 @@ uint8_t Stim::_PERC_8CH_SYNC_MSG[8] = {0xAA, 0xBB, 0xCC, 0xDD, 0xEE, 0xFF, 0x11,
 
 // Inter phase interval
 // CHECKLIST: Need to update this later according to gait pattern file!
-uint16_t Stim::_PERC_8CH_IPI[8] = {30, 60, 30, 60, 30, 30, 30, 30};
+//uint16_t Stim::_PERC_8CH_IPI[8] = {60, 30, 60, 60, 60, 30, 30, 30};
+uint16_t Stim::_PERC_8CH_IPI[8] = {30, 30, 30, 30, 30, 30, 30, 30};
 
 // Stim constructor and UART selector
 Stim::Stim(int uart_channel_id) {
@@ -402,16 +403,16 @@ int Stim::config(int setting) {
 									3,	// event_type = 3, for for Stimulus Event
 									i,	// port_chn_id = 0;
 									// 0x00,	// pulse_width set to 0,
-									50,	// pulse_width set to 0,
+									00,	// pulse_width set to 0,
 			            0x26,	// amplitude set to 0x26,
 			            0);	// zone not implemented;
 
-				Serial.print("In config loop, ");
-				Serial.print("i = ");
-				Serial.print(i,HEX);
-				Serial.print(";\t IPI = ");
-				Serial.println(_PERC_8CH_IPI[i],HEX);
-				Serial.println(" ");
+				// Serial.print("In config loop, ");
+				// Serial.print("i = ");
+				// Serial.print(i,HEX);
+				// Serial.print(";\t IPI = ");
+				// Serial.println(_PERC_8CH_IPI[i],HEX);
+				// Serial.println(" ");
 
 
 
@@ -739,13 +740,13 @@ int Stim::cmd_set_evnt( uint8_t event_id,
 	// Insert checksum byte
 	msg[size-1] = this->checksum(msg,size);
 
-	Serial.print("In set event loop, ");
-	Serial.print("event_id = ");
-	Serial.print(event_id,HEX);
-	Serial.print(";\t pulse_width = ");
-	Serial.print(pulse_width,HEX);
-	Serial.print(";\t amplitude = ");
-	Serial.println(amplitude,HEX);
+	// Serial.print("In set event loop, ");
+	// Serial.print("event_id = ");
+	// Serial.print(event_id,HEX);
+	// Serial.print(";\t pulse_width = ");
+	// Serial.print(pulse_width,HEX);
+	// Serial.print(";\t amplitude = ");
+	// Serial.println(amplitude,HEX);
 
 
 	// Send message
@@ -756,13 +757,13 @@ int Stim::cmd_set_sched( uint8_t sched_id,
                          uint8_t sync_signal,
                          uint16_t duration) {
 	// calculate message size
-	int size = CHANGE_EVENT_SCHED_MSG_LEN + UECU_MSG_EXTRAL_LEN;
+	int size = CHANGE_SCHEDULE_MSG_LEN + UECU_MSG_EXTRAL_LEN;
 	// build message content
-	uint8_t msg[CHANGE_EVENT_SCHED_MSG_LEN + UECU_MSG_EXTRAL_LEN] = 
+	uint8_t msg[CHANGE_SCHEDULE_MSG_LEN + UECU_MSG_EXTRAL_LEN] = 
 	{ 	MSG_DES_ADDR,
 		MSG_SRC_ADDR,
-		CHANGE_EVENT_SCHED_MSG,
-		CHANGE_EVENT_SCHED_MSG_LEN,
+		CHANGE_SCHEDULE_MSG,
+		CHANGE_SCHEDULE_MSG_LEN,
 		sched_id,
 		sync_signal,
 		(uint8_t)((duration >> 8) & 0x00FF),

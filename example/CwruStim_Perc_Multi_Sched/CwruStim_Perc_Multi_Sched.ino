@@ -15,9 +15,9 @@ Stim stim(STIM_CHANNEL_UART1);
 static int led_pin = 40; // for official N-TREK boards
 
 // Pulse width and Amplitude value
-uint8_t pulse_width[8] = {25,10,15,20,5,10,15,20};
+uint8_t pulse_width[8] = {25,50,100,150,25,50,100,150};
 uint8_t amplitude[8] = {38,38,38,38,38,38,38,38};
-uint16_t ipi[8] = {30, 60, 30, 60, 30, 30, 30, 30};
+uint16_t ipi[8] = {60, 50, 60, 50, 60, 50, 60, 50};
 
 void setup() {
 
@@ -73,11 +73,11 @@ void loop() {
 
 	for (int i=0; i<8; i++) {	
 		//stim.cmd_set_sched( sched_id, sync_signal, duration);
-		//stim.cmd_set_sched(i+1, UECU_SYNC_MSG, ipi[i]);
-		//delay(ipi[i]);
+		stim.cmd_set_sched(i+1, UECU_SYNC_MSG, ipi[i]);
+		delay(ipi[i]);
 		// stim.cmd_set_evnt( event_id, pulse_width, amplitude, zone);
 		stim.cmd_set_evnt(i+1, pulse_width[i], amplitude[i], 0); // Change Event i+1 for port_chn_id i in sched_id i+1
-		delay(UECU_DELAY_SETUP); // TODO: ask Jeremy about the mini interval for set event.
+		delay(1); // TODO: ask Jeremy about the mini interval for set event.
 	}
 
 
