@@ -396,12 +396,12 @@ int Stim::config(int setting) {
 				// Create Event 1 for port_chn_id 0 in sched_id 1 
 				this->cmd_crt_evnt( 
 								  i+1,	// sched_id 1 to 8
-									i*2,	// delay every 2ms. (0,2,4,6, ...)
+									(i+1)*2,	// delay every 2ms. (2,4,6, ...)
 									0,	// priority = 0
 									3,	// event_type = 3, for for Stimulus Event
 									i,	// port_chn_id = 0;
 									0x00,	// pulse_width set to 0,
-			            0x26,	// amplitude set to 0,
+			            0x26,	// amplitude set to 0x26,
 			            0);	// zone not implemented;
 			} // end for loop
 

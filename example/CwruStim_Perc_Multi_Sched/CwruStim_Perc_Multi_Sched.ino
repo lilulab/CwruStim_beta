@@ -6,7 +6,7 @@
   Repo: https://github.com/lilulab/CwruStim_beta
 */
 
-#include "CwruStim.h"
+#include <CwruStim.h>
 
 Stim stim(STIM_CHANNEL_UART1);
 // Stim stim(STIM_CHANNEL_UART0); //only use for USB-UART debugging.
@@ -15,9 +15,9 @@ Stim stim(STIM_CHANNEL_UART1);
 static int led_pin = 40; // for official N-TREK boards
 
 // Pulse width and Amplitude value
-uint8_t pulse_width[8] = {0,0,0,0,0,0,0,0};
-uint8_t amplitude[8] = {0,0,0,0,0,0,0,0};
-uint16_t ipi[8] = {30, 30, 30, 30, 30, 30, 30, 30};
+uint8_t pulse_width[8] = {5,10,15,20,5,10,15,20};
+uint8_t amplitude[8] = {38,38,38,38,38,38,38,38};
+uint16_t ipi[8] = {30, 30, 30, 30, 60, 60, 60, 60};
 
 void setup() {
 
