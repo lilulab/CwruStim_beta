@@ -56,14 +56,6 @@ void setup() {
 	// Stim Event update
 	//stim.update(STIM_COMMAND_ZERO_ALL); // Set pulse width and amplitude to 0 for all four channels. 
 	
-	for (int i=0; i<8; i++) {	
-		//stim.cmd_set_sched( sched_id, sync_signal, duration);
-		//stim.cmd_set_sched(i+1, UECU_SYNC_MSG, ipi[i]);
-		//delay(ipi[i]);
-		// stim.cmd_set_evnt( event_id, pulse_width, amplitude, zone);
-		stim.cmd_set_evnt(i+1, pulse_width[i], amplitude[i], 0); // Change Event i+1 for port_chn_id i in sched_id i+1
-		delay(UECU_DELAY_SETUP); // TODO: ask Jeremy about the mini interval for set event.
-	}
 }
 
 void loop() {
@@ -79,13 +71,21 @@ void loop() {
 	// amplitude[x] = ???;
 
 
+	for (int i=0; i<8; i++) {	
+		//stim.cmd_set_sched( sched_id, sync_signal, duration);
+		//stim.cmd_set_sched(i+1, UECU_SYNC_MSG, ipi[i]);
+		//delay(ipi[i]);
+		// stim.cmd_set_evnt( event_id, pulse_width, amplitude, zone);
+		stim.cmd_set_evnt(i+1, pulse_width[i], amplitude[i], 0); // Change Event i+1 for port_chn_id i in sched_id i+1
+		delay(UECU_DELAY_SETUP); // TODO: ask Jeremy about the mini interval for set event.
+	}
 
 
 
 	//delay(50); // delay 50ms, not requirement
 
 	digitalWrite(led_pin, LOW);    // turn the LED off by making the voltage LOW
-	delay(100);              // wait for 100ms, , not requirement
+	delay(900);              // wait for 100ms, , not requirement
 	
 }
 

@@ -396,7 +396,7 @@ int Stim::config(int setting) {
 				// this->cmd_crt_evnt(sched_id, delay, priority, event_type, port_chn_id);
 				// Create Event 1 for port_chn_id 0 in sched_id 1 
 				this->cmd_crt_evnt( 
-								  i+1,	// sched_id 1 to 8
+								    i+1,	// sched_id 1 to 8
 									(i+1)*2,	// delay every 2ms. (2,4,6, ...)
 									0,	// priority = 0
 									3,	// event_type = 3, for for Stimulus Event
