@@ -67,9 +67,11 @@ void loop() {
 	for (int i=0; i<8; i++) {
 		// stim.cmd_set_evnt( event_id, pulse_width, amplitude, zone);
 		stim.cmd_set_evnt(i+1, pulse_width[i], amplitude[i], 0); // Change Event i+1 for port_chn_id i in sched_id i+1
+		delay(ipi[i]);
 		
 		//stim.cmd_set_sched( sched_id, sync_signal, duration);
 		stim.cmd_set_sched(i+1, stim._PERC_8CH_SYNC_MSG[i], ipi[i]);
+		delay(ipi[i]);
 	}
 
 
