@@ -9,6 +9,7 @@
 #include "CwruStim.h"
 
 Stim stim(STIM_CHANNEL_UART1);
+// Stim stim(STIM_CHANNEL_UART0); //only use for USB-UART debugging.
 
 //static int led_pin = 13; // for official Arduino boards
 static int led_pin = 40; // for official N-TREK boards
@@ -41,12 +42,13 @@ void setup() {
   	*/
 
 	// Setup CwruStim Lib
+
 	stim.init(STIM_MODE_PERC_8CH_MULTI_SCHEDULE); // Initialize the Stim board and delete old schedule
 	stim.config(STIM_MODE_PERC_8CH_MULTI_SCHEDULE); // Setup channels, schedule, and events
 	stim.start_multi_schedule();
 
 	// Stim Event update
-	stim.update(STIM_COMMAND_ZERO_ALL); // Set pulse width and amplitude to 0 for all four channels. 
+	//stim.update(STIM_COMMAND_ZERO_ALL); // Set pulse width and amplitude to 0 for all four channels. 
 }
 
 void loop() {

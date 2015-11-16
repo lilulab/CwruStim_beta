@@ -117,291 +117,303 @@ int Stim::config(int setting) {
 	_setting = setting;
 	// //Serial.println("Exit Stim Config");
 
+	// Serial.print("_mode =  ");
+	// Serial.println(_mode);
+
+	// Serial.print("_setting =  ");
+	// Serial.println(_setting);
+
 	// For Surface board
-	if (_mode == STIM_MODE_SURF)
-	{
-		// Channels setup
-		//cmd_chan_set(port_chn_id, amp_limit, pw_limit, ip_delay, asp_ratio, anode_cathode);
-		
-		// Bipolar 01
-		this->cmd_chan_set(	0,		// port_chn_id =  0
-							100,	// amp_limit = 100mA
-							0xFA,	// pw_limit = 250usec
-							100,	// ip_delay = 100usec
-							0x11, 	// asp_ratio = 1:1
-							0x01);	//anode = 0, cathode = 1, for bipolar mode);
+	switch (setting) {
 
-		// Bipolar 23
-		this->cmd_chan_set(	1,		// port_chn_id =  0
-							100,	// amp_limit = 100mA
-							0xFA,	// pw_limit = 250usec
-							100,	// ip_delay = 100usec
-							0x11, 	// asp_ratio = 1:1
-							0x23);	//anode = 2, cathode = 3, for bipolar mode);
+		case STIM_MODE_SURF:
+			// Channels setup
+			//cmd_chan_set(port_chn_id, amp_limit, pw_limit, ip_delay, asp_ratio, anode_cathode);
+			
+			// Bipolar 01
+			this->cmd_chan_set(	0,		// port_chn_id =  0
+								100,	// amp_limit = 100mA
+								0xFA,	// pw_limit = 250usec
+								100,	// ip_delay = 100usec
+								0x11, 	// asp_ratio = 1:1
+								0x01);	//anode = 0, cathode = 1, for bipolar mode);
 
-		// Bipolar 45
-		this->cmd_chan_set(	2,		// port_chn_id =  0
-							100,	// amp_limit = 100mA
-							0xFA,	// pw_limit = 250usec
-							100,	// ip_delay = 100usec
-							0x11, 	// asp_ratio = 1:1
-							0x45);	//anode = 0, cathode = 1, for bipolar mode);
+			// Bipolar 23
+			this->cmd_chan_set(	1,		// port_chn_id =  0
+								100,	// amp_limit = 100mA
+								0xFA,	// pw_limit = 250usec
+								100,	// ip_delay = 100usec
+								0x11, 	// asp_ratio = 1:1
+								0x23);	//anode = 2, cathode = 3, for bipolar mode);
 
-		// Bipolar 67
-		this->cmd_chan_set(	3,		// port_chn_id =  0
-							100,	// amp_limit = 100mA
-							0xFA,	// pw_limit = 250usec
-							100,	// ip_delay = 100usec
-							0x11, 	// asp_ratio = 1:1
-							0x67);	//anode = 0, cathode = 1, for bipolar mode);
+			// Bipolar 45
+			this->cmd_chan_set(	2,		// port_chn_id =  0
+								100,	// amp_limit = 100mA
+								0xFA,	// pw_limit = 250usec
+								100,	// ip_delay = 100usec
+								0x11, 	// asp_ratio = 1:1
+								0x45);	//anode = 0, cathode = 1, for bipolar mode);
 
-
-
-		// Create Schedule
-		// this->cmd_crt_sched(sync_signal, duration);
-		this->cmd_crt_sched(UECU_SYNC_MSG, 29);	// Sync signal = 0xAA, duration 29msec.
-
-		// Create Events
-		// this->cmd_crt_evnt(sched_id, delay, priority, event_type, port_chn_id);
-
-		// Create Event 1 for port_chn_id 0 in sched_id 1 
-		this->cmd_crt_evnt( 
-						  1,	// sched_id = 1
-							0,	// delay = 0msec
-							0,	// priority = 0
-							3,	// event_type = 3, for for Stimulus Event
-							0,	// port_chn_id = 0;
-							0,	// pulse_width set to 0,
-	            0,	// amplitude set to 0,
-	            0);	// zone not implemented;
-
-		// Create Event 2 for port_chn_id 0 in sched_id 1 
-		this->cmd_crt_evnt( 
-						  1,	// sched_id = 1
-							0,	// delay = 0msec
-							0,	// priority = 0
-							3,	// event_type = 3, for for Stimulus Event
-							1,	// port_chn_id = 1;
-							0,	// pulse_width set to 0,
-	            0,	// amplitude set to 0,
-	            0);	// zone not implemented;
-
-		// Create Event 3 for port_chn_id 0 in sched_id 1 
-		this->cmd_crt_evnt( 
-						  1,	// sched_id = 1
-							0,	// delay = 0msec
-							0,	// priority = 0
-							3,	// event_type = 3, for for Stimulus Event
-							2,	// port_chn_id = 2;
-							0,	// pulse_width set to 0,
-	            0,	// amplitude set to 0,
-	            0);	// zone not implemented;
-
-		// Create Event 4 for port_chn_id 0 in sched_id 1 
-		this->cmd_crt_evnt( 
-						  1,	// sched_id = 1
-							0,	// delay = 0msec
-							0,	// priority = 0
-							3,	// event_type = 3, for for Stimulus Event
-							3,	// port_chn_id = 3;
-							0,	// pulse_width set to 0,
-	            0,	// amplitude set to 0,
-	            0);	// zone not implemented;
-	} 
-	// For Perc board
-	else if (_mode = STIM_MODE_PERC){
-		// Create Schedule ------------------------------
-		// crt_sched	: 01 80 10 03 AA 00 1D A3 
-
-		// this->cmd_crt_sched(sync_signal, duration);
-		this->cmd_crt_sched(UECU_SYNC_MSG, 29);	// Sync signal = 0xAA, duration 29msec (0d29 = 0x1D).
-
-		// Create Event 1-12  ----------------------------------
-		// crt_evnt1	: 01 80 15 09 01 00 00 00 03 00 50 10 00 FB
-		// crt_evnt2	: 01 80 15 09 01 00 05 00 03 01 80 15 00 C0
-		// ...
-		// crt_evnt12	: 01 80 15 09 01 00 0F 00 03 0B F0 26 00 2B
-
-		// this->cmd_crt_evnt(sched_id, delay, priority, event_type, port_chn_id);
-		// Create Event 1 for port_chn_id 0 in sched_id 1 
-		this->cmd_crt_evnt( 
-						  1,	// sched_id = 1
-							0,	// delay = 0msec
-							0,	// priority = 0
-							3,	// event_type = 3, for for Stimulus Event
-							0,	// port_chn_id = 0;
-							0x50,	// pulse_width set to 0,
-	            0x10,	// amplitude set to 0,
-	            0);	// zone not implemented;
-
-		// Create Event 2 for port_chn_id 0 in sched_id 1 
-		this->cmd_crt_evnt( 
-						  1,	// sched_id = 1
-							0x05,	// delay = 5msec
-							0,	// priority = 0
-							3,	// event_type = 3, for for Stimulus Event
-							1,	// port_chn_id = 1;
-							0x80,	// pulse_width set to 0,
-	            0x15,	// amplitude set to 0,
-	            0);	// zone not implemented;
-
-		// Create Event 3 for port_chn_id 0 in sched_id 1 
-		this->cmd_crt_evnt( 
-						  1,	// sched_id = 1
-							0x0A,	// delay = 10msec
-							0,	// priority = 0
-							3,	// event_type = 3, for for Stimulus Event
-							2,	// port_chn_id = 2;
-							0xB0,	// pulse_width set to 0,
-	            0x20,	// amplitude set to 0,
-	            0);	// zone not implemented;
-
-		// Create Event 4 for port_chn_id 0 in sched_id 1 
-		this->cmd_crt_evnt( 
-						  1,	// sched_id = 1
-							0x0F,	// delay = 15msec
-							0,	// priority = 0
-							3,	// event_type = 3, for for Stimulus Event
-							3,	// port_chn_id = 3;
-							0xF0,	// pulse_width set to 0,
-	            0x26,	// amplitude set to 0,
-	            0);	// zone not implemented;
-
-		// Create Event 5 for port_chn_id 0 in sched_id 1 
-		this->cmd_crt_evnt( 
-						  1,	// sched_id = 1
-							0,	// delay = 0msec
-							0,	// priority = 0
-							3,	// event_type = 3, for for Stimulus Event
-							4,	// port_chn_id = 4;
-							0x50,	// pulse_width set to 0,
-	            0x10,	// amplitude set to 0,
-	            0);	// zone not implemented;
-
-		// Create Event 6 for port_chn_id 0 in sched_id 1 
-		this->cmd_crt_evnt( 
-						  1,	// sched_id = 1
-							0x05,	// delay = 5msec
-							0,	// priority = 0
-							3,	// event_type = 3, for for Stimulus Event
-							5,	// port_chn_id = 5;
-							0x80,	// pulse_width set to 0,
-	            0x15,	// amplitude set to 0,
-	            0);	// zone not implemented;
-
-		// Create Event 7 for port_chn_id 0 in sched_id 1 
-		this->cmd_crt_evnt( 
-						  1,	// sched_id = 1
-							0x0A,	// delay = 10msec
-							0,	// priority = 0
-							3,	// event_type = 3, for for Stimulus Event
-							6,	// port_chn_id = 6;
-							0xB0,	// pulse_width set to 0,
-	            0x20,	// amplitude set to 0,
-	            0);	// zone not implemented;
-
-		// Create Event 8 for port_chn_id 0 in sched_id 1 
-		this->cmd_crt_evnt( 
-						  1,	// sched_id = 1
-							0x0F,	// delay = 15msec
-							0,	// priority = 0
-							3,	// event_type = 3, for for Stimulus Event
-							7,	// port_chn_id = 7;
-							0xF0,	// pulse_width set to 0,
-	            0x26,	// amplitude set to 0,
-	            0);	// zone not implemented;
-
-		// Create Event 9 for port_chn_id 0 in sched_id 1 
-		this->cmd_crt_evnt( 
-						  1,	// sched_id = 1
-							0,	// delay = 0msec
-							0,	// priority = 0
-							3,	// event_type = 3, for for Stimulus Event
-							8,	// port_chn_id = 8;
-							0x50,	// pulse_width set to 0,
-	            0x10,	// amplitude set to 0,
-	            0);	// zone not implemented;
-
-		// Create Event 10 for port_chn_id 0 in sched_id 1 
-		this->cmd_crt_evnt( 
-						  1,	// sched_id = 1
-							0x05,	// delay = 5msec
-							0,	// priority = 0
-							3,	// event_type = 3, for for Stimulus Event
-							9,	// port_chn_id = 9;
-							0x80,	// pulse_width set to 0,
-	            0x15,	// amplitude set to 0,
-	            0);	// zone not implemented;
-
-		// Create Event 11 for port_chn_id 0 in sched_id 1 
-		this->cmd_crt_evnt( 
-						  1,	// sched_id = 1
-							0x0A,	// delay = 10msec
-							0,	// priority = 0
-							3,	// event_type = 3, for for Stimulus Event
-							10,	// port_chn_id = 10;
-							0xB0,	// pulse_width set to 0,
-	            0x20,	// amplitude set to 0,
-	            0);	// zone not implemented;
-
-		// Create Event 12 for port_chn_id 0 in sched_id 1 
-		this->cmd_crt_evnt( 
-						  1,	// sched_id = 1
-							0x0F,	// delay = 15msec
-							0,	// priority = 0
-							3,	// event_type = 3, for for Stimulus Event
-							11,	// port_chn_id = 11;
-							0xF0,	// pulse_width set to 0,
-	            0x26,	// amplitude set to 0,
-	            0);	// zone not implemented;
-
-		// Create Sync Message ----------------------------------
-		// sync_msg1	: 01 80 1B 01 AA B7
+			// Bipolar 67
+			this->cmd_chan_set(	3,		// port_chn_id =  0
+								100,	// amp_limit = 100mA
+								0xFA,	// pw_limit = 250usec
+								100,	// ip_delay = 100usec
+								0x11, 	// asp_ratio = 1:1
+								0x67);	//anode = 0, cathode = 1, for bipolar mode);
 
 
-	}
 
-	// multi scheduler for percutaneous stimulation board
-	else if (_mode = STIM_MODE_PERC_8CH_MULTI_SCHEDULE){
-		// Create Schedule ------------------------------
-		// crt_sched	: 01 80 10 03 AA 00 1D A3 
+			// Create Schedule
+			// this->cmd_crt_sched(sync_signal, duration);
+			this->cmd_crt_sched(UECU_SYNC_MSG, 29);	// Sync signal = 0xAA, duration 29msec.
 
-		// this->cmd_crt_sched(sync_signal, duration);
-		// Create 8 schedules
-		for (int i=0; i<8; i++) {
+			// Create Events
+			// this->cmd_crt_evnt(sched_id, delay, priority, event_type, port_chn_id);
 
-			// QUESTION: setup 8 schedules than 8 events, or do it like below?
+			// Create Event 1 for port_chn_id 0 in sched_id 1 
+			this->cmd_crt_evnt( 
+							  1,	// sched_id = 1
+								0,	// delay = 0msec
+								0,	// priority = 0
+								3,	// event_type = 3, for for Stimulus Event
+								0,	// port_chn_id = 0;
+								0,	// pulse_width set to 0,
+		            0,	// amplitude set to 0,
+		            0);	// zone not implemented;
 
-			// Create schedule
-			// CHECKLIST: Need to set IPI array first!
-			this->cmd_crt_sched(_PERC_8CH_SYNC_MSG[i], _PERC_8CH_IPI[i]);	// Sync signal, duration 30msec.
+			// Create Event 2 for port_chn_id 0 in sched_id 1 
+			this->cmd_crt_evnt( 
+							  1,	// sched_id = 1
+								0,	// delay = 0msec
+								0,	// priority = 0
+								3,	// event_type = 3, for for Stimulus Event
+								1,	// port_chn_id = 1;
+								0,	// pulse_width set to 0,
+		            0,	// amplitude set to 0,
+		            0);	// zone not implemented;
 
-			delay(UECU_DELAY_SETUP);
+			// Create Event 3 for port_chn_id 0 in sched_id 1 
+			this->cmd_crt_evnt( 
+							  1,	// sched_id = 1
+								0,	// delay = 0msec
+								0,	// priority = 0
+								3,	// event_type = 3, for for Stimulus Event
+								2,	// port_chn_id = 2;
+								0,	// pulse_width set to 0,
+		            0,	// amplitude set to 0,
+		            0);	// zone not implemented;
 
-			// Create event 
+			// Create Event 4 for port_chn_id 0 in sched_id 1 
+			this->cmd_crt_evnt( 
+							  1,	// sched_id = 1
+								0,	// delay = 0msec
+								0,	// priority = 0
+								3,	// event_type = 3, for for Stimulus Event
+								3,	// port_chn_id = 3;
+								0,	// pulse_width set to 0,
+		            0,	// amplitude set to 0,
+		            0);	// zone not implemented;
+			return 1;
+			break;
+
+		// For Perc board
+		case STIM_MODE_PERC:
+
+				// Serial.print("EXE STIM_MODE_PERC");
+			// Create Schedule ------------------------------
+			// crt_sched	: 01 80 10 03 AA 00 1D A3 
+
+			// this->cmd_crt_sched(sync_signal, duration);
+			this->cmd_crt_sched(UECU_SYNC_MSG, 29);	// Sync signal = 0xAA, duration 29msec (0d29 = 0x1D).
+
+			// Create Event 1-12  ----------------------------------
+			// crt_evnt1	: 01 80 15 09 01 00 00 00 03 00 50 10 00 FB
+			// crt_evnt2	: 01 80 15 09 01 00 05 00 03 01 80 15 00 C0
+			// ...
+			// crt_evnt12	: 01 80 15 09 01 00 0F 00 03 0B F0 26 00 2B
+
 			// this->cmd_crt_evnt(sched_id, delay, priority, event_type, port_chn_id);
 			// Create Event 1 for port_chn_id 0 in sched_id 1 
 			this->cmd_crt_evnt( 
-							  i+1,	// sched_id 1 to 8
-								i*2,	// delay every 2ms. (0,2,4,6, ...)
+							  1,	// sched_id = 1
+								0,	// delay = 0msec
 								0,	// priority = 0
 								3,	// event_type = 3, for for Stimulus Event
-								i,	// port_chn_id = 0;
-								0x00,	// pulse_width set to 0,
+								0,	// port_chn_id = 0;
+								0x50,	// pulse_width set to 0,
+		            0x10,	// amplitude set to 0,
+		            0);	// zone not implemented;
+
+			// Create Event 2 for port_chn_id 0 in sched_id 1 
+			this->cmd_crt_evnt( 
+							  1,	// sched_id = 1
+								0x05,	// delay = 5msec
+								0,	// priority = 0
+								3,	// event_type = 3, for for Stimulus Event
+								1,	// port_chn_id = 1;
+								0x80,	// pulse_width set to 0,
+		            0x15,	// amplitude set to 0,
+		            0);	// zone not implemented;
+
+			// Create Event 3 for port_chn_id 0 in sched_id 1 
+			this->cmd_crt_evnt( 
+							  1,	// sched_id = 1
+								0x0A,	// delay = 10msec
+								0,	// priority = 0
+								3,	// event_type = 3, for for Stimulus Event
+								2,	// port_chn_id = 2;
+								0xB0,	// pulse_width set to 0,
+		            0x20,	// amplitude set to 0,
+		            0);	// zone not implemented;
+
+			// Create Event 4 for port_chn_id 0 in sched_id 1 
+			this->cmd_crt_evnt( 
+							  1,	// sched_id = 1
+								0x0F,	// delay = 15msec
+								0,	// priority = 0
+								3,	// event_type = 3, for for Stimulus Event
+								3,	// port_chn_id = 3;
+								0xF0,	// pulse_width set to 0,
 		            0x26,	// amplitude set to 0,
 		            0);	// zone not implemented;
-		} // end for loop
 
-		delay(UECU_DELAY_SETUP);
+			// Create Event 5 for port_chn_id 0 in sched_id 1 
+			this->cmd_crt_evnt( 
+							  1,	// sched_id = 1
+								0,	// delay = 0msec
+								0,	// priority = 0
+								3,	// event_type = 3, for for Stimulus Event
+								4,	// port_chn_id = 4;
+								0x50,	// pulse_width set to 0,
+		            0x10,	// amplitude set to 0,
+		            0);	// zone not implemented;
 
-		// TODO: Send 8 Sync msgs here or modify start func.
+			// Create Event 6 for port_chn_id 0 in sched_id 1 
+			this->cmd_crt_evnt( 
+							  1,	// sched_id = 1
+								0x05,	// delay = 5msec
+								0,	// priority = 0
+								3,	// event_type = 3, for for Stimulus Event
+								5,	// port_chn_id = 5;
+								0x80,	// pulse_width set to 0,
+		            0x15,	// amplitude set to 0,
+		            0);	// zone not implemented;
 
-	}
-	else{
-		return -1;
-	}
+			// Create Event 7 for port_chn_id 0 in sched_id 1 
+			this->cmd_crt_evnt( 
+							  1,	// sched_id = 1
+								0x0A,	// delay = 10msec
+								0,	// priority = 0
+								3,	// event_type = 3, for for Stimulus Event
+								6,	// port_chn_id = 6;
+								0xB0,	// pulse_width set to 0,
+		            0x20,	// amplitude set to 0,
+		            0);	// zone not implemented;
 
-	return 1;
+			// Create Event 8 for port_chn_id 0 in sched_id 1 
+			this->cmd_crt_evnt( 
+							  1,	// sched_id = 1
+								0x0F,	// delay = 15msec
+								0,	// priority = 0
+								3,	// event_type = 3, for for Stimulus Event
+								7,	// port_chn_id = 7;
+								0xF0,	// pulse_width set to 0,
+		            0x26,	// amplitude set to 0,
+		            0);	// zone not implemented;
+
+			// Create Event 9 for port_chn_id 0 in sched_id 1 
+			this->cmd_crt_evnt( 
+							  1,	// sched_id = 1
+								0,	// delay = 0msec
+								0,	// priority = 0
+								3,	// event_type = 3, for for Stimulus Event
+								8,	// port_chn_id = 8;
+								0x50,	// pulse_width set to 0,
+		            0x10,	// amplitude set to 0,
+		            0);	// zone not implemented;
+
+			// Create Event 10 for port_chn_id 0 in sched_id 1 
+			this->cmd_crt_evnt( 
+							  1,	// sched_id = 1
+								0x05,	// delay = 5msec
+								0,	// priority = 0
+								3,	// event_type = 3, for for Stimulus Event
+								9,	// port_chn_id = 9;
+								0x80,	// pulse_width set to 0,
+		            0x15,	// amplitude set to 0,
+		            0);	// zone not implemented;
+
+			// Create Event 11 for port_chn_id 0 in sched_id 1 
+			this->cmd_crt_evnt( 
+							  1,	// sched_id = 1
+								0x0A,	// delay = 10msec
+								0,	// priority = 0
+								3,	// event_type = 3, for for Stimulus Event
+								10,	// port_chn_id = 10;
+								0xB0,	// pulse_width set to 0,
+		            0x20,	// amplitude set to 0,
+		            0);	// zone not implemented;
+
+			// Create Event 12 for port_chn_id 0 in sched_id 1 
+			this->cmd_crt_evnt( 
+							  1,	// sched_id = 1
+								0x0F,	// delay = 15msec
+								0,	// priority = 0
+								3,	// event_type = 3, for for Stimulus Event
+								11,	// port_chn_id = 11;
+								0xF0,	// pulse_width set to 0,
+		            0x26,	// amplitude set to 0,
+		            0);	// zone not implemented;
+
+			// Create Sync Message ----------------------------------
+			// sync_msg1	: 01 80 1B 01 AA B7
+			return 1;
+			break;
+
+		// multi scheduler for percutaneous stimulation board
+		case STIM_MODE_PERC_8CH_MULTI_SCHEDULE:
+
+				// Serial.print("EXE STIM_MODE_PERC_8CH_MULTI_SCHEDULE");
+
+			// Create Schedule ------------------------------
+			// crt_sched	: 01 80 10 03 AA 00 1D A3 
+
+			// this->cmd_crt_sched(sync_signal, duration);
+			// Create 8 schedules
+			for (int i=0; i<8; i++) {
+
+				// QUESTION: setup 8 schedules than 8 events, or do it like below?
+
+				// Create schedule
+				// CHECKLIST: Need to set IPI array first!
+				this->cmd_crt_sched(_PERC_8CH_SYNC_MSG[i], _PERC_8CH_IPI[i]);	// Sync signal, duration 30msec.
+
+				delay(UECU_DELAY_SETUP);
+
+				// Create event 
+				// this->cmd_crt_evnt(sched_id, delay, priority, event_type, port_chn_id);
+				// Create Event 1 for port_chn_id 0 in sched_id 1 
+				this->cmd_crt_evnt( 
+								  i+1,	// sched_id 1 to 8
+									i*2,	// delay every 2ms. (0,2,4,6, ...)
+									0,	// priority = 0
+									3,	// event_type = 3, for for Stimulus Event
+									i,	// port_chn_id = 0;
+									0x00,	// pulse_width set to 0,
+			            0x26,	// amplitude set to 0,
+			            0);	// zone not implemented;
+			} // end for loop
+
+			delay(UECU_DELAY_SETUP);
+
+			// TODO: Send 8 Sync msgs here or modify start func.
+
+			break;
+
+		default: 
+			return -1;
+		} //end switch case
 }
 
 // Start Stim board using sync signal command
