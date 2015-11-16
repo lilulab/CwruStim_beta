@@ -383,15 +383,18 @@ int Stim::config(int setting) {
 			// this->cmd_crt_sched(sync_signal, duration);
 			// Create 8 schedules
 			for (uint8_t i=0; i<8; i++) {
+				this->cmd_crt_sched(UECU_SYNC_MSG, _PERC_8CH_IPI[i]);	// Sync signal, duration 30msec.
+				delay(UECU_DELAY_SETUP);
+			}
+
+			for (uint8_t i=0; i<8; i++) {
 
 				// QUESTION: setup 8 schedules than 8 events, or do it like below?
 
 				// Create schedule
 				// CHECKLIST: Need to set IPI array first!
 				//this->cmd_crt_sched(_PERC_8CH_SYNC_MSG[i], _PERC_8CH_IPI[i]);	// Sync signal, duration 30msec.
-				this->cmd_crt_sched(UECU_SYNC_MSG, _PERC_8CH_IPI[i]);	// Sync signal, duration 30msec.
 
-				delay(UECU_DELAY_SETUP);
 
 				// Create event 
 				// this->cmd_crt_evnt(sched_id, delay, priority, event_type, port_chn_id);
@@ -403,7 +406,7 @@ int Stim::config(int setting) {
 									3,	// event_type = 3, for for Stimulus Event
 									i,	// port_chn_id = 0;
 									// 0x00,	// pulse_width set to 0,
-									00,	// pulse_width set to 0,
+									0,	// pulse_width set to 0,
 			            0x26,	// amplitude set to 0x26,
 			            0);	// zone not implemented;
 
@@ -413,8 +416,7 @@ int Stim::config(int setting) {
 				// Serial.print(";\t IPI = ");
 				// Serial.println(_PERC_8CH_IPI[i],HEX);
 				// Serial.println(" ");
-
-
+				delay(UECU_DELAY_SETUP);
 
 			} // end for loop
 
