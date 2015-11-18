@@ -44,3 +44,7 @@ Temporary Items
 
 # Matlab Auto Save
 .asv
+
+# Serial log
+.log
+/note
