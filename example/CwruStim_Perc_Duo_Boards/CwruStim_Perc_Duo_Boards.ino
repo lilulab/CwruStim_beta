@@ -19,9 +19,9 @@ Stim stimBrd2(STIM_CHANNEL_UART3);
 static int led_pin = 40; // for official N-TREK boards
 
 // Pulse width and Amplitude value
-uint8_t pulse_width[8] = {0,0,0,0,0,0,0,0};
-uint8_t amplitude[8] = {38,38,38,38,38,38,38,38};
-uint16_t ipi[8] = {30, 30, 30, 30, 30, 30, 30, 30};
+// uint8_t pulse_width[8] = {0,0,0,0,0,0,0,0};
+// uint8_t amplitude[8] = {38,38,38,38,38,38,38,38};
+// uint16_t ipi[8] = {30, 30, 30, 30, 30, 30, 30, 30};
 
 void setup() {
 
@@ -73,9 +73,9 @@ void loop() {
 
 
   // Pulse width and Amplitude value
-  pulse_width[8] = {10,20,30,40,50,60,70,80};
-  amplitude[8] = {38,38,38,38,38,38,38,38};
-  ipi[8] = {30, 40, 50, 60, 30, 40, 50, 60};
+  uint8_t pulse_width[8] = {10,20,30,40,50,60,70,80};
+  uint8_t amplitude[8] = {38,38,38,38,38,38,38,38};
+  uint16_t ipi[8] = {30, 40, 50, 60, 30, 40, 50, 60};
 
   // Board 1 ===================================================
   for (int i=0; i<8; i++) {
