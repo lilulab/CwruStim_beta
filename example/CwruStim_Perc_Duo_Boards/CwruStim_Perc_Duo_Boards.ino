@@ -9,11 +9,11 @@
 #include "CwruStim.h"
 
 // Stim board 1 @ UART1
-Stim stimBrd1(STIM_CHANNEL_UART1);
 // Stim stimBrd1(STIM_CHANNEL_UART0); //only use for USB-UART debugging.
 
 // Stim board 2 @ UART3
 Stim stimBrd2(STIM_CHANNEL_UART3);
+Stim stimBrd1(STIM_CHANNEL_UART1);
 
 //static int led_pin = 13; // for official Arduino boards
 static int led_pin = 40; // for official N-TREK boards
@@ -99,7 +99,8 @@ void loop() {
     delay(1); // TODO: ask Jeremy about the mini interval for set event.
   }
 
-
+  // stimBrd1.debug_print_states(1);
+  // stimBrd2.debug_print_states(2);
 
   //delay(50); // delay 50ms, not requirement
 

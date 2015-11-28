@@ -9,11 +9,11 @@
 #include "Arduino.h"
 #include "CwruStim.h"
 
-int Stim::_uart_channel_id = 0;
-int Stim::_mode = 0;
-int Stim::_setting = 0;
-int Stim::_stim_error = 0;
-int Stim::_command = 0;
+// int Stim::_uart_channel_id = 0;
+// int Stim::_mode = 0;
+// int Stim::_setting = 0;
+// int Stim::_stim_error = 0;
+// int Stim::_command = 0;
  
 // Sync messages
 uint8_t Stim::_PERC_8CH_SYNC_MSG[8] = {0xAA, 0xBB, 0xCC, 0xDD, 0xEE, 0xFF, 0x11, 0x22};
@@ -573,6 +573,19 @@ int Stim::serial_write_array(uint8_t buf[], int length) {
 	//delay(50);
 	return Serial;
 }
+
+// Use Serial0 to print debug messages.
+int Stim::debug_print_states(int id) {
+  if (Serial) {
+    Serial.print("stimBrd"); Serial.print(id); Serial.print(".");
+    Serial.print("_uart_channel_id = ");
+    Serial.print(_uart_channel_id);
+    Serial.print(".\t _stim_error = ");
+    Serial.print(_stim_error);
+    Serial.println(".");
+  }
+}
+
 
 // Retun check sum byte
 uint8_t Stim::checksum(uint8_t vals[], int length){
