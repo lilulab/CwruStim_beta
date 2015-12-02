@@ -459,53 +459,89 @@ int Stim::start_multi_schedule(void) {
 // Stim::update(gait_type, pattern, cycle_percentage)
 int Stim::update(int gait_type, int pattern, int cycle_percentage) {
 
-  if (gait_type == GAIT_VCK5) {
+	// Pattern look up table temp holder.
+  const uint16_t (*LUT_PP)[12][8]; 
+  const uint8_t (*LUT_PW)[12][8]; 
+  const uint8_t (*LUT_IPI)[12];  
 
-		switch (pattern) {
+  switch (gait_type) {
 
-			case PATTERN_NO_STIM:
-				for (uint8_t i=0; i<STIM_CHANNEL_MAX_PERC; i++) {
-	  			_current_ipi[i] = 30;
-	  			_current_pulse_width[i] = 0;
-	  			_current_amplitude[i] = 0;
-	  		} 
+    case GAIT_VCK5_BOARD1:
 
-				break;
+      // Switch gait pattern type
+	    // NO_STIM, STAND, LSTEP, RSTEP, SIT
+      // TODO: join two 2D array so that don't need two big chuck of code to do board1&2
+			switch (pattern) {
+	      
+	      // No stim mode
+				case PATTERN_NO_STIM:
+				  // Loop through all channels and assign zeros
+					for (uint8_t i=0; i<STIM_CHANNEL_MAX_PERC; i++) {
+		  			_current_ipi[i] = 30;
+		  			_current_pulse_width[i] = 0;
+		  			_current_amplitude[i] = 0;
+		  		}
+					break;
+	      
+	      // Stand mode
+				case PATTERN_STAND:
+					// Assign Board1 gait to look up table holder
+		  		LUT_PP = &VCK5_stand_B1_PP; 
+					LUT_PW = &VCK5_stand_B1_PW; 
+					LUT_IPI = &VCK5_stand_B1_IPI;  
+					break;
 
-			case PATTERN_STAND:
+	      // Left single step mode
+				case PATTERN_LSETP:
+					// Assign Board1 gait to look up table holder
+		  		LUT_PP = &VCK5_walk_L_B1_PP; 
+					LUT_PW = &VCK5_walk_L_B1_PW; 
+					LUT_IPI = &VCK5_walk_L_B1_IPI;  
+					break;
+	      
+	      // Right single step mode
+				case PATTERN_RSETP:
+					// Assign Board1 gait to look up table holder
+		  		LUT_PP = &VCK5_walk_R_B1_PP; 
+					LUT_PW = &VCK5_walk_R_B1_PW; 
+					LUT_IPI = &VCK5_walk_R_B1_IPI; 
+					break;
 
-				break;
+	      // Sit mode
+				case PATTERN_SIT:
+					// Assign Board1 gait to look up table holder
+		  		LUT_PP = &VCK5_sit_B1_PP; 
+					LUT_PW = &VCK5_sit_B1_PW; 
+					LUT_IPI = &VCK5_sit_B1_IPI; 
+					break;
+	      
+	      // Error handling
+				default:
+					_stim_error |= STIM_ERROR_GAIT_TYPE_ERROR;
+					return -1;
+					break;
+			} // end switch (pattern)
 
-			case PATTERN_LSETP:
+    break; // board 1
 
-				break;
+    case GAIT_VCK5_BOARD2:
 
-			case PATTERN_RSETP:
+    break; // board 2
 
-				break;
+    default:
+      _stim_error |= STIM_ERROR_GAIT_TYPE_ERROR;
+      return -1;
+      break;
+  } // end   switch (gait_type) 
 
-			case PATTERN_SIT:
+	// update pattern
+	// this will use the lower level UART communication to send command
+	for (uint8_t i=0; i<STIM_CHANNEL_MAX_PERC; i++) {
+  	this->cmd_set_sched(i+1, UECU_SYNC_MSG, _current_ipi[i]);
+  	delay(_PERC_8CH_IPI[i]);
 
-				break;
-
-			default:
-				_stim_error |= STIM_ERROR_GAIT_TYPE_ERROR;
-				return -1;
-				break;
-		}
-
-		// update pattern
-		for (uint8_t i=0; i<STIM_CHANNEL_MAX_PERC; i++) {
-	  	this->cmd_set_sched(i+1, UECU_SYNC_MSG, _current_ipi[i]);
-	  	delay(_PERC_8CH_IPI[i]);
-
-	  	this->cmd_set_evnt(i+1, _current_pulse_width[i], _current_amplitude[i], 0); // Change Event i for port_chn_id i in sched_id 1  
-	  } 
-
-  } else {
-    _stim_error |= STIM_ERROR_GAIT_TYPE_ERROR;
-    return -1;
-  }
+  	this->cmd_set_evnt(i+1, _current_pulse_width[i], _current_amplitude[i], 0); // Change Event i for port_chn_id i in sched_id 1  
+  } 
 
 	return 1;
 }
