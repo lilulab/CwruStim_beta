@@ -9,19 +9,14 @@
 #include "Arduino.h"
 #include "CwruStim.h"
 
-// int Stim::_uart_channel_id = 0;
-// int Stim::_mode = 0;
-// int Stim::_setting = 0;
-// int Stim::_stim_error = 0;
-// int Stim::_command = 0;
  
 // Sync messages
-uint8_t Stim::_PERC_8CH_SYNC_MSG[8] = {0xAA, 0xBB, 0xCC, 0xDD, 0xEE, 0xFF, 0x11, 0x22};
+uint8_t Stim::_PERC_8CH_SYNC_MSG[STIM_CHANNEL_MAX_PERC] = {0xAA, 0xBB, 0xCC, 0xDD, 0xEE, 0xFF, 0x11, 0x22};
 
 // Inter phase interval
 // CHECKLIST: Need to update this later according to gait pattern file!
 //uint16_t Stim::_PERC_8CH_IPI[8] = {60, 30, 60, 60, 60, 30, 30, 30};
-uint16_t Stim::_PERC_8CH_IPI[8] = {30, 30, 30, 30, 30, 30, 30, 30};
+uint16_t Stim::_PERC_8CH_IPI[STIM_CHANNEL_MAX_PERC] = {30, 30, 30, 30, 30, 30, 30, 30};
 
 // Stim constructor and UART selector
 Stim::Stim(int uart_channel_id) {
@@ -382,12 +377,12 @@ int Stim::config(int setting) {
 
 			// this->cmd_crt_sched(sync_signal, duration);
 			// Create 8 schedules
-			for (uint8_t i=0; i<8; i++) {
+			for (uint8_t i=0; i<STIM_CHANNEL_MAX_PERC; i++) {
 				this->cmd_crt_sched(UECU_SYNC_MSG, _PERC_8CH_IPI[i]);	// Sync signal, duration 30msec.
 				delay(UECU_DELAY_SETUP);
 			}
 
-			for (uint8_t i=0; i<8; i++) {
+			for (uint8_t i=0; i<STIM_CHANNEL_MAX_PERC; i++) {
 
 				// QUESTION: setup 8 schedules than 8 events, or do it like below?
 
@@ -443,7 +438,7 @@ int Stim::start(uint8_t sync_signal) {
 int Stim::start_multi_schedule(void) {
 
 	// Loop through 8 schedules
-	for (int i=0; i<8; i++) {
+	for (int i=0; i<STIM_CHANNEL_MAX_PERC; i++) {
 		// Send Sync to start
 		this->cmd_sync_msg(_PERC_8CH_SYNC_MSG[i]); // Sent Sync_message to start schedule.
 
@@ -454,81 +449,25 @@ int Stim::start_multi_schedule(void) {
 }
 
 // Update Stim pattern via UART
-int Stim::update(int command) {
+// Stim::update(gait_type, pattern, cycle_percentage)
+int Stim::update(int gait_type, int pattern, int cycle_percentage) {
 
 	// STIM_COMMAND_DEMO
-	switch (command) {
+	// switch (gait_type) {
 
-		case STIM_COMMAND_ZERO_ALL:
+	// 	case :
 
-			// Pulse width 0us, Amplitude 0mA
+	// 		break;
 
-			// this->cmd_set_evnt( event_id, pulse_width, amplitude, zone);
-			// Change Event 1 for port_chn_id 0 in sched_id 1 
-			this->cmd_set_evnt(	1,	//event_id
-								0,//pulse_width = 100us
-								0,	//amplitude = 60mA
-								0);	// zone not implemented
+	// 	case :
 
-			// Change Event 2 for port_chn_id 1 in sched_id 1 
-			this->cmd_set_evnt(	2,	//event_id
-								0,//pulse_width = 100us
-								0,	//amplitude = 60mA
-								0);	// zone not implemented	
+	// 		break;
 
-			// Change Event 3 for port_chn_id 2 in sched_id 1 
-			this->cmd_set_evnt(	3,	//event_id
-								0,//pulse_width = 100us
-								0,	//amplitude = 60mA
-								0);	// zone not implemented	
+	// 	default:
+	// 		_stim_error |= STIM_ERROR_GAIT_TYPE_ERROR;
+	// 		break;
+	// }
 
-			// Change Event 4 for port_chn_id 3 in sched_id 1 
-			this->cmd_set_evnt(	4,	//event_id
-								0,//pulse_width = 100us
-								0,	//amplitude = 60mA
-								0);	// zone not implemented
-
-			delay(50); // delay 50ms
-			break;
-
-		case STIM_COMMAND_DEMO:
-
-			// Pulse width 100us, Amplitude 60mA
-
-			// this->cmd_set_evnt( event_id, pulse_width, amplitude, zone);
-			// Change Event 1 for port_chn_id 0 in sched_id 1 
-			this->cmd_set_evnt(	1,	//event_id
-								100,//pulse_width = 100us
-								60,	//amplitude = 60mA
-								0);	// zone not implemented
-
-			// Change Event 2 for port_chn_id 1 in sched_id 1 
-			this->cmd_set_evnt(	2,	//event_id
-								100,//pulse_width = 100us
-								60,	//amplitude = 60mA
-								0);	// zone not implemented	
-
-			// Change Event 3 for port_chn_id 2 in sched_id 1 
-			this->cmd_set_evnt(	3,	//event_id
-								100,//pulse_width = 100us
-								60,	//amplitude = 60mA
-								0);	// zone not implemented	
-
-			// Change Event 4 for port_chn_id 3 in sched_id 1 
-			this->cmd_set_evnt(	4,	//event_id
-								100,//pulse_width = 100us
-								60,	//amplitude = 60mA
-								0);	// zone not implemented
-
-			//delay(50); // delay 50ms
-			break;
-
-		default:
-			_stim_error |= STIM_ERROR_COMMAND_ERROR;
-			break;
-	}
-
-	_command = command;
 	return 1;
 }
 

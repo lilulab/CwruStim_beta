@@ -52,9 +52,6 @@ void setup() {
 	stim.config(STIM_MODE_PERC_8CH_MULTI_SCHEDULE); // Setup channels, schedule, and events
 	//stim.start_multi_schedule();
 	stim.start(UECU_SYNC_MSG);
-
-	// Stim Event update
-	//stim.update(STIM_COMMAND_ZERO_ALL); // Set pulse width and amplitude to 0 for all four channels. 
 	
 }
 

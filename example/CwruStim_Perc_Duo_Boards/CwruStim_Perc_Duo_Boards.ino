@@ -9,11 +9,11 @@
 #include "CwruStim.h"
 
 // Stim board 1 @ UART1
+Stim stimBrd1(STIM_CHANNEL_UART1);
 // Stim stimBrd1(STIM_CHANNEL_UART0); //only use for USB-UART debugging.
 
 // Stim board 2 @ UART3
 Stim stimBrd2(STIM_CHANNEL_UART3);
-Stim stimBrd1(STIM_CHANNEL_UART1);
 
 //static int led_pin = 13; // for official Arduino boards
 static int led_pin = 40; // for official N-TREK boards
