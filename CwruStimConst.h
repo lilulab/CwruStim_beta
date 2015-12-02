@@ -84,4 +84,14 @@ static const int UECU_SYNC_MSG = 0xAA;
 // Delay for setup
 static const int UECU_DELAY_SETUP = 25;
 
+// Gait Params
+static const int GAIT_VCK5 = 101;
+
+static const int PATTERN_NO_STIM = 0;
+static const int PATTERN_STAND = 1;
+static const int PATTERN_LSETP = 2;
+static const int PATTERN_RSETP = 3;
+static const int PATTERN_SIT = 4;
+
+
 #endif

@@ -9,15 +9,6 @@
 #include "Arduino.h"
 #include "CwruStim.h"
 
- 
-// Sync messages
-uint8_t Stim::_PERC_8CH_SYNC_MSG[STIM_CHANNEL_MAX_PERC] = {0xAA, 0xBB, 0xCC, 0xDD, 0xEE, 0xFF, 0x11, 0x22};
-
-// Inter phase interval
-// CHECKLIST: Need to update this later according to gait pattern file!
-//uint16_t Stim::_PERC_8CH_IPI[8] = {60, 30, 60, 60, 60, 30, 30, 30};
-uint16_t Stim::_PERC_8CH_IPI[STIM_CHANNEL_MAX_PERC] = {30, 30, 30, 30, 30, 30, 30, 30};
-
 // Stim constructor and UART selector
 Stim::Stim(int uart_channel_id) {
 	// Initialize the NTREK ECB to connect the Stim Board
@@ -58,6 +49,22 @@ Stim::Stim(int uart_channel_id) {
 			break;
 		//Serial.print("_stim_error=");//Serial.print(_stim_error,BIN);//Serial.println(".");
 		//Serial.println("exit Stim constructor");
+	}
+
+	// Pattern init
+	for (uint8_t i=0; i<STIM_CHANNEL_MAX_PERC; i++) {
+		// Sync messages
+		_PERC_8CH_SYNC_MSG[i] = 0xAA;
+
+		// Inter phase interval
+		// CHECKLIST: Need to update this later according to gait pattern file!
+		_PERC_8CH_IPI[i] = 30;
+
+		// Pulse width
+		_current_pulse_width[i] = 0;
+
+		// Amplitude
+		_current_amplitude[i] = 0;
 	}
 
 }
@@ -452,21 +459,53 @@ int Stim::start_multi_schedule(void) {
 // Stim::update(gait_type, pattern, cycle_percentage)
 int Stim::update(int gait_type, int pattern, int cycle_percentage) {
 
-	// STIM_COMMAND_DEMO
-	// switch (gait_type) {
+  if (gait_type == GAIT_VCK5) {
 
-	// 	case :
+		switch (pattern) {
 
-	// 		break;
+			case PATTERN_NO_STIM:
+				for (uint8_t i=0; i<STIM_CHANNEL_MAX_PERC; i++) {
+	  			_current_ipi[i] = 30;
+	  			_current_pulse_width[i] = 0;
+	  			_current_amplitude[i] = 0;
+	  		} 
 
-	// 	case :
+				break;
 
-	// 		break;
+			case PATTERN_STAND:
 
-	// 	default:
-	// 		_stim_error |= STIM_ERROR_GAIT_TYPE_ERROR;
-	// 		break;
-	// }
+				break;
+
+			case PATTERN_LSETP:
+
+				break;
+
+			case PATTERN_RSETP:
+
+				break;
+
+			case PATTERN_SIT:
+
+				break;
+
+			default:
+				_stim_error |= STIM_ERROR_GAIT_TYPE_ERROR;
+				return -1;
+				break;
+		}
+
+		// update pattern
+		for (uint8_t i=0; i<STIM_CHANNEL_MAX_PERC; i++) {
+	  	this->cmd_set_sched(i+1, UECU_SYNC_MSG, _current_ipi[i]);
+	  	delay(_PERC_8CH_IPI[i]);
+
+	  	this->cmd_set_evnt(i+1, _current_pulse_width[i], _current_amplitude[i], 0); // Change Event i for port_chn_id i in sched_id 1  
+	  } 
+
+  } else {
+    _stim_error |= STIM_ERROR_GAIT_TYPE_ERROR;
+    return -1;
+  }
 
 	return 1;
 }
