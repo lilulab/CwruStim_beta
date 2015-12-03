@@ -54,7 +54,40 @@ void loop() {
   Serial.print("cycle_percentage = ");
   Serial.println(time_test);
 
+
+  // const uint16_t array[2][3] = {{1,2,3},{4,5,6}}; 
+  // const uint16_t (*array_prt)[2][3]; 
+  // const uint8_t (*VCK5_B1_AMP_prt)[12]; 
+
+  // // const uint8_t VCK5_B1_AMP[12] = { 38,    38,   38,   38,   38,   38,   38,   38,   0,    0,    0,    0 };
+  // VCK5_B1_AMP_prt = &VCK5_B1_AMP; 
+
+  // array_prt = &array;
+
+  // Serial.println("test array = ");
+  // for (int i=0; i<2; i++) {
+  //   Serial.print("{");
+  //   for (int j=0; j<3; j++) {
+  //     Serial.print((*array_prt)[i][j]);
+  //     Serial.print(",");
+  //   }
+  //   Serial.println("}");
+  // }
+
+  // Serial.println("VCK5_B1_AMP array = ");
+  // Serial.print("{");  
+  // for (int i=0; i<12; i++) {
+  //     Serial.print((*VCK5_B1_AMP_prt)[i]);
+  //     Serial.print(",");
+  // }
+  // Serial.println("}");
+
+  
+
+
   // Run gait pattern update
+
+
   // Stim::update(gait_type, pattern, cycle_percentage)
   stimBrd1.update(GAIT_VCK5_BOARD1, PATTERN_STAND, time_test);
   //stimBrd1.debug_print_states(1);
