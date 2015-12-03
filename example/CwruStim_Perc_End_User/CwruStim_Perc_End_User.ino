@@ -16,11 +16,13 @@ Stim stimBrd2(STIM_CHANNEL_UART3);
 
 static int led_pin = 40; // for N-TREK board LEDs
 
+uint16_t time_test = 0;
+
 void setup() {
 
 
   // initialize Serial0 for debug.
-  Serial.begin(9600);
+  Serial.begin(115200);
   //Serial.println("Start CwruStim Program Setup");
 
   // LED pin
@@ -48,10 +50,20 @@ void loop() {
   digitalWrite(led_pin, HIGH);   // turn the LED on (HIGH is the voltage level)
   delay(100);              // wait for 100ms, , not requirement
 
-  // Run gait pattern update
+  Serial.println(" ");
+  Serial.print("cycle_percentage = ");
+  Serial.println(time_test);
 
-  // stimBrd1.debug_print_states(1);
-  // stimBrd2.debug_print_states(2);
+  // Run gait pattern update
+  // Stim::update(gait_type, pattern, cycle_percentage)
+  stimBrd1.update(GAIT_VCK5_BOARD1, PATTERN_STAND, time_test);
+  //stimBrd1.debug_print_states(1);
+  
+
+  stimBrd1.update(GAIT_VCK5_BOARD2, PATTERN_STAND, time_test);
+  //stimBrd2.debug_print_states(2);
+
+  time_test +=100;
 
   //delay(50); // delay 50ms, not requirement
 

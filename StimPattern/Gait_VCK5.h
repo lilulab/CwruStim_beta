@@ -7,12 +7,12 @@
 
 #include <avr/pgmspace.h>
 
+// Channel Amplitude 
+const uint8_t VCK5_B1_AMP[12] PROGMEM = { 38,		38,		38,		38,		38,		38,		38,		38,		0,		0,		0,		0 };
+const uint8_t VCK5_B2_AMP[12] PROGMEM = { 38,		38,		38,		38,		38,		38,		38,		38,		0,		0,		0,		0 };
 
 // ------ Walk ------
 
-// Channel Amplitude 
-const uint8_t VCK5_walk_L_amplitude[12] PROGMEM = { 38,		38,		38,		38,		38,		38,		38,		38,		0,		0,		0,		0 };
-const uint8_t VCK5_walk_R_amplitude[12] PROGMEM = { 38,		38,		38,		38,		38,		38,		38,		38,		0,		0,		0,		0 };
 
 // Step Duration 
 const float VCK5_walk_L_duration PROGMEM = 1.33; 
@@ -24,7 +24,7 @@ const float VCK5_walk_R_duration PROGMEM = 1.56;
 // Left Step ---------
 
 // Percent Pattern
-const uint16_t VCK5_walk_L_B1_PP[12][8] PROGMEM = { 
+const uint16_t VCK5_walk_L_B1_PP[12][GAIT_LUT_RES] PROGMEM = { 
 		{ 0,		1000,	1736,	1979,	6424,	7535,	9201,	10000 },
 		{ 0,		1000,	1736,	1979,	6979,	9201,	9500,	10000 },
 		{ 0,		1000,	1736,	1979,	6701,	8090,	9000,	10000 },
@@ -41,7 +41,7 @@ const uint16_t VCK5_walk_L_B1_PP[12][8] PROGMEM = {
 
 
 // Pulse Width
-const uint8_t VCK5_walk_L_B1_PW[12][8] PROGMEM = { 
+const uint8_t VCK5_walk_L_B1_PW[12][GAIT_LUT_RES] PROGMEM = { 
 		{ 100,	100,	100,	0,		0,		150,	131,	131 },
 		{ 0,		0,		0,		60,		60,		0,		0,		0 },
 		{ 25,		25,		25,		0,		0,		25,		25,		25 },
@@ -65,7 +65,7 @@ const uint8_t VCK5_walk_L_B1_IPI[12] PROGMEM =
 // Right Step ---------
 
 // Percent Pattern
-const uint16_t VCK5_walk_R_B1_PP[12][8] PROGMEM = { 
+const uint16_t VCK5_walk_R_B1_PP[12][GAIT_LUT_RES] PROGMEM = { 
 		{ 0,		451,	1493,	5700,	7900,	8500,	9500,	10000 },
 		{ 0,		1000,	5000,	7500,	8800,	9400,	9500,	10000 },
 		{ 0,		1000,	2000,	5000,	9306,	9700,	9900,	10000 },
@@ -82,7 +82,7 @@ const uint16_t VCK5_walk_R_B1_PP[12][8] PROGMEM = {
 
 
 // Pulse Width
-const uint8_t VCK5_walk_R_B1_PW[12][8] PROGMEM = { 
+const uint8_t VCK5_walk_R_B1_PW[12][GAIT_LUT_RES] PROGMEM = { 
 		{ 131,	120,	100,	100,	100,	100,	100,	100 },
 		{ 0,		0,		0,		0,		0,		0,		0,		0 },
 		{ 25,		25,		25,		25,		25,		25,		25,		25 },
@@ -109,7 +109,7 @@ const uint8_t VCK5_walk_R_B1_IPI[12] PROGMEM =
 // Left Step ---------
 
 // Percent Pattern
-const uint16_t VCK5_walk_L_B2_PP[12][8] PROGMEM = { 
+const uint16_t VCK5_walk_L_B2_PP[12][GAIT_LUT_RES] PROGMEM = { 
 		{ 0,		2500,	5000,	7500,	8800,	9400,	9500,	10000 },
 		{ 0,		1000,	5000,	7500,	8800,	9400,	9500,	10000 },
 		{ 0,		1000,	5000,	7500,	8800,	9400,	9500,	10000 },
@@ -126,7 +126,7 @@ const uint16_t VCK5_walk_L_B2_PP[12][8] PROGMEM = {
 
 
 // Pulse Width
-const uint8_t VCK5_walk_L_B2_PW[12][8] PROGMEM = { 
+const uint8_t VCK5_walk_L_B2_PW[12][GAIT_LUT_RES] PROGMEM = { 
 		{ 150,	150,	150,	150,	150,	150,	150,	150 },
 		{ 0,		0,		0,		0,		0,		0,		0,		0 },
 		{ 110,	110,	110,	110,	110,	110,	110,	110 },
@@ -150,7 +150,7 @@ const uint8_t VCK5_walk_L_B2_IPI[12] PROGMEM =
 // Right Step ---------
 
 // Percent Pattern
-const uint16_t VCK5_walk_R_B2_PP[12][8] PROGMEM = { 
+const uint16_t VCK5_walk_R_B2_PP[12][GAIT_LUT_RES] PROGMEM = { 
 		{ 0,		500,	938,	1181,	6181,	9306,	9500,	10000 },
 		{ 0,		500,	938,	1181,	7743,	9306,	9500,	10000 },
 		{ 0,		400,	800,	938,	1181,	8681,	9306,	10000 },
@@ -167,7 +167,7 @@ const uint16_t VCK5_walk_R_B2_PP[12][8] PROGMEM = {
 
 
 // Pulse Width
-const uint8_t VCK5_walk_R_B2_PW[12][8] PROGMEM = { 
+const uint8_t VCK5_walk_R_B2_PW[12][GAIT_LUT_RES] PROGMEM = { 
 		{ 150,	150,	150,	0,		0,		150,	150,	150 },
 		{ 0,		0,		0,		150,	150,	0,		0,		0 },
 		{ 110,	110,	110,	110,	0,		0,		108,	110 },
@@ -197,7 +197,7 @@ const float VCK5_stand_duration PROGMEM = 1.95;
 // Board 1------------------
 
 // Percent Pattern
-const uint16_t VCK5_stand_B1_PP[12][8] PROGMEM = { 
+const uint16_t VCK5_stand_B1_PP[12][GAIT_LUT_RES] PROGMEM = { 
 		{ 0,		500,	1026,	1282,	5600,	7800,	9000,	10000 },
 		{ 0,		1000,	5000,	7500,	8800,	9400,	9500,	10000 },
 		{ 0,		500,	1026,	1282,	8974,	9500,	9800,	10000 },
@@ -214,7 +214,7 @@ const uint16_t VCK5_stand_B1_PP[12][8] PROGMEM = {
 
 
 // Pulse Width
-const uint8_t VCK5_stand_B1_PW[12][8] PROGMEM = { 
+const uint8_t VCK5_stand_B1_PW[12][GAIT_LUT_RES] PROGMEM = { 
 		{ 0,		0,		0,		119,	119,	119,	119,	119 },
 		{ 0,		0,		0,		0,		0,		0,		0,		0 },
 		{ 0,		0,		0,		60,		60,		43,		36,		25 },
@@ -239,7 +239,7 @@ const uint8_t VCK5_stand_B1_IPI[12] PROGMEM =
 // Board 2------------------
 
 // Percent Pattern
-const uint16_t VCK5_stand_B2_PP[12][8] PROGMEM = { 
+const uint16_t VCK5_stand_B2_PP[12][GAIT_LUT_RES] PROGMEM = { 
 		{ 0,		500,	1026,	1282,	5600,	7800,	9500,	10000 },
 		{ 0,		1000,	5000,	7500,	8800,	9400,	9500,	10000 },
 		{ 0,		1026,	1282,	5600,	7800,	8900,	9500,	10000 },
@@ -256,7 +256,7 @@ const uint16_t VCK5_stand_B2_PP[12][8] PROGMEM = {
 
 
 // Pulse Width
-const uint8_t VCK5_stand_B2_PW[12][8] PROGMEM = { 
+const uint8_t VCK5_stand_B2_PW[12][GAIT_LUT_RES] PROGMEM = { 
 		{ 0,		0,		0,		150,	150,	150,	150,	150 },
 		{ 0,		0,		0,		0,		0,		0,		0,		0 },
 		{ 0,		0,		150,	150,	150,	150,	150,	150 },
@@ -286,7 +286,7 @@ const float VCK5_sit_duration PROGMEM = 1.5;
 // Board 1------------------
 
 // Percent Pattern
-const uint16_t VCK5_sit_B1_PP[12][8] PROGMEM = { 
+const uint16_t VCK5_sit_B1_PP[12][GAIT_LUT_RES] PROGMEM = { 
 		{ 0,		5000,	5500,	6000,	7500,	8800,	9400,	10000 },
 		{ 0,		1000,	5000,	7500,	8800,	9400,	9500,	10000 },
 		{ 0,		5000,	5500,	6000,	7500,	8800,	9400,	10000 },
@@ -303,7 +303,7 @@ const uint16_t VCK5_sit_B1_PP[12][8] PROGMEM = {
 
 
 // Pulse Width
-const uint8_t VCK5_sit_B1_PW[12][8] PROGMEM = { 
+const uint8_t VCK5_sit_B1_PW[12][GAIT_LUT_RES] PROGMEM = { 
 		{ 100,	50,		50,		50,		50,		26,		13,		0 },
 		{ 0,		0,		0,		0,		0,		0,		0,		0 },
 		{ 20,		10,		10,		10,		10,		5,		3,		0 },
@@ -328,7 +328,7 @@ const uint8_t VCK5_sit_B1_IPI[12] PROGMEM =
 // Board 2------------------
 
 // Percent Pattern
-const uint16_t VCK5_sit_B2_PP[12][8] PROGMEM = { 
+const uint16_t VCK5_sit_B2_PP[12][GAIT_LUT_RES] PROGMEM = { 
 		{ 0,		5000,	5500,	6000,	7500,	8800,	9400,	10000 },
 		{ 0,		1000,	5000,	7500,	8800,	9400,	9500,	10000 },
 		{ 0,		5000,	5500,	6000,	7500,	8800,	9400,	10000 },
@@ -345,7 +345,7 @@ const uint16_t VCK5_sit_B2_PP[12][8] PROGMEM = {
 
 
 // Pulse Width
-const uint8_t VCK5_sit_B2_PW[12][8] PROGMEM = { 
+const uint8_t VCK5_sit_B2_PW[12][GAIT_LUT_RES] PROGMEM = { 
 		{ 150,	75,		75,		75,		75,		39,		20,		0 },
 		{ 0,		0,		0,		0,		0,		0,		0,		0 },
 		{ 110,	55,		55,		55,		55,		29,		14,		0 },

@@ -9,6 +9,9 @@
 #include "Arduino.h"
 #include "CwruStim.h"
 
+// #define DEBUG_ON 1 //Comment this out if want to disenable all debug serial printing.
+// #define DEBUG_STIM_UPDATE 1;
+
 // Stim constructor and UART selector
 Stim::Stim(int uart_channel_id) {
 	// Initialize the NTREK ECB to connect the Stim Board
@@ -58,7 +61,7 @@ Stim::Stim(int uart_channel_id) {
 
 		// Inter phase interval
 		// CHECKLIST: Need to update this later according to gait pattern file!
-		_PERC_8CH_IPI[i] = 30;
+		_current_ipi[i] = 30;
 
 		// Pulse width
 		_current_pulse_width[i] = 0;
@@ -385,7 +388,7 @@ int Stim::config(int setting) {
 			// this->cmd_crt_sched(sync_signal, duration);
 			// Create 8 schedules
 			for (uint8_t i=0; i<STIM_CHANNEL_MAX_PERC; i++) {
-				this->cmd_crt_sched(UECU_SYNC_MSG, _PERC_8CH_IPI[i]);	// Sync signal, duration 30msec.
+				this->cmd_crt_sched(UECU_SYNC_MSG, _current_ipi[i]);	// Sync signal, duration 30msec.
 				delay(UECU_DELAY_SETUP);
 			}
 
@@ -395,7 +398,7 @@ int Stim::config(int setting) {
 
 				// Create schedule
 				// CHECKLIST: Need to set IPI array first!
-				//this->cmd_crt_sched(_PERC_8CH_SYNC_MSG[i], _PERC_8CH_IPI[i]);	// Sync signal, duration 30msec.
+				//this->cmd_crt_sched(_PERC_8CH_SYNC_MSG[i], _current_ipi[i]);	// Sync signal, duration 30msec.
 
 
 				// Create event 
@@ -416,7 +419,7 @@ int Stim::config(int setting) {
 				// Serial.print("i = ");
 				// Serial.print(i,HEX);
 				// Serial.print(";\t IPI = ");
-				// Serial.println(_PERC_8CH_IPI[i],HEX);
+				// Serial.println(_current_ipi[i],HEX);
 				// Serial.println(" ");
 				delay(UECU_DELAY_SETUP);
 
@@ -450,23 +453,42 @@ int Stim::start_multi_schedule(void) {
 		this->cmd_sync_msg(_PERC_8CH_SYNC_MSG[i]); // Sent Sync_message to start schedule.
 
 		// Delay duration need to be save as IPI.
-		delay(_PERC_8CH_IPI[i]);
+		delay(_current_ipi[i]);
 	}
 
 }
 
 // Update Stim pattern via UART
 // Stim::update(gait_type, pattern, cycle_percentage)
-int Stim::update(int gait_type, int pattern, int cycle_percentage) {
+int Stim::update(int gait_type, int pattern, uint16_t cycle_percentage) {
 
 	// Pattern look up table temp holder.
   const uint16_t (*LUT_PP)[12][8]; 
   const uint8_t (*LUT_PW)[12][8]; 
   const uint8_t (*LUT_IPI)[12];  
+  const uint8_t (*LUT_AMP)[12];  
+
+
+  #if defined(DEBUG_STIM_UPDATE) && defined(DEBUG_ON)
+	  Serial.println(" ");
+	  Serial.println(" ");
+	  Serial.print("gait_type = ");
+	  Serial.print(gait_type);  
+	  Serial.print("\tpattern = ");
+	  Serial.print(pattern);
+	  Serial.print("\tcycle_percentage = ");
+	  Serial.print(cycle_percentage);
+	  Serial.println(". ");
+  #endif
 
   switch (gait_type) {
 
     case GAIT_VCK5_BOARD1:
+    	#if defined(DEBUG_STIM_UPDATE) && defined(DEBUG_ON)
+    		Serial.println("GAIT_VCK5_BOARD1");
+    	#endif
+    	// Amplitude
+    	LUT_AMP = &VCK5_B1_AMP;
 
       // Switch gait pattern type
 	    // NO_STIM, STAND, LSTEP, RSTEP, SIT
@@ -475,12 +497,7 @@ int Stim::update(int gait_type, int pattern, int cycle_percentage) {
 	      
 	      // No stim mode
 				case PATTERN_NO_STIM:
-				  // Loop through all channels and assign zeros
-					for (uint8_t i=0; i<STIM_CHANNEL_MAX_PERC; i++) {
-		  			_current_ipi[i] = 30;
-		  			_current_pulse_width[i] = 0;
-		  			_current_amplitude[i] = 0;
-		  		}
+				  // Do Nothing
 					break;
 	      
 	      // Stand mode
@@ -525,6 +542,60 @@ int Stim::update(int gait_type, int pattern, int cycle_percentage) {
     break; // board 1
 
     case GAIT_VCK5_BOARD2:
+    	#if defined(DEBUG_STIM_UPDATE) && defined(DEBUG_ON)
+    		Serial.println("GAIT_VCK5_BOARD2");
+    	#endif
+    	// Amplitude
+    	LUT_AMP = &VCK5_B2_AMP;
+
+      // Switch gait pattern type
+	    // NO_STIM, STAND, LSTEP, RSTEP, SIT
+      // TODO: join two 2D array so that don't need two big chuck of code to do board1&2
+			switch (pattern) {
+	      
+	      // No stim mode
+				case PATTERN_NO_STIM:
+					// Do nothing
+					break;
+	      
+	      // Stand mode
+				case PATTERN_STAND:
+					// Assign Board1 gait to look up table holder
+		  		LUT_PP = &VCK5_stand_B2_PP; 
+					LUT_PW = &VCK5_stand_B2_PW; 
+					LUT_IPI = &VCK5_stand_B2_IPI;  
+					break;
+
+	      // Left single step mode
+				case PATTERN_LSETP:
+					// Assign Board1 gait to look up table holder
+		  		LUT_PP = &VCK5_walk_L_B2_PP; 
+					LUT_PW = &VCK5_walk_L_B2_PW; 
+					LUT_IPI = &VCK5_walk_L_B2_IPI;  
+					break;
+	      
+	      // Right single step mode
+				case PATTERN_RSETP:
+					// Assign Board1 gait to look up table holder
+		  		LUT_PP = &VCK5_walk_R_B2_PP; 
+					LUT_PW = &VCK5_walk_R_B2_PW; 
+					LUT_IPI = &VCK5_walk_R_B2_IPI; 
+					break;
+
+	      // Sit mode
+				case PATTERN_SIT:
+					// Assign Board1 gait to look up table holder
+		  		LUT_PP = &VCK5_sit_B2_PP; 
+					LUT_PW = &VCK5_sit_B2_PW; 
+					LUT_IPI = &VCK5_sit_B2_IPI; 
+					break;
+	      
+	      // Error handling
+				default:
+					_stim_error |= STIM_ERROR_GAIT_TYPE_ERROR;
+					return -1;
+					break;
+			} // end switch (pattern)
 
     break; // board 2
 
@@ -537,13 +608,128 @@ int Stim::update(int gait_type, int pattern, int cycle_percentage) {
 	// update pattern
 	// this will use the lower level UART communication to send command
 	for (uint8_t i=0; i<STIM_CHANNEL_MAX_PERC; i++) {
+		#if defined(DEBUG_STIM_UPDATE) && defined(DEBUG_ON)
+    		Serial.print("channel = ");
+    		Serial.println(i);
+    #endif
+
+		// if no stim then all param is 0
+		if (pattern == PATTERN_NO_STIM) {
+
+			#if defined(DEBUG_STIM_UPDATE) && defined(DEBUG_ON)
+    		Serial.println("NO_STIM");
+    	#endif
+			// Loop through all channels and assign zeros
+			//_current_ipi[i] = 30;
+			_current_pulse_width[i] = 0;
+			_current_amplitude[i] = 0;
+		} else { 
+			// else check LUT and calculate the ramping
+			int t_next=GAIT_LUT_RES-1;// scan from 7 to 0
+			int flag = 0;
+
+			// Calculate the params based on cycle_percentage vs PP LUT
+			// Search for t_next
+			while (flag == 0) {
+				// if cycle_percentage == PP[t_next], return this PP
+				if (cycle_percentage==(*LUT_PP)[i][t_next]) {
+					flag = 1;
+					//and directly assign
+					_current_ipi[i] = (*LUT_IPI)[i];
+					_current_amplitude[i] = (*LUT_AMP)[i];
+					_current_pulse_width[i] = (*LUT_PW)[i][t_next];
+				} 
+				// cycle_percentage > PP[t_next], exit
+				else if (cycle_percentage>(*LUT_PP)[i][t_next]) {
+					t_next+=1; // restore to last value
+					flag = -1; // end exit while loop
+
+					// assign param
+					_current_ipi[i] = (*LUT_IPI)[i];
+					_current_amplitude[i] = (*LUT_AMP)[i];
+					// calculate ramping
+					uint16_t time_diff = cycle_percentage - (*LUT_PP)[i][t_next-1];
+					uint16_t time_div = (*LUT_PP)[i][t_next] - (*LUT_PP)[i][t_next-1];
+					_current_pulse_width[i] = ((*LUT_PW)[i][t_next] - (*LUT_PW)[i][t_next-1]) * (time_diff / time_div);
+				} 
+				// cycle_percentage < PP[t_next]
+				else {
+					t_next--; // keep searching down
+				} // end if
+			} // end while (flag == 0)
+		} // end if (pattern == PATTERN_NO_STIM)
+
+		#if defined(DEBUG_STIM_UPDATE) && defined(DEBUG_ON)
+  		Serial.print("_current_ipi[i] = ");
+  		Serial.println(_current_ipi[i]);
+  		Serial.print("_current_pulse_width[i] = ");
+  		Serial.println(_current_pulse_width[i]);
+  		Serial.print("_current_amplitude[i] = ");
+  		Serial.println(_current_amplitude[i]);
+    #endif
+
   	this->cmd_set_sched(i+1, UECU_SYNC_MSG, _current_ipi[i]);
-  	delay(_PERC_8CH_IPI[i]);
+  	delay(_current_ipi[i]);
 
   	this->cmd_set_evnt(i+1, _current_pulse_width[i], _current_amplitude[i], 0); // Change Event i for port_chn_id i in sched_id 1  
-  } 
+  }// end for 
 
 	return 1;
+}
+
+//int _Gait_LUT_VCK5[2][4];
+int Stim::gait_LUT_builder(void) {
+
+  // Board 1
+  // STAND
+	// _Gait_LUT_VCK5[GAIT_VCK5_BOARD1][PATTERN_STAND][PATTERN_PARAM_PP] = (uint16_t) &VCK5_stand_B1_PP;
+	// _Gait_LUT_VCK5[GAIT_VCK5_BOARD1][PATTERN_STAND][PATTERN_PARAM_PW] = &VCK5_stand_B1_PW;
+	// _Gait_LUT_VCK5[GAIT_VCK5_BOARD1][PATTERN_STAND][PATTERN_PARAM_AMP] = &VCK5_B1_AMP; //Same cross board
+	// _Gait_LUT_VCK5[GAIT_VCK5_BOARD1][PATTERN_STAND][PATTERN_PARAM_IPI] = &VCK5_stand_B1_IPI;
+
+ //  // SIT
+	// *_Gait_LUT_VCK5[GAIT_VCK5_BOARD1][PATTERN_SIT][PATTERN_PARAM_PP] = &VCK5_sit_B1_PP;
+	// *_Gait_LUT_VCK5[GAIT_VCK5_BOARD1][PATTERN_SIT][PATTERN_PARAM_PW] = &VCK5_sit_B1_PW;
+	// *_Gait_LUT_VCK5[GAIT_VCK5_BOARD1][PATTERN_SIT][PATTERN_PARAM_AMP] = &VCK5_B1_AMP; //Same cross board
+	// *_Gait_LUT_VCK5[GAIT_VCK5_BOARD1][PATTERN_SIT][PATTERN_PARAM_IPI] = &VCK5_sit_B1_IPI;	
+
+	// // LSTEP
+	// *_Gait_LUT_VCK5[GAIT_VCK5_BOARD1][PATTERN_LSETP][PATTERN_PARAM_PP] = &VCK5_walk_L_B1_PP;
+	// *_Gait_LUT_VCK5[GAIT_VCK5_BOARD1][PATTERN_LSETP][PATTERN_PARAM_PW] = &VCK5_walk_L_B1_PW;
+	// *_Gait_LUT_VCK5[GAIT_VCK5_BOARD1][PATTERN_LSETP][PATTERN_PARAM_AMP] = &VCK5_B1_AMP; //Same cross board
+	// *_Gait_LUT_VCK5[GAIT_VCK5_BOARD1][PATTERN_LSETP][PATTERN_PARAM_IPI] = &VCK5_walk_L_B1_IPI;
+
+	// // RSTEP
+	// *_Gait_LUT_VCK5[GAIT_VCK5_BOARD1][PATTERN_RSETP][PATTERN_PARAM_PP] = &VCK5_walk_R_B1_PP;
+	// *_Gait_LUT_VCK5[GAIT_VCK5_BOARD1][PATTERN_RSETP][PATTERN_PARAM_PW] = &VCK5_walk_R_B1_PW;
+	// *_Gait_LUT_VCK5[GAIT_VCK5_BOARD1][PATTERN_RSETP][PATTERN_PARAM_AMP] = &VCK5_B1_AMP; //Same cross board
+	// *_Gait_LUT_VCK5[GAIT_VCK5_BOARD1][PATTERN_RSETP][PATTERN_PARAM_IPI] = &VCK5_walk_R_B1_IPI;
+
+ //  // Board 2
+ //  // STAND
+	// *_Gait_LUT_VCK5[GAIT_VCK5_BOARD2][PATTERN_STAND][PATTERN_PARAM_PP] = &VCK5_stand_B2_PP;
+	// *_Gait_LUT_VCK5[GAIT_VCK5_BOARD2][PATTERN_STAND][PATTERN_PARAM_PW] = &VCK5_stand_B2_PW;
+	// *_Gait_LUT_VCK5[GAIT_VCK5_BOARD2][PATTERN_STAND][PATTERN_PARAM_AMP] = &VCK5_B2_AMP; //Same cross board
+	// *_Gait_LUT_VCK5[GAIT_VCK5_BOARD2][PATTERN_STAND][PATTERN_PARAM_IPI] = &VCK5_stand_B2_IPI;
+
+ //  // SIT
+	// *_Gait_LUT_VCK5[GAIT_VCK5_BOARD2][PATTERN_SIT][PATTERN_PARAM_PP] = &VCK5_sit_B2_PP;
+	// *_Gait_LUT_VCK5[GAIT_VCK5_BOARD2][PATTERN_SIT][PATTERN_PARAM_PW] = &VCK5_sit_B2_PW;
+	// *_Gait_LUT_VCK5[GAIT_VCK5_BOARD2][PATTERN_SIT][PATTERN_PARAM_AMP] = &VCK5_B2_AMP; //Same cross board
+	// *_Gait_LUT_VCK5[GAIT_VCK5_BOARD2][PATTERN_SIT][PATTERN_PARAM_IPI] = &VCK5_sit_B2_IPI;	
+
+	// // LSTEP
+	// *_Gait_LUT_VCK5[GAIT_VCK5_BOARD2][PATTERN_LSETP][PATTERN_PARAM_PP] = &VCK5_walk_L_B2_PP;
+	// *_Gait_LUT_VCK5[GAIT_VCK5_BOARD2][PATTERN_LSETP][PATTERN_PARAM_PW] = &VCK5_walk_L_B2_PW;
+	// *_Gait_LUT_VCK5[GAIT_VCK5_BOARD2][PATTERN_LSETP][PATTERN_PARAM_AMP] = &VCK5_B2_AMP; //Same cross board
+	// *_Gait_LUT_VCK5[GAIT_VCK5_BOARD2][PATTERN_LSETP][PATTERN_PARAM_IPI] = &VCK5_walk_L_B2_IPI;
+
+	// // RSTEP
+	// *_Gait_LUT_VCK5[GAIT_VCK5_BOARD2][PATTERN_RSETP][PATTERN_PARAM_PP] = &VCK5_walk_R_B2_PP;
+	// *_Gait_LUT_VCK5[GAIT_VCK5_BOARD2][PATTERN_RSETP][PATTERN_PARAM_PW] = &VCK5_walk_R_B2_PW;
+	// *_Gait_LUT_VCK5[GAIT_VCK5_BOARD2][PATTERN_RSETP][PATTERN_PARAM_AMP] = &VCK5_B2_AMP; //Same cross board
+	// *_Gait_LUT_VCK5[GAIT_VCK5_BOARD2][PATTERN_RSETP][PATTERN_PARAM_IPI] = &VCK5_walk_R_B2_IPI;
+
 }
 
 // UART write array
@@ -597,6 +783,28 @@ int Stim::debug_print_states(int id) {
     Serial.print(".\t _stim_error = ");
     Serial.print(_stim_error);
     Serial.println(".");
+
+    Serial.print("_current_pulse_width = {");
+    for (uint8_t i=0; i<STIM_CHANNEL_MAX_PERC; i++) {
+    	Serial.print(_current_pulse_width[i]);
+    	Serial.print(",\t");
+    }
+    Serial.println("}.");
+
+    Serial.print("_current_amplitude = {");
+    for (uint8_t i=0; i<STIM_CHANNEL_MAX_PERC; i++) {
+    	Serial.print(_current_amplitude[i]);
+    	Serial.print(",\t");
+    }
+    Serial.println("}.");
+
+    Serial.print("_current_ipi = {");
+    for (uint8_t i=0; i<STIM_CHANNEL_MAX_PERC; i++) {
+    	Serial.print(_current_ipi[i]);
+    	Serial.print(",\t");
+    }
+    Serial.println("}.");
+
   }
 }
 

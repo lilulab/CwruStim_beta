@@ -85,14 +85,29 @@ static const int UECU_SYNC_MSG = 0xAA;
 static const int UECU_DELAY_SETUP = 25;
 
 // Gait Params
-static const int GAIT_VCK5_BOARD1 = 101;
-static const int GAIT_VCK5_BOARD2 = 201;
+static const int NUM_GAIT_VCK5_BOARD = 2;
+static const int GAIT_VCK5_BOARD1 = 0;
+static const int GAIT_VCK5_BOARD2 = 1;
 
+
+static const int NUM_PATTERN = 5;
 static const int PATTERN_NO_STIM = 0;
 static const int PATTERN_STAND = 1;
 static const int PATTERN_SIT = 2;
 static const int PATTERN_LSETP = 3;
 static const int PATTERN_RSETP = 4;
+
+
+static const int NUM_PATTERN_PARAM = 4;
+static const int PATTERN_PARAM_PP = 0;
+static const int PATTERN_PARAM_PW = 1;
+static const int PATTERN_PARAM_AMP = 2;
+static const int PATTERN_PARAM_IPI = 3;
+
+// gait look up table resolution.
+static const int GAIT_LUT_RES = 8;
+
+
 
 
 #endif
