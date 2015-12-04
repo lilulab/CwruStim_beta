@@ -9,6 +9,8 @@
 #include "CwruStim.h" // Stim board driver
 #include <TimerOne.h>
 
+// #define DEBUG_ON 1 //Comment this out if want to disenable all debug serial printing.
+
 // Stim board 1 @ UART1
 Stim stimBrd1(STIM_CHANNEL_UART1);
 
@@ -28,7 +30,9 @@ void setup() {
 
   // initialize Serial0 for debug.
   Serial.begin(115200);
-  Serial.print("Program Start ...");
+  #if defined(DEBUG_ON)
+    Serial.print("Program Start ...");
+  #endif  
   //Serial.println("Start CwruStim Program Setup");
 
   // LED pin
@@ -57,53 +61,59 @@ void setup() {
 
 
 void loop() {
+  #if defined(DEBUG_ON)
+    Serial.println("Start CwruStim Main Loop");
+  #endif
 
   stimBrd1.update(VCK5_BRD1|IPI, PATTERN_LSETP, cycle_percentage_value);
   stimBrd1.update(VCK5_BRD1|AMP, PATTERN_LSETP, cycle_percentage_value);
   stimBrd1.start(UECU_SYNC_MSG); // After set IPI, board need a Sync msg to line up the pulses.
 
+  stimBrd2.update(VCK5_BRD2|IPI, PATTERN_LSETP, cycle_percentage_value);
+  stimBrd2.update(VCK5_BRD2|AMP, PATTERN_LSETP, cycle_percentage_value);
+  stimBrd2.start(UECU_SYNC_MSG); // After set IPI, board need a Sync msg to line up the pulses.
+
   cycle_percentage_value = 0;
   
   while (1) {
-	  //Serial.println("Start CwruStim Main Loop");
-	  //digitalWrite(led_pin, !led_state);   // turn the LED on (HIGH is the voltage level)
-	  //delay(100);              // wait for 100ms, , not requirement
+    //digitalWrite(led_pin, !led_state);   // turn the LED on (HIGH is the voltage level)
+    //delay(100);              // wait for 100ms, , not requirement
 
-	  //Serial.println(" ");
-	  Serial.print("cycle_PP = ");
-	  Serial.print(cycle_percentage_value);
-	  Serial.print("\t PP_step = ");
-	  Serial.print(PP_step);
-	  Serial.print("\t PP_increment = ");
-	  Serial.print(PP_increment);
-	  Serial.print("\t");
 
-	  // for debug only, set all board/param/pattern combo
-	  //test_all_update();
+    // for debug only, set all board/param/pattern combo
+    //test_all_update();
 
-	  // Test the board/pattern in PW mode
+    stimBrd1.update(VCK5_BRD1|PW, PATTERN_LSETP, cycle_percentage_value);
 
-	  //stimBrd2.debug_print_states(2);
+    stimBrd2.update(VCK5_BRD2|PW, PATTERN_LSETP, cycle_percentage_value);
 
-	  //digitalWrite(led_pin, LOW);    // turn the LED off by making the voltage LOW
+    #if defined(DEBUG_ON)
+      //Serial.println(" ");
+      Serial.print("cycle_PP = ");
+      Serial.print(cycle_percentage_value);
+      Serial.print("\t PP_step = ");
+      Serial.print(PP_step);
+      Serial.print("\t PP_increment = ");
+      Serial.print(PP_increment);
+      Serial.print("\t");
 
-	  //delay(50); // delay 50ms, not requirement
-	  stimBrd1.update(VCK5_BRD1|PW, PATTERN_LSETP, cycle_percentage_value);
-	  stimBrd1.debug_print_states(1);
-	  //delay(100);              // wait for 100ms, , not requirement
+      // Print out Stim PW
+      //stimBrd1.debug_print_states(1);
+      //stimBrd2.debug_print_states(1);
+    #endif
+
   } // end while 1
 }
 
 void timerOneIsr()
 {
+  // 30ms timer ISR
+  digitalWrite( led_pin, digitalRead( led_pin ) ^ 1 );
+  cycle_percentage_value += PP_increment;
 
-	// 30ms timer ISR
-	digitalWrite( led_pin, digitalRead( led_pin ) ^ 1 );
-	cycle_percentage_value += PP_increment;
-
-	if (cycle_percentage_value > 20000) {
-		cycle_percentage_value = 0;
-	}
+  if (cycle_percentage_value > 20000) {
+    cycle_percentage_value = 0;
+  }
 }
 
 void test_all_update(void) {
