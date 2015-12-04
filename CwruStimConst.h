@@ -24,7 +24,8 @@ static const int STIM_SETTING_DEFAULT = 0;
 // Error Flag (bitwise encoded)
 static const int STIM_NO_ERROR = 0<<0;
 static const int STIM_ERROR_SERIAL_ERROR = 1<<1;
-static const int STIM_ERROR_GAIT_TYPE_ERROR = 1<<2;
+static const int STIM_ERROR_UPDATE_TYPE_ERROR = 1<<2;
+static const int STIM_ERROR_UPDATE_PATTERN_ERROR = 1<<3;
 
 // UECU Message Header
 static int MSG_DES_ADDR; 
@@ -89,6 +90,12 @@ static const int NUM_GAIT_VCK5_BOARD = 2;
 static const int GAIT_VCK5_BOARD1 = 0;
 static const int GAIT_VCK5_BOARD2 = 1;
 
+static const int VCK5_BRD1 = 0<<8;
+static const int VCK5_BRD2 = 1<<8;
+
+static const int IPI = 1;
+static const int AMP = 2;
+static const int PW = 3;
 
 static const int NUM_PATTERN = 5;
 static const int PATTERN_NO_STIM = 0;

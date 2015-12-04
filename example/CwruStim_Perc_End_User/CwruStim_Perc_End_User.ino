@@ -89,11 +89,19 @@ void loop() {
 
 
   // Stim::update(gait_type, pattern, cycle_percentage)
-  stimBrd1.update(GAIT_VCK5_BOARD1, PATTERN_STAND, time_test);
+  stimBrd1.update(VCK5_BRD1|AMP, PATTERN_NO_STIM, time_test);
+  stimBrd1.update(VCK5_BRD1|AMP, PATTERN_STAND, time_test);
+  stimBrd1.update(VCK5_BRD1|AMP, PATTERN_SIT, time_test);
+  stimBrd1.update(VCK5_BRD1|AMP, PATTERN_LSETP, time_test);
+  stimBrd1.update(VCK5_BRD1|AMP, PATTERN_RSETP, time_test);
   //stimBrd1.debug_print_states(1);
   
 
-  stimBrd1.update(GAIT_VCK5_BOARD2, PATTERN_STAND, time_test);
+  stimBrd2.update(VCK5_BRD2|AMP, PATTERN_NO_STIM, time_test);
+  stimBrd2.update(VCK5_BRD2|AMP, PATTERN_STAND, time_test);
+  stimBrd2.update(VCK5_BRD2|AMP, PATTERN_SIT, time_test);
+  stimBrd2.update(VCK5_BRD2|AMP, PATTERN_LSETP, time_test);
+  stimBrd2.update(VCK5_BRD2|AMP, PATTERN_RSETP, time_test);
   //stimBrd2.debug_print_states(2);
 
   time_test +=100;
