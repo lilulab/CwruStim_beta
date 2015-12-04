@@ -7,6 +7,7 @@
 */
 
 #include "CwruStim.h" // Stim board driver
+#include <TimerOne.h>
 
 // Stim board 1 @ UART1
 Stim stimBrd1(STIM_CHANNEL_UART1);
@@ -17,6 +18,7 @@ Stim stimBrd2(STIM_CHANNEL_UART3);
 static int led_pin = 40; // for N-TREK board LEDs
 
 uint16_t time_test = 0;
+bool led_state;
 
 void setup() {
 
@@ -43,46 +45,56 @@ void setup() {
 
   //Serial.println((*LUT_B1_PP)[1][5]);
 
+  Timer1.initialize(30000); // set a timer of length 1000 microseconds (or 0.001 sec - or 1kHz) 
+  Timer1.attachInterrupt( timerOneIsr ); // attach the service routine here
+  //Timer1.start();
+
 
 }
 
+
 void loop() {
-  //Serial.println("Start CwruStim Main Loop");
-  digitalWrite(led_pin, HIGH);   // turn the LED on (HIGH is the voltage level)
-  delay(100);              // wait for 100ms, , not requirement
 
-  //Serial.println(" ");
-  Serial.print("cycle_percentage = ");
-  Serial.print(time_test);
-  Serial.print("\t");
+  stimBrd1.update(VCK5_BRD1|IPI, PATTERN_LSETP, time_test);
+  stimBrd1.update(VCK5_BRD1|AMP, PATTERN_LSETP, time_test);
 
-  // for debug only, set all board/param/pattern combo
-  //test_all_update();
+  time_test = 0;
+  
+  while (1) {
+	  //Serial.println("Start CwruStim Main Loop");
+	  //digitalWrite(led_pin, !led_state);   // turn the LED on (HIGH is the voltage level)
+	  //delay(100);              // wait for 100ms, , not requirement
 
-  // Test all the board/pattern in PW mode
-  // Stim::update(type, pattern, cycle_percentage)
-  // stimBrd1.update(VCK5_BRD1|PW, PATTERN_NO_STIM, time_test);
-  // stimBrd1.update(VCK5_BRD1|PW, PATTERN_STAND, time_test);
-  // stimBrd1.update(VCK5_BRD1|PW, PATTERN_SIT, time_test);
-  stimBrd1.update(VCK5_BRD1|PW, PATTERN_LSETP, time_test);
-  // stimBrd1.update(VCK5_BRD1|PW, PATTERN_RSETP, time_test);
+	  Serial.println(" ");
+	  Serial.print("cycle_percentage = ");
+	  Serial.print(time_test);
+	  Serial.print("\t");
 
-  // stimBrd2.update(VCK5_BRD2|PW, PATTERN_NO_STIM, time_test);
-  // stimBrd2.update(VCK5_BRD2|PW, PATTERN_STAND, time_test);
-  // stimBrd2.update(VCK5_BRD2|PW, PATTERN_SIT, time_test);
-  //stimBrd2.update(VCK5_BRD2|PW, PATTERN_LSETP, time_test);
-  // stimBrd2.update(VCK5_BRD2|PW, PATTERN_RSETP, time_test);
+	  // for debug only, set all board/param/pattern combo
+	  //test_all_update();
 
-  stimBrd1.debug_print_states(1);
-  //stimBrd2.debug_print_states(2);
+	  // Test the board/pattern in PW mode
 
-  time_test +=100;
+	  //stimBrd2.debug_print_states(2);
 
-  //delay(50); // delay 50ms, not requirement
+	  //digitalWrite(led_pin, LOW);    // turn the LED off by making the voltage LOW
 
-  digitalWrite(led_pin, LOW);    // turn the LED off by making the voltage LOW
-	delay(800);              // wait for 100ms, , not requirement
-	
+	  //delay(50); // delay 50ms, not requirement
+	  stimBrd1.update(VCK5_BRD1|PW, PATTERN_LSETP, time_test);
+	  stimBrd1.debug_print_states(1);
+	  //delay(100);              // wait for 100ms, , not requirement
+  } // end while 1
+}
+
+void timerOneIsr()
+{
+	// 30ms timer ISR
+	digitalWrite( led_pin, digitalRead( led_pin ) ^ 1 );
+	time_test +=235;
+
+	if (time_test > 20000) {
+		time_test = 0;
+	}
 }
 
 void test_all_update(void) {
