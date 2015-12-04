@@ -23,13 +23,14 @@ void setup() {
 
   // initialize Serial0 for debug.
   Serial.begin(115200);
+  Serial.print("Program Start ...");
   //Serial.println("Start CwruStim Program Setup");
 
   // LED pin
   pinMode(led_pin, OUTPUT);
   digitalWrite(led_pin, HIGH);  // turn the LED on
 
-  delay(2000); // delay 2 sec
+  delay(1000); // delay 2 sec
 
   // Setup CwruStim Lib
   stimBrd1.init(STIM_MODE_PERC_8CH_MULTI_SCHEDULE); // Initialize the Stim board and delete old schedule
@@ -50,58 +51,29 @@ void loop() {
   digitalWrite(led_pin, HIGH);   // turn the LED on (HIGH is the voltage level)
   delay(100);              // wait for 100ms, , not requirement
 
-  Serial.println(" ");
+  //Serial.println(" ");
   Serial.print("cycle_percentage = ");
-  Serial.println(time_test);
+  Serial.print(time_test);
+  Serial.print("\t");
 
+  // for debug only, set all board/param/pattern combo
+  //test_all_update();
 
-  // const uint16_t array[2][3] = {{1,2,3},{4,5,6}}; 
-  // const uint16_t (*array_prt)[2][3]; 
-  // const uint8_t (*VCK5_B1_AMP_prt)[12]; 
+  // Test all the board/pattern in PW mode
+  // Stim::update(type, pattern, cycle_percentage)
+  // stimBrd1.update(VCK5_BRD1|PW, PATTERN_NO_STIM, time_test);
+  // stimBrd1.update(VCK5_BRD1|PW, PATTERN_STAND, time_test);
+  // stimBrd1.update(VCK5_BRD1|PW, PATTERN_SIT, time_test);
+  stimBrd1.update(VCK5_BRD1|PW, PATTERN_LSETP, time_test);
+  // stimBrd1.update(VCK5_BRD1|PW, PATTERN_RSETP, time_test);
 
-  // // const uint8_t VCK5_B1_AMP[12] = { 38,    38,   38,   38,   38,   38,   38,   38,   0,    0,    0,    0 };
-  // VCK5_B1_AMP_prt = &VCK5_B1_AMP; 
+  // stimBrd2.update(VCK5_BRD2|PW, PATTERN_NO_STIM, time_test);
+  // stimBrd2.update(VCK5_BRD2|PW, PATTERN_STAND, time_test);
+  // stimBrd2.update(VCK5_BRD2|PW, PATTERN_SIT, time_test);
+  stimBrd2.update(VCK5_BRD2|PW, PATTERN_LSETP, time_test);
+  // stimBrd2.update(VCK5_BRD2|PW, PATTERN_RSETP, time_test);
 
-  // array_prt = &array;
-
-  // Serial.println("test array = ");
-  // for (int i=0; i<2; i++) {
-  //   Serial.print("{");
-  //   for (int j=0; j<3; j++) {
-  //     Serial.print((*array_prt)[i][j]);
-  //     Serial.print(",");
-  //   }
-  //   Serial.println("}");
-  // }
-
-  // Serial.println("VCK5_B1_AMP array = ");
-  // Serial.print("{");  
-  // for (int i=0; i<12; i++) {
-  //     Serial.print((*VCK5_B1_AMP_prt)[i]);
-  //     Serial.print(",");
-  // }
-  // Serial.println("}");
-
-  
-
-
-  // Run gait pattern update
-
-
-  // Stim::update(gait_type, pattern, cycle_percentage)
-  stimBrd1.update(VCK5_BRD1|AMP, PATTERN_NO_STIM, time_test);
-  stimBrd1.update(VCK5_BRD1|AMP, PATTERN_STAND, time_test);
-  stimBrd1.update(VCK5_BRD1|AMP, PATTERN_SIT, time_test);
-  stimBrd1.update(VCK5_BRD1|AMP, PATTERN_LSETP, time_test);
-  stimBrd1.update(VCK5_BRD1|AMP, PATTERN_RSETP, time_test);
-  //stimBrd1.debug_print_states(1);
-  
-
-  stimBrd2.update(VCK5_BRD2|AMP, PATTERN_NO_STIM, time_test);
-  stimBrd2.update(VCK5_BRD2|AMP, PATTERN_STAND, time_test);
-  stimBrd2.update(VCK5_BRD2|AMP, PATTERN_SIT, time_test);
-  stimBrd2.update(VCK5_BRD2|AMP, PATTERN_LSETP, time_test);
-  stimBrd2.update(VCK5_BRD2|AMP, PATTERN_RSETP, time_test);
+  stimBrd1.debug_print_states(1);
   //stimBrd2.debug_print_states(2);
 
   time_test +=100;
@@ -111,6 +83,36 @@ void loop() {
   digitalWrite(led_pin, LOW);    // turn the LED off by making the voltage LOW
 	delay(800);              // wait for 100ms, , not requirement
 	
+}
+
+void test_all_update(void) {
+  // Test all the board/pattern in IPI mode
+  // Stim::update(type, pattern, cycle_percentage)
+  stimBrd1.update(VCK5_BRD1|IPI, PATTERN_NO_STIM, time_test);
+  stimBrd1.update(VCK5_BRD1|IPI, PATTERN_STAND, time_test);
+  stimBrd1.update(VCK5_BRD1|IPI, PATTERN_SIT, time_test);
+  stimBrd1.update(VCK5_BRD1|IPI, PATTERN_LSETP, time_test);
+  stimBrd1.update(VCK5_BRD1|IPI, PATTERN_RSETP, time_test);
+
+  stimBrd2.update(VCK5_BRD2|IPI, PATTERN_NO_STIM, time_test);
+  stimBrd2.update(VCK5_BRD2|IPI, PATTERN_STAND, time_test);
+  stimBrd2.update(VCK5_BRD2|IPI, PATTERN_SIT, time_test);
+  stimBrd2.update(VCK5_BRD2|IPI, PATTERN_LSETP, time_test);
+  stimBrd2.update(VCK5_BRD2|IPI, PATTERN_RSETP, time_test);
+
+  // Test all the board/pattern in AMP mode
+  // Stim::update(type, pattern, cycle_percentage)
+  stimBrd1.update(VCK5_BRD1|AMP, PATTERN_NO_STIM, time_test);
+  stimBrd1.update(VCK5_BRD1|AMP, PATTERN_STAND, time_test);
+  stimBrd1.update(VCK5_BRD1|AMP, PATTERN_SIT, time_test);
+  stimBrd1.update(VCK5_BRD1|AMP, PATTERN_LSETP, time_test);
+  stimBrd1.update(VCK5_BRD1|AMP, PATTERN_RSETP, time_test);
+
+  stimBrd2.update(VCK5_BRD2|AMP, PATTERN_NO_STIM, time_test);
+  stimBrd2.update(VCK5_BRD2|AMP, PATTERN_STAND, time_test);
+  stimBrd2.update(VCK5_BRD2|AMP, PATTERN_SIT, time_test);
+  stimBrd2.update(VCK5_BRD2|AMP, PATTERN_LSETP, time_test);
+  stimBrd2.update(VCK5_BRD2|AMP, PATTERN_RSETP, time_test);
 }
 
 

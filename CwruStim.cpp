@@ -9,8 +9,9 @@
 #include "Arduino.h"
 #include "CwruStim.h"
 
-#define DEBUG_ON 1 //Comment this out if want to disenable all debug serial printing.
-#define DEBUG_STIM_UPDATE 1;
+// #define DEBUG_ON 1 //Comment this out if want to disenable all debug serial printing.
+// #define DEBUG_STIM_UPDATE 1;
+// #define DEBUG_STIM_RAMPING 1;
 
 // Stim constructor and UART selector
 Stim::Stim(int uart_channel_id) {
@@ -629,7 +630,7 @@ int Stim::update(int type, int pattern, uint16_t cycle_percentage) {
         for (int i=0; i<STIM_CHANNEL_MAX_PERC; i++) {
           _current_ipi[i] = (*LUT_IPI)[i];
           #if defined(DEBUG_STIM_UPDATE) && defined(DEBUG_ON)
-            Serial.print((*LUT_IPI)[i]);
+            Serial.print(_current_ipi[i]);
             Serial.print(",\t");
           #endif
           this->cmd_set_sched(i+1, UECU_SYNC_MSG, _current_ipi[i]);
@@ -672,6 +673,98 @@ int Stim::update(int type, int pattern, uint16_t cycle_percentage) {
 
     // if need to update PW
     case PW:
+      #if defined(DEBUG_STIM_UPDATE) && defined(DEBUG_ON)
+        Serial.print("PW MODE: ");
+      #endif
+      // Select which pattern
+      need_update = 1;
+      switch (pattern) {
+        case PATTERN_NO_STIM:
+          // do nothing here, set all 0 at the cmd_set_evnt in the end
+          break;
+
+        // PW - Stand
+        case PATTERN_STAND:
+          #if defined(DEBUG_STIM_UPDATE) && defined(DEBUG_ON)
+            Serial.print("-- PW - Stand ");
+          #endif
+          if (board == VCK5_BRD1) {
+            LUT_PP = &VCK5_stand_B1_PP;
+            LUT_PW = &VCK5_stand_B1_PW;
+          } else if (board == VCK5_BRD2) {
+            LUT_PP = &VCK5_stand_B2_PP;
+            LUT_PW = &VCK5_stand_B2_PW;
+          } else {
+            _stim_error |= STIM_ERROR_UPDATE_PATTERN_ERROR;
+          }
+          break;
+
+        // PW - SIT
+        case PATTERN_SIT:
+          #if defined(DEBUG_STIM_UPDATE) && defined(DEBUG_ON)
+            Serial.print("-- PW - SIT ");
+          #endif
+          if (board == VCK5_BRD1) {
+            LUT_PP = &VCK5_sit_B1_PP;
+            LUT_PW = &VCK5_sit_B1_PW;
+          } else if (board == VCK5_BRD2) {
+            LUT_PP = &VCK5_sit_B2_PP;
+            LUT_PW = &VCK5_sit_B2_PW;
+          } else {
+            _stim_error |= STIM_ERROR_UPDATE_PATTERN_ERROR;
+          }
+          break;
+
+        // PW - LSTEP
+        case PATTERN_LSETP:
+          #if defined(DEBUG_STIM_UPDATE) && defined(DEBUG_ON)
+            Serial.print("-- PW - LSTEP ");
+          #endif
+          if (board == VCK5_BRD1) {
+            LUT_PP = &VCK5_walk_L_B1_PP;
+            LUT_PW = &VCK5_walk_L_B1_PW;
+          } else if (board == VCK5_BRD2) {
+            LUT_PP = &VCK5_walk_L_B2_PP;
+            LUT_PW = &VCK5_walk_L_B2_PW;
+          } else {
+            _stim_error |= STIM_ERROR_UPDATE_PATTERN_ERROR;
+          }
+          break;
+
+        // PW - RSTEP
+        case PATTERN_RSETP:
+          #if defined(DEBUG_STIM_UPDATE) && defined(DEBUG_ON)
+            Serial.print("-- PW - RSTEP ");
+          #endif
+          if (board == VCK5_BRD1) {
+            LUT_PP = &VCK5_walk_R_B1_PP;
+            LUT_PW = &VCK5_walk_R_B1_PW;
+          } else if (board == VCK5_BRD2) {
+            LUT_PP = &VCK5_walk_R_B2_PP;
+            LUT_PW = &VCK5_walk_R_B2_PW;
+          } else {
+            _stim_error |= STIM_ERROR_UPDATE_PATTERN_ERROR;
+          }
+          break;
+      } // end switch (pattern)
+
+      // Now update PW 
+      if (need_update == 1) {
+        for (int i=0; i<STIM_CHANNEL_MAX_PERC; i++) {
+          if (pattern == PATTERN_NO_STIM) {
+            _current_pulse_width[i] = 0;
+          } else {
+            // ramping function
+            _current_pulse_width[i] = get_PW_ramping(i, LUT_PP, LUT_PW, cycle_percentage);
+            //_current_pulse_width[i] = (*LUT_PW)[i][STIM_CHANNEL_MAX_PERC-1];
+          }
+          #if defined(DEBUG_STIM_UPDATE) && defined(DEBUG_ON)
+            Serial.print(_current_pulse_width[i]);
+            Serial.print(",\t");
+          #endif
+          this->cmd_set_evnt(i+1, _current_pulse_width[i], _current_amplitude[i], 0); // Change Event i for port_chn_id i in sched_id 1  
+        } // end for
+      } // end if
 
       break; // end case PW
 
@@ -689,6 +782,137 @@ int Stim::update(int type, int pattern, uint16_t cycle_percentage) {
   
 
   return 1;
+}
+
+uint8_t Stim::get_PW_ramping( int channel_i,
+                        const uint16_t (*LUT_PP_t)[12][8],
+                        const uint8_t (*LUT_PW_t)[12][8],
+                        uint16_t cycle_pp_t) 
+{
+  // search in LUT_PP_t[i][:] find where cycle_pp_t belongs to
+  // find the upper limit of ramp
+
+  // calulated ramping value, set to 0 for safety
+  uint8_t pw_ramping_val = 0;
+
+  // search until found the correct ramping value
+  int found_ramp = 0;
+
+  #if defined(DEBUG_STIM_RAMPING) && defined(DEBUG_ON)
+    Serial.print("get_PW_ramping(): ");
+    Serial.print("channel_i = ");
+    Serial.print(channel_i);
+    Serial.print("\t cycle_pp_t = ");
+    Serial.println(cycle_pp_t);
+
+    Serial.println("(*LUT_PP_t)[12][8] = {");
+    for (int i=0; i < STIM_CHANNEL_MAX_PERC; i++) {
+      for (int j=0; j < GAIT_LUT_RES; j++) {
+        Serial.print((*LUT_PP_t)[i][j]);
+        Serial.print(", \t");
+      }
+      Serial.println("}");
+    }
+
+    Serial.println(" ");
+
+    Serial.println("(*LUT_PW_t)[12][8] = {");
+    for (int i=0; i < STIM_CHANNEL_MAX_PERC; i++) {
+      for (int j=0; j < GAIT_LUT_RES; j++) {
+        Serial.print((*LUT_PW_t)[i][j]);
+        Serial.print(", \t");
+      }
+      Serial.println("}");
+    }
+
+  #endif
+  
+  int j=0;
+  while (found_ramp == 0) {
+    // LUT resolution step iterator
+
+    #if defined(DEBUG_STIM_RAMPING) && defined(DEBUG_ON)
+      Serial.print("found_ramp = ");
+      Serial.print(found_ramp);
+      Serial.print(".\t j = ");
+      Serial.println(j);
+    #endif
+
+    // only search 0 to (RES-1)
+    if (j < GAIT_LUT_RES) {
+
+      #if defined(DEBUG_STIM_RAMPING) && defined(DEBUG_ON)
+          Serial.print("Search loop j: ");
+      #endif
+
+      //(*LUT_PP_t)[channel_i][j]
+      if (cycle_pp_t == (*LUT_PP_t)[channel_i][j]) {
+        // if equal, then use PP to directly find PW value, no need for ramping
+        // direct return the ramped PW value;
+        pw_ramping_val =  (*LUT_PW_t)[channel_i][j];
+
+        // and exit search loop
+        found_ramp = 1;
+
+        #if defined(DEBUG_STIM_RAMPING) && defined(DEBUG_ON)
+          Serial.print("cycle_pp_t = (*LUT_PP_t)[channel_i][j]");
+          Serial.print(", pw_ramping_val = ");
+          Serial.println(pw_ramping_val);
+        #endif
+
+      } else if (cycle_pp_t > (*LUT_PP_t)[channel_i][j]) {
+        // if cycle_pp_t is greater then LUT_PP_t
+        // that means the previous LUT_PP_t is the correct upper limit
+        // and do calculation in here, then break the search loop
+
+        // Calculate the ramping value
+        //                              time_diff 
+        // pw_ramping_val = pw_diff * (-----------)
+        //                              time_div  
+        // then,
+        //                                     PP_now - PP_low 
+        // pw_ramping_val = (PW_up-PW_low) * (-----------------)
+        //                                     PP_up - PP_low  
+        uint16_t time_diff = cycle_pp_t - (*LUT_PP_t)[channel_i][j-1];
+        uint16_t time_div = (*LUT_PP_t)[channel_i][j] - (*LUT_PP_t)[channel_i][j-1];
+        uint16_t pw_diff = (uint8_t) ((*LUT_PW_t)[channel_i][j] - (*LUT_PW_t)[channel_i][j-1]);
+        pw_ramping_val = (uint8_t) (pw_diff * (time_diff / time_div));
+
+        // and exit search loop
+        found_ramp = 1;
+
+        #if defined(DEBUG_STIM_RAMPING) && defined(DEBUG_ON)
+          Serial.print("cycle_pp_t > (*LUT_PP_t)[channel_i][j]");
+          Serial.print(", pw_ramping_val = ");
+          Serial.println(pw_ramping_val);
+        #endif
+
+      } else {
+        // this means either cycle_pp_t should belong to this slot,
+        // or we still need to keep serching.
+        // so keep increment j, or keep the search loop
+        found_ramp = 0;
+        j++;
+
+        #if defined(DEBUG_STIM_RAMPING) && defined(DEBUG_ON)
+          Serial.print("Else");
+          Serial.print(", pw_ramping_val = ");
+          Serial.println(pw_ramping_val);
+        #endif
+      } // end if else ..
+    }// end if j<
+  } // end while (found_ramp)
+
+  #if defined(DEBUG_STIM_RAMPING) && defined(DEBUG_ON)
+          Serial.print("Found Ramp!");
+          Serial.print("j = ");
+          Serial.println(j);
+          Serial.print(", pw_ramping_val = ");
+          Serial.println(pw_ramping_val);
+  #endif
+  // return the ramped PW value;
+  return pw_ramping_val;
+
 }
 
 //int _Gait_LUT_VCK5[2][4];
@@ -791,12 +1015,12 @@ int Stim::serial_write_array(uint8_t buf[], int length) {
 // Use Serial0 to print debug messages.
 int Stim::debug_print_states(int id) {
   if (Serial) {
-    Serial.print("stimBrd"); Serial.print(id); Serial.print(".");
-    Serial.print("_uart_channel_id = ");
-    Serial.print(_uart_channel_id);
-    Serial.print(".\t _stim_error = ");
-    Serial.print(_stim_error);
-    Serial.println(".");
+    // Serial.print("stimBrd"); Serial.print(id); Serial.print(".");
+    // Serial.print("_uart_channel_id = ");
+    // Serial.print(_uart_channel_id);
+    // Serial.print(".\t _stim_error = ");
+    // Serial.print(_stim_error);
+    // Serial.println(".");
 
     Serial.print("_current_pulse_width = {");
     for (uint8_t i=0; i<STIM_CHANNEL_MAX_PERC; i++) {
@@ -805,19 +1029,19 @@ int Stim::debug_print_states(int id) {
     }
     Serial.println("}.");
 
-    Serial.print("_current_amplitude = {");
-    for (uint8_t i=0; i<STIM_CHANNEL_MAX_PERC; i++) {
-      Serial.print(_current_amplitude[i]);
-      Serial.print(",\t");
-    }
-    Serial.println("}.");
+    // Serial.print("_current_amplitude = {");
+    // for (uint8_t i=0; i<STIM_CHANNEL_MAX_PERC; i++) {
+    //   Serial.print(_current_amplitude[i]);
+    //   Serial.print(",\t");
+    // }
+    // Serial.println("}.");
 
-    Serial.print("_current_ipi = {");
-    for (uint8_t i=0; i<STIM_CHANNEL_MAX_PERC; i++) {
-      Serial.print(_current_ipi[i]);
-      Serial.print(",\t");
-    }
-    Serial.println("}.");
+    // Serial.print("_current_ipi = {");
+    // for (uint8_t i=0; i<STIM_CHANNEL_MAX_PERC; i++) {
+    //   Serial.print(_current_ipi[i]);
+    //   Serial.print(",\t");
+    // }
+    // Serial.println("}.");
 
   }
 }
