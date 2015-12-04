@@ -766,7 +766,8 @@ int Stim::update(int type, int pattern, uint16_t cycle_percentage) {
             Serial.print(",\t");
           #endif
           // publish if only it is diff than the previous value
-          if ((_last_pulse_width != _current_pulse_width[i]) || (cycle_percentage == 0)) {
+          // if ((_last_pulse_width != _current_pulse_width[i]) || (cycle_percentage == 0)) {
+          if (_last_pulse_width != _current_pulse_width[i]) {
             this->cmd_set_evnt(i+1, _current_pulse_width[i], _current_amplitude[i], 0); // Change Event i for port_chn_id i in sched_id 1  
           }
         } // end for

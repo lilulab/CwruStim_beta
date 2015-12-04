@@ -17,11 +17,14 @@ Stim stimBrd2(STIM_CHANNEL_UART3);
 
 static int led_pin = 40; // for N-TREK board LEDs
 
-uint16_t time_test = 0;
 bool led_state;
 
-void setup() {
+uint16_t cycle_percentage_value = 0;
+float step_duration_ms = VCK5_walk_L_duration*1000;
+float PP_step = (step_duration_ms/30);
+uint16_t PP_increment = (uint16_t)(10000/PP_step);
 
+void setup() {
 
   // initialize Serial0 for debug.
   Serial.begin(115200);
@@ -55,19 +58,24 @@ void setup() {
 
 void loop() {
 
-  stimBrd1.update(VCK5_BRD1|IPI, PATTERN_LSETP, time_test);
-  stimBrd1.update(VCK5_BRD1|AMP, PATTERN_LSETP, time_test);
+  stimBrd1.update(VCK5_BRD1|IPI, PATTERN_LSETP, cycle_percentage_value);
+  stimBrd1.update(VCK5_BRD1|AMP, PATTERN_LSETP, cycle_percentage_value);
+  stimBrd1.start(UECU_SYNC_MSG); // After set IPI, board need a Sync msg to line up the pulses.
 
-  time_test = 0;
+  cycle_percentage_value = 0;
   
   while (1) {
 	  //Serial.println("Start CwruStim Main Loop");
 	  //digitalWrite(led_pin, !led_state);   // turn the LED on (HIGH is the voltage level)
 	  //delay(100);              // wait for 100ms, , not requirement
 
-	  Serial.println(" ");
-	  Serial.print("cycle_percentage = ");
-	  Serial.print(time_test);
+	  //Serial.println(" ");
+	  Serial.print("cycle_PP = ");
+	  Serial.print(cycle_percentage_value);
+	  Serial.print("\t PP_step = ");
+	  Serial.print(PP_step);
+	  Serial.print("\t PP_increment = ");
+	  Serial.print(PP_increment);
 	  Serial.print("\t");
 
 	  // for debug only, set all board/param/pattern combo
@@ -80,7 +88,7 @@ void loop() {
 	  //digitalWrite(led_pin, LOW);    // turn the LED off by making the voltage LOW
 
 	  //delay(50); // delay 50ms, not requirement
-	  stimBrd1.update(VCK5_BRD1|PW, PATTERN_LSETP, time_test);
+	  stimBrd1.update(VCK5_BRD1|PW, PATTERN_LSETP, cycle_percentage_value);
 	  stimBrd1.debug_print_states(1);
 	  //delay(100);              // wait for 100ms, , not requirement
   } // end while 1
@@ -88,43 +96,44 @@ void loop() {
 
 void timerOneIsr()
 {
+
 	// 30ms timer ISR
 	digitalWrite( led_pin, digitalRead( led_pin ) ^ 1 );
-	time_test +=235;
+	cycle_percentage_value += PP_increment;
 
-	if (time_test > 20000) {
-		time_test = 0;
+	if (cycle_percentage_value > 20000) {
+		cycle_percentage_value = 0;
 	}
 }
 
 void test_all_update(void) {
   // Test all the board/pattern in IPI mode
   // Stim::update(type, pattern, cycle_percentage)
-  stimBrd1.update(VCK5_BRD1|IPI, PATTERN_NO_STIM, time_test);
-  stimBrd1.update(VCK5_BRD1|IPI, PATTERN_STAND, time_test);
-  stimBrd1.update(VCK5_BRD1|IPI, PATTERN_SIT, time_test);
-  stimBrd1.update(VCK5_BRD1|IPI, PATTERN_LSETP, time_test);
-  stimBrd1.update(VCK5_BRD1|IPI, PATTERN_RSETP, time_test);
+  stimBrd1.update(VCK5_BRD1|IPI, PATTERN_NO_STIM, cycle_percentage_value);
+  stimBrd1.update(VCK5_BRD1|IPI, PATTERN_STAND, cycle_percentage_value);
+  stimBrd1.update(VCK5_BRD1|IPI, PATTERN_SIT, cycle_percentage_value);
+  stimBrd1.update(VCK5_BRD1|IPI, PATTERN_LSETP, cycle_percentage_value);
+  stimBrd1.update(VCK5_BRD1|IPI, PATTERN_RSETP, cycle_percentage_value);
 
-  stimBrd2.update(VCK5_BRD2|IPI, PATTERN_NO_STIM, time_test);
-  stimBrd2.update(VCK5_BRD2|IPI, PATTERN_STAND, time_test);
-  stimBrd2.update(VCK5_BRD2|IPI, PATTERN_SIT, time_test);
-  stimBrd2.update(VCK5_BRD2|IPI, PATTERN_LSETP, time_test);
-  stimBrd2.update(VCK5_BRD2|IPI, PATTERN_RSETP, time_test);
+  stimBrd2.update(VCK5_BRD2|IPI, PATTERN_NO_STIM, cycle_percentage_value);
+  stimBrd2.update(VCK5_BRD2|IPI, PATTERN_STAND, cycle_percentage_value);
+  stimBrd2.update(VCK5_BRD2|IPI, PATTERN_SIT, cycle_percentage_value);
+  stimBrd2.update(VCK5_BRD2|IPI, PATTERN_LSETP, cycle_percentage_value);
+  stimBrd2.update(VCK5_BRD2|IPI, PATTERN_RSETP, cycle_percentage_value);
 
   // Test all the board/pattern in AMP mode
   // Stim::update(type, pattern, cycle_percentage)
-  stimBrd1.update(VCK5_BRD1|AMP, PATTERN_NO_STIM, time_test);
-  stimBrd1.update(VCK5_BRD1|AMP, PATTERN_STAND, time_test);
-  stimBrd1.update(VCK5_BRD1|AMP, PATTERN_SIT, time_test);
-  stimBrd1.update(VCK5_BRD1|AMP, PATTERN_LSETP, time_test);
-  stimBrd1.update(VCK5_BRD1|AMP, PATTERN_RSETP, time_test);
+  stimBrd1.update(VCK5_BRD1|AMP, PATTERN_NO_STIM, cycle_percentage_value);
+  stimBrd1.update(VCK5_BRD1|AMP, PATTERN_STAND, cycle_percentage_value);
+  stimBrd1.update(VCK5_BRD1|AMP, PATTERN_SIT, cycle_percentage_value);
+  stimBrd1.update(VCK5_BRD1|AMP, PATTERN_LSETP, cycle_percentage_value);
+  stimBrd1.update(VCK5_BRD1|AMP, PATTERN_RSETP, cycle_percentage_value);
 
-  stimBrd2.update(VCK5_BRD2|AMP, PATTERN_NO_STIM, time_test);
-  stimBrd2.update(VCK5_BRD2|AMP, PATTERN_STAND, time_test);
-  stimBrd2.update(VCK5_BRD2|AMP, PATTERN_SIT, time_test);
-  stimBrd2.update(VCK5_BRD2|AMP, PATTERN_LSETP, time_test);
-  stimBrd2.update(VCK5_BRD2|AMP, PATTERN_RSETP, time_test);
+  stimBrd2.update(VCK5_BRD2|AMP, PATTERN_NO_STIM, cycle_percentage_value);
+  stimBrd2.update(VCK5_BRD2|AMP, PATTERN_STAND, cycle_percentage_value);
+  stimBrd2.update(VCK5_BRD2|AMP, PATTERN_SIT, cycle_percentage_value);
+  stimBrd2.update(VCK5_BRD2|AMP, PATTERN_LSETP, cycle_percentage_value);
+  stimBrd2.update(VCK5_BRD2|AMP, PATTERN_RSETP, cycle_percentage_value);
 }
 
 
