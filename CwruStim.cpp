@@ -797,6 +797,11 @@ uint8_t Stim::get_PW_ramping( int channel_i,
 
   // search until found the correct ramping value
   int found_ramp = 0;
+  
+  // prevent pp greater than 100%
+  if (cycle_pp_t>10000) {
+    cycle_pp_t = 10000;
+  }
 
   #if defined(DEBUG_STIM_RAMPING) && defined(DEBUG_ON)
     Serial.print("get_PW_ramping(): ");
@@ -860,23 +865,32 @@ uint8_t Stim::get_PW_ramping( int channel_i,
           Serial.println(pw_ramping_val);
         #endif
 
-      } else if (cycle_pp_t > (*LUT_PP_t)[channel_i][j]) {
-        // if cycle_pp_t is greater then LUT_PP_t
-        // that means the previous LUT_PP_t is the correct upper limit
+      } else if (cycle_pp_t < (*LUT_PP_t)[channel_i][j]) {
+
+        // if cycle_pp_t is smaller then this LUT_PP_t
+        // then cycle_pp_t belongs to this slot
+        // that means the previous LUT_PP_t is the correct lower limit
         // and do calculation in here, then break the search loop
 
         // Calculate the ramping value
         //                              time_diff 
-        // pw_ramping_val = pw_diff * (-----------)
+        // pw_ramping_val = pw_diff * (-----------) + PW_low
         //                              time_div  
         // then,
         //                                     PP_now - PP_low 
-        // pw_ramping_val = (PW_up-PW_low) * (-----------------)
+        // pw_ramping_val = (PW_up-PW_low) * (-----------------) + PW_low
         //                                     PP_up - PP_low  
         uint16_t time_diff = cycle_pp_t - (*LUT_PP_t)[channel_i][j-1];
-        uint16_t time_div = (*LUT_PP_t)[channel_i][j] - (*LUT_PP_t)[channel_i][j-1];
-        uint16_t pw_diff = (uint8_t) ((*LUT_PW_t)[channel_i][j] - (*LUT_PW_t)[channel_i][j-1]);
-        pw_ramping_val = (uint8_t) (pw_diff * (time_diff / time_div));
+        uint16_t time_base = (*LUT_PP_t)[channel_i][j] - (*LUT_PP_t)[channel_i][j-1];
+        float time_div = (float)time_diff / (float)time_base;
+        float pw_diff = (float)((*LUT_PW_t)[channel_i][j] - (*LUT_PW_t)[channel_i][j-1]);
+        uint8_t pw_base;
+        if (j==0) {
+          pw_base = (*LUT_PW_t)[channel_i][j];
+        } else {
+          pw_base = (*LUT_PW_t)[channel_i][j-1];
+        }
+        pw_ramping_val = (uint8_t) round(pw_diff * time_div) + pw_base;
 
         // and exit search loop
         found_ramp = 1;
@@ -885,6 +899,14 @@ uint8_t Stim::get_PW_ramping( int channel_i,
           Serial.print("cycle_pp_t > (*LUT_PP_t)[channel_i][j]");
           Serial.print(", pw_ramping_val = ");
           Serial.println(pw_ramping_val);
+          Serial.print("time_diff = ");
+          Serial.print(time_diff);
+          Serial.print("time_base = ");
+          Serial.print(time_base);
+          Serial.print("time_div = ");
+          Serial.print(time_div);
+          Serial.print("pw_diff = ");
+          Serial.println(pw_diff);
         #endif
 
       } else {

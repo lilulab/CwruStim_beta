@@ -26,6 +26,7 @@ static const int STIM_NO_ERROR = 0<<0;
 static const int STIM_ERROR_SERIAL_ERROR = 1<<1;
 static const int STIM_ERROR_UPDATE_TYPE_ERROR = 1<<2;
 static const int STIM_ERROR_UPDATE_PATTERN_ERROR = 1<<3;
+static const int STIM_ERROR_UPDATE_RAMPING_ERROR = 1<<4;
 
 // UECU Message Header
 static int MSG_DES_ADDR; 

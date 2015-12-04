@@ -70,7 +70,7 @@ void loop() {
   // stimBrd2.update(VCK5_BRD2|PW, PATTERN_NO_STIM, time_test);
   // stimBrd2.update(VCK5_BRD2|PW, PATTERN_STAND, time_test);
   // stimBrd2.update(VCK5_BRD2|PW, PATTERN_SIT, time_test);
-  stimBrd2.update(VCK5_BRD2|PW, PATTERN_LSETP, time_test);
+  //stimBrd2.update(VCK5_BRD2|PW, PATTERN_LSETP, time_test);
   // stimBrd2.update(VCK5_BRD2|PW, PATTERN_RSETP, time_test);
 
   stimBrd1.debug_print_states(1);
