@@ -627,6 +627,11 @@ int Stim::update(int type, int pattern, uint16_t cycle_percentage) {
 
       // Now update IPI 
       if (need_update == 1) {
+
+        #if defined(DEBUG_STIM_UPDATE) && defined(DEBUG_ON)
+          Serial.print("IPI updating.\t");
+        #endif
+
         for (int i=0; i<STIM_CHANNEL_MAX_PERC; i++) {
           _current_ipi[i] = (*LUT_IPI)[i];
           #if defined(DEBUG_STIM_UPDATE) && defined(DEBUG_ON)
@@ -634,7 +639,7 @@ int Stim::update(int type, int pattern, uint16_t cycle_percentage) {
             Serial.print(",\t");
           #endif
           this->cmd_set_sched(i+1, UECU_SYNC_MSG, _current_ipi[i]);
-          delay(_current_ipi[i]);
+          //delay(_current_ipi[i]); //Do not need this delay
         } // end for
       } // end if
 
@@ -1044,12 +1049,15 @@ int Stim::serial_write_array(uint8_t buf[], int length) {
 // Use Serial0 to print debug messages.
 int Stim::debug_print_states(int id) {
   if (Serial) {
-    // Serial.print("stimBrd"); Serial.print(id); Serial.print(".");
-    // Serial.print("_uart_channel_id = ");
-    // Serial.print(_uart_channel_id);
-    // Serial.print(".\t _stim_error = ");
-    // Serial.print(_stim_error);
-    // Serial.println(".");
+
+    Serial.println(" ");
+
+    Serial.print("stimBrd"); Serial.print(id); Serial.print(".");
+    Serial.print("_uart_channel_id = ");
+    Serial.print(_uart_channel_id);
+    Serial.print(".\t _stim_error = ");
+    Serial.print(_stim_error);
+    Serial.println(".");
 
     Serial.print("_current_pulse_width = {");
     for (uint8_t i=0; i<STIM_CHANNEL_MAX_PERC; i++) {
@@ -1058,19 +1066,19 @@ int Stim::debug_print_states(int id) {
     }
     Serial.println("}.");
 
-    // Serial.print("_current_amplitude = {");
-    // for (uint8_t i=0; i<STIM_CHANNEL_MAX_PERC; i++) {
-    //   Serial.print(_current_amplitude[i]);
-    //   Serial.print(",\t");
-    // }
-    // Serial.println("}.");
+    Serial.print("_current_amplitude = {");
+    for (uint8_t i=0; i<STIM_CHANNEL_MAX_PERC; i++) {
+      Serial.print(_current_amplitude[i]);
+      Serial.print(",\t");
+    }
+    Serial.println("}.");
 
-    // Serial.print("_current_ipi = {");
-    // for (uint8_t i=0; i<STIM_CHANNEL_MAX_PERC; i++) {
-    //   Serial.print(_current_ipi[i]);
-    //   Serial.print(",\t");
-    // }
-    // Serial.println("}.");
+    Serial.print("_current_ipi = {");
+    for (uint8_t i=0; i<STIM_CHANNEL_MAX_PERC; i++) {
+      Serial.print(_current_ipi[i]);
+      Serial.print(",\t");
+    }
+    Serial.println("}.");
 
   }
 }
