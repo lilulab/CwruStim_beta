@@ -11,10 +11,16 @@ static const int STIM_PORT_UART1 = 1;
 static const int STIM_PORT_UART3 = 3;
 
 // Stim settings
+static const int MULTI_SCHEDULE = 0x01;
 static const int STIM_MODE_DEFAULT = 0; // Not used
-static const int STIM_MODE_SURF = 1;  // For surface stimulation board
-static const int STIM_MODE_PERC = 2;  // For percutaneous stimulation board
-static const int STIM_MODE_PERC_8CH_MULTI_SCHEDULE = 3;  // multi scheduler for percutaneous stimulation board
+static const int STIM_MODE_SURF = 0x10;  // For surface stimulation board
+static const int STIM_MODE_PERC = 0x20;  // For percutaneous stimulation board
+static const int STIM_MODE_PERC_8CH_MULTI_SCHEDULE = STIM_MODE_PERC|MULTI_SCHEDULE;  // multi scheduler for percutaneous stimulation board
+static const int STIM_MODE_ICM = 0x30;  // For implant stimulation board
+static const int IRS8 = 0x01;  // For ICM implant - IRS8 stimulation board
+static const int IST16 = 0x02;  // For ICM implant - IST16 stimulation board
+
+
 
 // Upper limit of channels
 static const int STIM_CHANNEL_MAX_PERC = 8;
