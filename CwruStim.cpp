@@ -387,9 +387,16 @@ int Stim::config(int setting) {
       // crt_sched  : 01 80 10 03 AA 00 1D A3 
 
       // this->cmd_crt_sched(sync_signal, duration);
+
+      // Create 3 fixed schedule for 30,50,60 ms IPI.
+      static const int FIXED_SCHED = 3;
+      this->cmd_crt_sched(UECU_SYNC_MSG, 30);  // Sync signal, duration 30msec.
+      this->cmd_crt_sched(UECU_SYNC_MSG, 50);  // Sync signal, duration 50msec.
+      this->cmd_crt_sched(UECU_SYNC_MSG, 60);  // Sync signal, duration 60msec.
+
       // Create 8 schedules
       for (uint8_t i=0; i<STIM_CHANNEL_MAX_PERC; i++) {
-        this->cmd_crt_sched(UECU_SYNC_MSG, _current_ipi[i]);  // Sync signal, duration 30msec.
+        this->cmd_crt_sched(UECU_SYNC_MSG, _current_ipi[i]);  // Sync signal, duration IPI.
         delay(UECU_DELAY_SETUP);
       }
 
@@ -401,6 +408,7 @@ int Stim::config(int setting) {
         // CHECKLIST: Need to set IPI array first!
         //this->cmd_crt_sched(_PERC_8CH_SYNC_MSG[i], _current_ipi[i]);  // Sync signal, duration 30msec.
 
+        // TODO smart scheduler
 
         // Create event 
         // this->cmd_crt_evnt(sched_id, delay, priority, event_type, port_chn_id);
@@ -634,10 +642,13 @@ int Stim::update(int type, int pattern, uint16_t cycle_percentage) {
 
         for (int i=0; i<STIM_CHANNEL_MAX_PERC; i++) {
           _current_ipi[i] = (*LUT_IPI)[i];
+
           #if defined(DEBUG_STIM_UPDATE) && defined(DEBUG_ON)
             Serial.print(_current_ipi[i]);
             Serial.print(",\t");
           #endif
+
+          // TODO smart scheduler
           this->cmd_set_sched(i+1, UECU_SYNC_MSG, _current_ipi[i]);
           //delay(_current_ipi[i]); //Do not need this delay
         } // end for
