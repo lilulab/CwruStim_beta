@@ -400,6 +400,8 @@ int Stim::config(int setting) {
         delay(UECU_DELAY_SETUP);
       }
 
+      uint16_t group_event_count[FIXED_SCHED+1] = {0,0,0,0};//count num of events in one schedule
+      uint8_t schedule_id =0; //schedule_id
       for (uint8_t i=0; i<STIM_CHANNEL_MAX_PERC; i++) {
 
         // QUESTION: setup 8 schedules than 8 events, or do it like below?
@@ -409,13 +411,34 @@ int Stim::config(int setting) {
         //this->cmd_crt_sched(_PERC_8CH_SYNC_MSG[i], _current_ipi[i]);  // Sync signal, duration 30msec.
 
         // TODO smart scheduler
+        switch(_current_ipi[i]){
+          case 30:
+            schedule_id = 1;
+            group_event_count[schedule_id-1]++;
+            break;
+          
+          case 50:
+            schedule_id = 2;
+            group_event_count[schedule_id-1]++;
+            break;
+          case 60:
+            schedule_id = 3;
+            group_event_count[schedule_id-1]++;
+            break;
+
+          default:
+            schedule_id = i+1+FIXED_SCHED;
+            group_event_count[FIXED_SCHED]++;
+
+            break;
+        }
 
         // Create event 
         // this->cmd_crt_evnt(sched_id, delay, priority, event_type, port_chn_id);
         // Create Event 1 for port_chn_id 0 in sched_id 1 
         this->cmd_crt_evnt( 
-                    i+1,  // sched_id 1 to 8
-                  (i+1)*2,  // delay every 2ms. (2,4,6, ...)
+                  schedule_id,  // sched_id 1 to 8, add fixed offset
+                  (group_event_count[schedule_id-1]+1)*2,  // delay every 2ms. (2,4,6, ...)
                   0,  // priority = 0
                   3,  // event_type = 3, for for Stimulus Event
                   i,  // port_chn_id = 0;
