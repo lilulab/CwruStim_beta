@@ -675,8 +675,25 @@ int Stim::update(int type, int pattern, uint16_t cycle_percentage) {
             Serial.print(",\t");
           #endif
 
-          // TODO smart scheduler
-          this->cmd_set_sched(i+1, UECU_SYNC_MSG, _current_ipi[i]);
+          // fixed scheduler
+          switch(_current_ipi[i]){
+            case 30:
+              schedule_id = 1;
+              break;
+            
+            case 50:
+              schedule_id = 2;
+              break;
+            case 60:
+              schedule_id = 3;
+              break;
+
+            default:
+              // do something?
+              break;
+          }
+          // this->cmd_set_sched(i+1, UECU_SYNC_MSG, _current_ipi[i]);
+          this->cmd_set_sched(schedule_id, UECU_SYNC_MSG, _current_ipi[i]);
           //delay(_current_ipi[i]); //Do not need this delay
         } // end for
       } // end if
