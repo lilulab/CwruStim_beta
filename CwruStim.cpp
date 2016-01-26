@@ -119,6 +119,10 @@ int Stim::init(int mode) {
 // Configure Stim Board via UART
 int Stim::config(int setting) {
 
+  // for fixed scheduler
+  uint16_t group_event_count[FIXED_SCHED] = {0,0,0};//count num of events in one schedule
+  uint8_t schedule_id =0; //schedule_id 
+
   // //Serial.println("Enter Stim Config");
 
   _setting = setting;
@@ -389,19 +393,17 @@ int Stim::config(int setting) {
       // this->cmd_crt_sched(sync_signal, duration);
 
       // Create 3 fixed schedule for 30,50,60 ms IPI.
-      static const int FIXED_SCHED = 3;
-      this->cmd_crt_sched(UECU_SYNC_MSG, 30);  // Sync signal, duration 30msec.
-      this->cmd_crt_sched(UECU_SYNC_MSG, 50);  // Sync signal, duration 50msec.
-      this->cmd_crt_sched(UECU_SYNC_MSG, 60);  // Sync signal, duration 60msec.
+      this->cmd_crt_sched(UECU_SYNC_MSG, FIXED_SCHED_ID1_IPI);  // Sync signal, duration 30msec.
+      this->cmd_crt_sched(UECU_SYNC_MSG, FIXED_SCHED_ID2_IPI);  // Sync signal, duration 50msec.
+      this->cmd_crt_sched(UECU_SYNC_MSG, FIXED_SCHED_ID3_IPI);  // Sync signal, duration 60msec.
 
-      // Create 8 schedules
-      for (uint8_t i=0; i<STIM_CHANNEL_MAX_PERC; i++) {
-        this->cmd_crt_sched(UECU_SYNC_MSG, _current_ipi[i]);  // Sync signal, duration IPI.
-        delay(UECU_DELAY_SETUP);
-      }
+      // // Create 8 schedules
+      // for (uint8_t i=0; i<STIM_CHANNEL_MAX_PERC; i++) {
+      //   this->cmd_crt_sched(UECU_SYNC_MSG, _current_ipi[i]);  // Sync signal, duration IPI.
+      //   delay(UECU_DELAY_SETUP);
+      // }
 
-      uint16_t group_event_count[FIXED_SCHED+1] = {0,0,0,0};//count num of events in one schedule
-      uint8_t schedule_id =0; //schedule_id
+
       for (uint8_t i=0; i<STIM_CHANNEL_MAX_PERC; i++) {
 
         // QUESTION: setup 8 schedules than 8 events, or do it like below?
@@ -410,7 +412,7 @@ int Stim::config(int setting) {
         // CHECKLIST: Need to set IPI array first!
         //this->cmd_crt_sched(_PERC_8CH_SYNC_MSG[i], _current_ipi[i]);  // Sync signal, duration 30msec.
 
-        // TODO smart scheduler
+        // Fixed scheduler
         switch(_current_ipi[i]){
           case 30:
             schedule_id = 1;
@@ -427,8 +429,8 @@ int Stim::config(int setting) {
             break;
 
           default:
-            schedule_id = i+1+FIXED_SCHED;
-            group_event_count[FIXED_SCHED]++;
+            // schedule_id = i+1+FIXED_SCHED;
+            // group_event_count[FIXED_SCHED]++;
 
             break;
         }
@@ -437,8 +439,9 @@ int Stim::config(int setting) {
         // this->cmd_crt_evnt(sched_id, delay, priority, event_type, port_chn_id);
         // Create Event 1 for port_chn_id 0 in sched_id 1 
         this->cmd_crt_evnt( 
-                  schedule_id,  // sched_id 1 to 8, add fixed offset
-                  (group_event_count[schedule_id-1]+1)*2,  // delay every 2ms. (2,4,6, ...)
+                  schedule_id,  // fixed schedule
+                  (group_event_count[schedule_id-1])*2,  // delay every 2ms. (2,4,6, ...)
+                  // (group_event_count[schedule_id-1]+1)*2,  // delay every 2ms. (2,4,6, ...)
                   0,  // priority = 0
                   3,  // event_type = 3, for for Stimulus Event
                   i,  // port_chn_id = 0;
@@ -460,11 +463,12 @@ int Stim::config(int setting) {
       delay(UECU_DELAY_SETUP);
 
       // TODO: Send 8 Sync msgs here or modify start func.
-
+      return 1;
       break;
 
     default: 
       return -1;
+      break;
     } //end switch case
 }
 

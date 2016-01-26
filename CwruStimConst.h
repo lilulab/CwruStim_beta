@@ -115,6 +115,12 @@ static const int PATTERN_PARAM_IPI = 3;
 // gait look up table resolution.
 static const int GAIT_LUT_RES = 8;
 
+// Create 3 fixed schedule for 30,50,60 ms IPI.
+static const int FIXED_SCHED = 3;
+static const int FIXED_SCHED_ID1_IPI = 30;
+static const int FIXED_SCHED_ID2_IPI = 50;
+static const int FIXED_SCHED_ID3_IPI = 60;
+
 
 
 
