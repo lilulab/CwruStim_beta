@@ -71,6 +71,12 @@ Stim::Stim(int uart_channel_id) {
     _current_amplitude[i] = 0;
   }
 
+  // Fixed Scheduler init
+  _schedule_id = 0;
+  for (uint8_t i=0; i<FIXED_SCHED; i++) {
+    _group_event_count[i] = 0; 
+  }
+
 }
 
 // Initialize Stim Board via UART
@@ -118,10 +124,6 @@ int Stim::init(int mode) {
 
 // Configure Stim Board via UART
 int Stim::config(int setting) {
-
-  // for fixed scheduler
-  uint16_t group_event_count[FIXED_SCHED] = {0,0,0};//count num of events in one schedule
-  uint8_t schedule_id =0; //schedule_id 
 
   // //Serial.println("Enter Stim Config");
 
@@ -403,35 +405,27 @@ int Stim::config(int setting) {
       //   delay(UECU_DELAY_SETUP);
       // }
 
-
       for (uint8_t i=0; i<STIM_CHANNEL_MAX_PERC; i++) {
-
-        // QUESTION: setup 8 schedules than 8 events, or do it like below?
-
-        // Create schedule
-        // CHECKLIST: Need to set IPI array first!
-        //this->cmd_crt_sched(_PERC_8CH_SYNC_MSG[i], _current_ipi[i]);  // Sync signal, duration 30msec.
-
         // Fixed scheduler
         switch(_current_ipi[i]){
-          case 30:
-            schedule_id = 1;
-            group_event_count[schedule_id-1]++;
+          case FIXED_SCHED_ID1_IPI:
+            _schedule_id = 1;
+            _group_event_count[_schedule_id-1]++;
             break;
           
-          case 50:
-            schedule_id = 2;
-            group_event_count[schedule_id-1]++;
+          case FIXED_SCHED_ID2_IPI:
+            _schedule_id = 2;
+            _group_event_count[_schedule_id-1]++;
             break;
-          case 60:
-            schedule_id = 3;
-            group_event_count[schedule_id-1]++;
+            
+          case FIXED_SCHED_ID3_IPI:
+            _schedule_id = 3;
+            _group_event_count[_schedule_id-1]++;
             break;
 
           default:
-            // schedule_id = i+1+FIXED_SCHED;
-            // group_event_count[FIXED_SCHED]++;
-
+            // Error, invalid IPI value
+            return -1;
             break;
         }
 
@@ -439,9 +433,9 @@ int Stim::config(int setting) {
         // this->cmd_crt_evnt(sched_id, delay, priority, event_type, port_chn_id);
         // Create Event 1 for port_chn_id 0 in sched_id 1 
         this->cmd_crt_evnt( 
-                  schedule_id,  // fixed schedule
-                  (group_event_count[schedule_id-1])*2,  // delay every 2ms. (2,4,6, ...)
-                  // (group_event_count[schedule_id-1]+1)*2,  // delay every 2ms. (2,4,6, ...)
+                  _schedule_id,  // fixed schedule
+                  (_group_event_count[_schedule_id-1])*2,  // delay every 2ms. (2,4,6, ...)
+                  // (_group_event_count[_schedule_id-1]+1)*2,  // delay every 2ms. (2,4,6, ...)
                   0,  // priority = 0
                   3,  // event_type = 3, for for Stimulus Event
                   i,  // port_chn_id = 0;
@@ -678,14 +672,14 @@ int Stim::update(int type, int pattern, uint16_t cycle_percentage) {
           // fixed scheduler
           switch(_current_ipi[i]){
             case 30:
-              schedule_id = 1;
+              _schedule_id = 1;
               break;
             
             case 50:
-              schedule_id = 2;
+              _schedule_id = 2;
               break;
             case 60:
-              schedule_id = 3;
+              _schedule_id = 3;
               break;
 
             default:
@@ -693,7 +687,7 @@ int Stim::update(int type, int pattern, uint16_t cycle_percentage) {
               break;
           }
           // this->cmd_set_sched(i+1, UECU_SYNC_MSG, _current_ipi[i]);
-          this->cmd_set_sched(schedule_id, UECU_SYNC_MSG, _current_ipi[i]);
+          this->cmd_set_sched(_schedule_id, UECU_SYNC_MSG, _current_ipi[i]);
           //delay(_current_ipi[i]); //Do not need this delay
         } // end for
       } // end if
