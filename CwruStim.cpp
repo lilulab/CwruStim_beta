@@ -687,8 +687,12 @@ int Stim::update(int type, int pattern, uint16_t cycle_percentage) {
               // do something?
               break;
           }
+
+          // For fixed scheduler, cannot use cmd_set_sched(), since IPI is fixed.
           // this->cmd_set_sched(i+1, UECU_SYNC_MSG, _current_ipi[i]);
-          this->cmd_set_sched(_schedule_id, UECU_SYNC_MSG, _current_ipi[i]);
+
+          // Need to use ChangeEventSchedMsg
+
           //delay(_current_ipi[i]); //Do not need this delay
         } // end for
       } // end if
@@ -1314,6 +1318,35 @@ int Stim::cmd_set_evnt( uint8_t event_id,
   // Send message
   return this->serial_write_array (msg,sizeof(msg)/sizeof(uint8_t));
 }
+
+// UECU Change Event Schedule Message
+int Stim::cmd_chg_evnt_sched(
+                  uint8_t event_id,
+                  uint8_t sched_id,
+                  uint8_t delay,
+                  uint8_t priority) {
+  // calculate message size
+  int size = CHANGE_EVENT_SCHED_MSG_LEN + UECU_MSG_EXTRAL_LEN;
+  // build message content
+  uint8_t msg[CHANGE_EVENT_SCHED_MSG_LEN + UECU_MSG_EXTRAL_LEN] = 
+  { MSG_DES_ADDR,
+    MSG_SRC_ADDR,
+    CHANGE_EVENT_SCHED_MSG,
+    CHANGE_EVENT_SCHED_MSG_LEN,
+    event_id,
+    sched_id,
+    delay,
+    priority,
+    0x00
+  };
+
+  // Insert checksum byte
+  msg[size-1] = this->checksum(msg,size);
+
+  // Send message
+  return this->serial_write_array (msg,sizeof(msg)/sizeof(uint8_t));  
+}
+
 // UECU Change Schedule Message
 int Stim::cmd_set_sched( uint8_t sched_id,
                          uint8_t sync_signal,
