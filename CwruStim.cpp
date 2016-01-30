@@ -405,6 +405,7 @@ int Stim::config(int setting) {
       //   delay(UECU_DELAY_SETUP);
       // }
 
+      // Assign event to schedule based on IPI value.
       for (uint8_t i=0; i<STIM_CHANNEL_MAX_PERC; i++) {
         // Fixed scheduler
         switch(_current_ipi[i]){
@@ -417,7 +418,7 @@ int Stim::config(int setting) {
             _schedule_id = 2;
             _group_event_count[_schedule_id-1]++;
             break;
-            
+
           case FIXED_SCHED_ID3_IPI:
             _schedule_id = 3;
             _group_event_count[_schedule_id-1]++;
