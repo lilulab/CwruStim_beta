@@ -15,10 +15,13 @@ static const int MULTI_SCHEDULE = 0x01;
 static const int STIM_MODE_DEFAULT = 0; // Not used
 static const int STIM_MODE_SURF = 0x10;  // For surface stimulation board
 static const int STIM_MODE_PERC = 0x20;  // For percutaneous stimulation board
-static const int STIM_MODE_PERC_8CH_MULTI_SCHEDULE = STIM_MODE_PERC|MULTI_SCHEDULE;  // multi scheduler for percutaneous stimulation board
+
+// multi scheduler for percutaneous stimulation board
+static const int STIM_MODE_PERC_8CH_MULTI_SCHEDULE = 
+                                              STIM_MODE_PERC|MULTI_SCHEDULE;  
 static const int STIM_MODE_ICM = 0x30;  // For implant stimulation board
-static const int IRS8 = 0x01;  // For ICM implant - IRS8 stimulation board
-static const int IST16 = 0x02;  // For ICM implant - IST16 stimulation board
+static const int IRS = 0x01;  // For ICM implant - IRS8 stimulation board
+static const int IST = 0x02;  // For ICM implant - IST16 stimulation board
 
 
 
@@ -38,6 +41,7 @@ static const int STIM_ERROR_UPDATE_RAMPING_ERROR = 1<<4;
 static int MSG_DES_ADDR; 
 static const int MSG_DES_ADDR_SURF = 0x04;
 static const int MSG_DES_ADDR_PERC = 0x01;
+static const int MSG_DES_ADDR_ICM = 0x0A;
 static const int MSG_SRC_ADDR = 0x80;
 
 // UECU Message Type
@@ -80,7 +84,8 @@ static const int EVENT_COMMAND_MSG_LEN = 0;
 static const int CHANNEL_SETUP_MSG_LEN = 7;
 static const int EVENT_COMMAND_REPLY_LEN = 0;
 
-static const int UECU_MSG_EXTRAL_LEN = 5; // 2 Header + 1 msg_type + 1 msg_length +1 Check_sum = 5
+// 2 Header + 1 msg_type + 1 msg_length +1 Check_sum = 5
+static const int UECU_MSG_EXTRAL_LEN = 5; 
 
 // UECU Halt
 static const int UECU_HALT = 0x00;
@@ -121,7 +126,18 @@ static const int PATTERN_PARAM_IPI = 3;
 // gait look up table resolution.
 static const int GAIT_LUT_RES = 8;
 
+// Magic number setup for implant
+static const int ICM_IST_SET_MSG[] = {MSG_DES_ADDR_ICM, MSG_SRC_ADDR, 
+                                        0x20, 0x05, 0x10, 0x00, 
+                                        0x00, 0x00, 0x00, 0x40};
+static const int ICM_IRS_SET_MSG[] = {MSG_DES_ADDR_ICM, MSG_SRC_ADDR, 
+                                        0x20, 0x05, 0x04, 0x00, 
+                                        0x00, 0x00, 0x00, 0x4C};
 
-
+// send those two msg at the end of setup
+static const int ICM_RFPWR_EVNT_0[] = {MSG_DES_ADDR_ICM, MSG_SRC_ADDR, 
+                                  0x1C, 0x04, 0x06, 0x80, 0x00, 0xFF, 0xCE};                //Port 0
+static const int ICM_RFPWR_EVNT_1[] = {MSG_DES_ADDR_ICM, MSG_SRC_ADDR, 
+                                  0x1C, 0x04, 0x06, 0x80, 0x40, 0xFF, 0x8E};                //Port 1
 
 #endif
