@@ -435,7 +435,7 @@ int Stim::config(int setting) {
         // Create Event 1 for port_chn_id 0 in sched_id 1 
         this->cmd_crt_evnt( 
                   _schedule_id,  // fixed schedule
-                  (_group_event_count[_schedule_id-1])*2,  // delay every 2ms. (2,4,6, ...)
+                  i*2,  // delay every 2ms. (2,4,6, ...)
                   // (_group_event_count[_schedule_id-1]+1)*2,  // delay every 2ms. (2,4,6, ...)
                   0,  // priority = 0
                   3,  // event_type = 3, for for Stimulus Event
@@ -663,37 +663,72 @@ int Stim::update(int type, int pattern, uint16_t cycle_percentage) {
         #endif
 
         for (int i=0; i<STIM_CHANNEL_MAX_PERC; i++) {
-          _current_ipi[i] = (*LUT_IPI)[i];
+
+          // decide if this event's IPI is changed.
+          if (_current_ipi[i] != (*LUT_IPI)[i]) {
+            // need to change IPI of this event
+
+            // update new IPI value.
+            _current_ipi[i] = (*LUT_IPI)[i];
+
+            // fixed scheduler
+            switch(_current_ipi[i]){
+              case FIXED_SCHED_ID1_IPI:
+                _schedule_id = 1;
+                break;
+              
+              case FIXED_SCHED_ID2_IPI:
+                _schedule_id = 2;
+                break;
+
+              case FIXED_SCHED_ID3_IPI:
+                _schedule_id = 3;
+                break;
+
+              default:
+                // do something?
+                _schedule_id = 0; // this will not exe on UECU, since no sche 0
+                // TODO ： Invalid value detector.
+                break;
+            } //end switch
+
+            // For fixed scheduler, cannot use cmd_set_sched(), since IPI is fixed.
+            // this->cmd_set_sched(i+1, UECU_SYNC_MSG, _current_ipi[i]);
+
+            // Need to use ChangeEventSchedMsg
+            // cmd_chg_evnt_sched(event_id, sched_id, delay, priority);
+            cmd_chg_evnt_sched(i+1, _schedule_id, i*2, 0);
+
+            //delay(_current_ipi[i]); //Do not need this delay
+
+            // Print move Event i to Schedule Y.
+            #if defined(DEBUG_STIM_UPDATE) && defined(DEBUG_ON)
+              Serial.print("[mv.E");
+              Serial.print(i+1,DEC);
+              Serial.print("2S");
+              Serial.print(_schedule_id,DEC);
+              Serial.print("]");
+            #endif
+
+          } else {
+            // If event's IPI stay the same, do nothing.
+
+            // Print keep Event i at Schedule Y
+            #if defined(DEBUG_STIM_UPDATE) && defined(DEBUG_ON)
+              Serial.print("[kp.E");
+              Serial.print(i+1,DEC);
+              Serial.print("@S");
+              Serial.print(_schedule_id,DEC);
+              Serial.print("]");
+            #endif
+          }
+          
 
           #if defined(DEBUG_STIM_UPDATE) && defined(DEBUG_ON)
             Serial.print(_current_ipi[i]);
             Serial.print(",\t");
           #endif
 
-          // fixed scheduler
-          switch(_current_ipi[i]){
-            case 30:
-              _schedule_id = 1;
-              break;
-            
-            case 50:
-              _schedule_id = 2;
-              break;
-            case 60:
-              _schedule_id = 3;
-              break;
-
-            default:
-              // do something?
-              break;
-          }
-
-          // For fixed scheduler, cannot use cmd_set_sched(), since IPI is fixed.
-          // this->cmd_set_sched(i+1, UECU_SYNC_MSG, _current_ipi[i]);
-
-          // Need to use ChangeEventSchedMsg
-
-          //delay(_current_ipi[i]); //Do not need this delay
         } // end for
       } // end if
 
