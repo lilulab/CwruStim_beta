@@ -42,13 +42,13 @@ void setup() {
   // delay(1000); // delay 2 sec
 
   // // Setup CwruStim Lib
-  // stimBrd1.init(STIM_MODE_PERC_8CH_MULTI_SCHEDULE); // Initialize the Stim board and delete old schedule
-  // stimBrd1.config(STIM_MODE_PERC_8CH_MULTI_SCHEDULE); // Setup channels, schedule, and events
-  // stimBrd1.start(UECU_SYNC_MSG);
+  stimBrd1.init(STIM_MODE_ICM|IRS); // Initialize the Stim board and delete old schedule
+  stimBrd1.config(STIM_MODE_ICM|IRS); // Setup channels, schedule, and events
+  stimBrd1.start(UECU_SYNC_MSG);
 
-  // stimBrd2.init(STIM_MODE_PERC_8CH_MULTI_SCHEDULE); // Initialize the Stim board and delete old schedule
-  // stimBrd2.config(STIM_MODE_PERC_8CH_MULTI_SCHEDULE); // Setup channels, schedule, and events
-  // stimBrd2.start(UECU_SYNC_MSG);
+  stimBrd2.init(STIM_MODE_ICM|IST); // Initialize the Stim board and delete old schedule
+  stimBrd2.config(STIM_MODE_ICM|IST); // Setup channels, schedule, and events
+  stimBrd2.start(UECU_SYNC_MSG);
 
   // //Serial.println((*LUT_B1_PP)[1][5]);
 

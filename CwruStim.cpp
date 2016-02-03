@@ -85,6 +85,7 @@ int Stim::init(int mode) {
   delay(50); //wait UECU power up
 
   switch (mode) {
+    // surface stim
     case STIM_MODE_SURF:
       // Set message destination address
       MSG_DES_ADDR = MSG_DES_ADDR_SURF;
@@ -94,6 +95,8 @@ int Stim::init(int mode) {
       // Delete Schedule
       this->cmd_del_sched(1); // Delete schedule 1
       break;
+
+    // perc stim
     case STIM_MODE_PERC:
       // Do nothing, since Perc board don't need to channel setup
       // Set message destination address
@@ -105,9 +108,17 @@ int Stim::init(int mode) {
       MSG_DES_ADDR = MSG_DES_ADDR_PERC;
       break;
 
+    // implant stim, both IRS and IST board
+    case STIM_MODE_ICM|IRS:
+    case STIM_MODE_ICM|IST:
+      // Set message destination address
+      MSG_DES_ADDR = MSG_DES_ADDR_ICM;
+      break;
+
     case STIM_MODE_DEFAULT:
       return -1;
       break;
+      
     default:
       return -1;
       break;
