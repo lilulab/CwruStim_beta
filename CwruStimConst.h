@@ -127,17 +127,30 @@ static const int PATTERN_PARAM_IPI = 3;
 static const int GAIT_LUT_RES = 8;
 
 // Magic number setup for implant
-static const int ICM_IST_SET_MSG[] = {MSG_DES_ADDR_ICM, MSG_SRC_ADDR, 
-                                        0x20, 0x05, 0x10, 0x00, 
-                                        0x00, 0x00, 0x00, 0x40};
-static const int ICM_IRS_SET_MSG[] = {MSG_DES_ADDR_ICM, MSG_SRC_ADDR, 
+// 0A 80 20 05 04 00 00 00 00 4C (IRS 8, Port 0)
+static const uint8_t ICM_IRS_SET_0_MSG[] = {MSG_DES_ADDR_ICM, MSG_SRC_ADDR, 
                                         0x20, 0x05, 0x04, 0x00, 
                                         0x00, 0x00, 0x00, 0x4C};
 
+// 0A 80 20 05 05 00 00 00 00 4B (IRS 8, Port 1)
+static const uint8_t ICM_IRS_SET_1_MSG[] = {MSG_DES_ADDR_ICM, MSG_SRC_ADDR, 
+                                        0x20, 0x05, 0x05, 0x00, 
+                                        0x00, 0x00, 0x00, 0x4B};
+
+// 0A 80 20 05 10 00 00 00 00 40 (IST16, Port 0) 
+static const uint8_t ICM_IST_SET_0_MSG[] = {MSG_DES_ADDR_ICM, MSG_SRC_ADDR, 
+                                        0x20, 0x05, 0x10, 0x00, 
+                                        0x00, 0x00, 0x00, 0x40};
+
+// 0A 80 20 05 11 00 00 00 00 3F (IST16, Port 1)
+static const uint8_t ICM_IST_SET_1_MSG[] = {MSG_DES_ADDR_ICM, MSG_SRC_ADDR, 
+                                        0x20, 0x05, 0x11, 0x00, 
+                                        0x00, 0x00, 0x00, 0x40};
+
 // send those two msg at the end of setup
-static const int ICM_RFPWR_EVNT_0[] = {MSG_DES_ADDR_ICM, MSG_SRC_ADDR, 
+static const uint8_t ICM_RFPWR_EVNT_0[] = {MSG_DES_ADDR_ICM, MSG_SRC_ADDR, 
                                   0x1C, 0x04, 0x06, 0x80, 0x00, 0xFF, 0xCE};                //Port 0
-static const int ICM_RFPWR_EVNT_1[] = {MSG_DES_ADDR_ICM, MSG_SRC_ADDR, 
+static const uint8_t ICM_RFPWR_EVNT_1[] = {MSG_DES_ADDR_ICM, MSG_SRC_ADDR, 
                                   0x1C, 0x04, 0x06, 0x80, 0x40, 0xFF, 0x8E};                //Port 1
 
 #endif

@@ -118,7 +118,7 @@ int Stim::init(int mode) {
     case STIM_MODE_DEFAULT:
       return -1;
       break;
-      
+
     default:
       return -1;
       break;
@@ -440,6 +440,43 @@ int Stim::config(int setting) {
       delay(UECU_DELAY_SETUP);
 
       // TODO: Send 8 Sync msgs here or modify start func.
+      break;
+
+    // implant stim IRS board
+    case STIM_MODE_ICM|IRS:
+      // Send implant set msg
+      this->serial_write_array ((uint8_t*)ICM_IRS_SET_0_MSG,sizeof(ICM_IRS_SET_0_MSG)/sizeof(uint8_t));
+      this->serial_write_array ((uint8_t*)ICM_IRS_SET_1_MSG,sizeof(ICM_IRS_SET_1_MSG)/sizeof(uint8_t));
+
+      // TODO
+      // Setup schedules
+
+      // Setup events
+
+      // Send Sync msg
+
+      // Send RF power events msg
+      this->serial_write_array ((uint8_t*)ICM_RFPWR_EVNT_0,sizeof(ICM_RFPWR_EVNT_0)/sizeof(uint8_t));
+      this->serial_write_array ((uint8_t*)ICM_RFPWR_EVNT_1,sizeof(ICM_RFPWR_EVNT_1)/sizeof(uint8_t));
+
+      break;
+
+    // implant stim IST board
+    case STIM_MODE_ICM|IST:
+      // Send implant set msg
+      this->serial_write_array ((uint8_t*)ICM_IST_SET_0_MSG,sizeof(ICM_IST_SET_0_MSG)/sizeof(uint8_t));
+      this->serial_write_array ((uint8_t*)ICM_IST_SET_1_MSG,sizeof(ICM_IST_SET_1_MSG)/sizeof(uint8_t));
+      
+      // TODO
+      // Setup schedules
+
+      // Setup events
+
+      // Send Sync msg
+
+      // Send RF power events msg
+      this->serial_write_array ((uint8_t*)ICM_RFPWR_EVNT_0,sizeof(ICM_RFPWR_EVNT_0)/sizeof(uint8_t));
+      this->serial_write_array ((uint8_t*)ICM_RFPWR_EVNT_1,sizeof(ICM_RFPWR_EVNT_1)/sizeof(uint8_t));
 
       break;
 
