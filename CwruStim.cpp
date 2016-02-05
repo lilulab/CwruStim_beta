@@ -9,8 +9,9 @@
 #include "Arduino.h"
 #include "CwruStim.h"
 
-// #define DEBUG_ON 1 //Comment this out if want to disenable all debug serial printing.
+#define DEBUG_ON 1 //Comment this out if want to disenable all debug serial printing.
 // #define DEBUG_STIM_UPDATE 1;
+#define DEBUG_STIM_UPDATE_IPI 1;
 // #define DEBUG_STIM_RAMPING 1;
 
 // Stim constructor and UART selector
@@ -426,6 +427,9 @@ int Stim::config(int setting) {
 
           default:
             // Error, invalid IPI value
+            #if defined(DEBUG_STIM_UPDATE_IPI) && defined(DEBUG_ON)
+              Serial.println("[ERROR] IPI SETUP, invalid IPI value ");
+            #endif  
             return -1;
             break;
         }
@@ -445,6 +449,13 @@ int Stim::config(int setting) {
                   0x26, // amplitude set to 0x26,
                   0); // zone not implemented;
 
+        #if defined(DEBUG_STIM_UPDATE_IPI) && defined(DEBUG_ON)
+          Serial.print("[cr.E");
+          Serial.print(i,DEC);
+          Serial.print("@S");
+          Serial.print(_schedule_id,DEC);
+          Serial.print("]");
+        #endif
         // Serial.print("In config loop, ");
         // Serial.print("i = ");
         // Serial.print(i,HEX);
@@ -457,14 +468,23 @@ int Stim::config(int setting) {
 
       delay(UECU_DELAY_SETUP);
 
+      #if defined(DEBUG_STIM_UPDATE_IPI) && defined(DEBUG_ON)
+          Serial.println(" - End Setup");
+      #endif
+
+
       // TODO: Send 8 Sync msgs here or modify start func.
       return 1;
       break;
 
     default: 
+      #if defined(DEBUG_STIM_UPDATE) && defined(DEBUG_ON)
+          Serial.println("[ERROR] SETUP ");
+      #endif
       return -1;
       break;
     } //end switch case
+
 }
 
 // Start Stim board using sync signal command
@@ -582,7 +602,7 @@ int Stim::update(int type, int pattern, uint16_t cycle_percentage) {
   switch (param) {
     // if need to update IPI
     case IPI:
-      #if defined(DEBUG_STIM_UPDATE) && defined(DEBUG_ON)
+      #if defined(DEBUG_STIM_UPDATE_IPI) && defined(DEBUG_ON)
         Serial.print("IPI MODE: ");
       #endif
       // Select which pattern
@@ -594,16 +614,16 @@ int Stim::update(int type, int pattern, uint16_t cycle_percentage) {
 
         // IPI - Stand
         case PATTERN_STAND:
-          #if defined(DEBUG_STIM_UPDATE) && defined(DEBUG_ON)
+          #if defined(DEBUG_STIM_UPDATE_IPI) && defined(DEBUG_ON)
             Serial.print("-- IPI - Stand ");
           #endif
           if (board == VCK5_BRD1) {
-            // #if defined(DEBUG_STIM_UPDATE) && defined(DEBUG_ON)
+            // #if defined(DEBUG_STIM_UPDATE_IPI) && defined(DEBUG_ON)
             //   Serial.print("-- -- VCK5_BRD1 ");
             // #endif
             LUT_IPI = &VCK5_stand_B1_IPI;
           } else if (board == VCK5_BRD2) {
-            // #if defined(DEBUG_STIM_UPDATE) && defined(DEBUG_ON)
+            // #if defined(DEBUG_STIM_UPDATE_IPI) && defined(DEBUG_ON)
             //   Serial.print("-- -- VCK5_BRD2 ");
             // #endif
             LUT_IPI = &VCK5_stand_B2_IPI;
@@ -614,7 +634,7 @@ int Stim::update(int type, int pattern, uint16_t cycle_percentage) {
 
         // IPI - SIT
         case PATTERN_SIT:
-          #if defined(DEBUG_STIM_UPDATE) && defined(DEBUG_ON)
+          #if defined(DEBUG_STIM_UPDATE_IPI) && defined(DEBUG_ON)
             Serial.print("-- IPI - SIT ");
           #endif
           if (board == VCK5_BRD1) {
@@ -628,7 +648,7 @@ int Stim::update(int type, int pattern, uint16_t cycle_percentage) {
 
         // IPI - LSTEP
         case PATTERN_LSETP:
-          #if defined(DEBUG_STIM_UPDATE) && defined(DEBUG_ON)
+          #if defined(DEBUG_STIM_UPDATE_IPI) && defined(DEBUG_ON)
             Serial.print("-- IPI - LSTEP ");
           #endif
           if (board == VCK5_BRD1) {
@@ -642,7 +662,7 @@ int Stim::update(int type, int pattern, uint16_t cycle_percentage) {
 
         // IPI - RSTEP
         case PATTERN_RSETP:
-          #if defined(DEBUG_STIM_UPDATE) && defined(DEBUG_ON)
+          #if defined(DEBUG_STIM_UPDATE_IPI) && defined(DEBUG_ON)
             Serial.print("-- IPI - RSTEP ");
           #endif
           if (board == VCK5_BRD1) {
@@ -658,7 +678,7 @@ int Stim::update(int type, int pattern, uint16_t cycle_percentage) {
       // Now update IPI 
       if (need_update == 1) {
 
-        #if defined(DEBUG_STIM_UPDATE) && defined(DEBUG_ON)
+        #if defined(DEBUG_STIM_UPDATE_IPI) && defined(DEBUG_ON)
           Serial.print("IPI updating.\t");
         #endif
 
@@ -667,6 +687,14 @@ int Stim::update(int type, int pattern, uint16_t cycle_percentage) {
           // decide if this event's IPI is changed.
           if (_current_ipi[i] != (*LUT_IPI)[i]) {
             // need to change IPI of this event
+
+            #if defined(DEBUG_STIM_UPDATE_IPI) && defined(DEBUG_ON)
+              Serial.print("[mv.E");
+              Serial.print(i+1,DEC);
+              Serial.print("(");
+              Serial.print(_current_ipi[i],DEC);
+              Serial.print(")");
+            #endif
 
             // update new IPI value.
             _current_ipi[i] = (*LUT_IPI)[i];
@@ -686,9 +714,10 @@ int Stim::update(int type, int pattern, uint16_t cycle_percentage) {
                 break;
 
               default:
-                // do something?
+                #if defined(DEBUG_STIM_UPDATE_IPI) && defined(DEBUG_ON)
+                  Serial.println("[ERROR] IPI UPDATE, invalid IPI value ");
+                #endif  
                 _schedule_id = 0; // this will not exe on UECU, since no sche 0
-                // TODO ： Invalid value detector.
                 break;
             } //end switch
 
@@ -702,10 +731,8 @@ int Stim::update(int type, int pattern, uint16_t cycle_percentage) {
             //delay(_current_ipi[i]); //Do not need this delay
 
             // Print move Event i to Schedule Y.
-            #if defined(DEBUG_STIM_UPDATE) && defined(DEBUG_ON)
-              Serial.print("[mv.E");
-              Serial.print(i+1,DEC);
-              Serial.print("2S");
+            #if defined(DEBUG_STIM_UPDATE_IPI) && defined(DEBUG_ON)
+              Serial.print(">S");
               Serial.print(_schedule_id,DEC);
               Serial.print("]");
             #endif
@@ -714,9 +741,35 @@ int Stim::update(int type, int pattern, uint16_t cycle_percentage) {
             // If event's IPI stay the same, do nothing.
 
             // Print keep Event i at Schedule Y
-            #if defined(DEBUG_STIM_UPDATE) && defined(DEBUG_ON)
+            #if defined(DEBUG_STIM_UPDATE_IPI) && defined(DEBUG_ON)
+
+              // fixed scheduler
+              switch(_current_ipi[i]){
+                case FIXED_SCHED_ID1_IPI:
+                  _schedule_id = 1;
+                  break;
+                
+                case FIXED_SCHED_ID2_IPI:
+                  _schedule_id = 2;
+                  break;
+
+                case FIXED_SCHED_ID3_IPI:
+                  _schedule_id = 3;
+                  break;
+
+                default:
+                  #if defined(DEBUG_STIM_UPDATE_IPI) && defined(DEBUG_ON)
+                    Serial.println("[ERROR] IPI UPDATE, invalid IPI value ");
+                  #endif  
+                  _schedule_id = 0; // this will not exe on UECU, since no sche 0
+                  break;
+              } //end switch
+            
               Serial.print("[kp.E");
               Serial.print(i+1,DEC);
+              Serial.print("(");
+              Serial.print((*LUT_IPI)[i],DEC);
+              Serial.print(")");
               Serial.print("@S");
               Serial.print(_schedule_id,DEC);
               Serial.print("]");
@@ -724,12 +777,16 @@ int Stim::update(int type, int pattern, uint16_t cycle_percentage) {
           }
           
 
-          #if defined(DEBUG_STIM_UPDATE) && defined(DEBUG_ON)
+          #if defined(DEBUG_STIM_UPDATE_IPI) && defined(DEBUG_ON)
             Serial.print(_current_ipi[i]);
-            Serial.print(",\t");
+            Serial.print(",");
           #endif
 
         } // end for
+
+        #if defined(DEBUG_STIM_UPDATE_IPI) && defined(DEBUG_ON)
+            Serial.println(",\t");
+        #endif
       } // end if
 
       break; // end case IPI
