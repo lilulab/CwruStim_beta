@@ -1415,7 +1415,7 @@ int Stim::cmd_set_evnt( uint8_t event_id,
 int Stim::cmd_chg_evnt_sched(
                   uint8_t event_id,
                   uint8_t sched_id,
-                  uint8_t delay,
+                  uint16_t delay,
                   uint8_t priority) {
   // calculate message size
   int size = CHANGE_EVENT_SCHED_MSG_LEN + UECU_MSG_EXTRAL_LEN;
@@ -1427,7 +1427,8 @@ int Stim::cmd_chg_evnt_sched(
     CHANGE_EVENT_SCHED_MSG_LEN,
     event_id,
     sched_id,
-    delay,
+    (uint8_t)((delay >> 8) & 0x00FF),
+    (uint8_t)(delay & 0x00FF),
     priority,
     0x00
   };
