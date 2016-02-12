@@ -726,7 +726,7 @@ int Stim::update(int type, int pattern, uint16_t cycle_percentage) {
 
             // Need to use ChangeEventSchedMsg
             // cmd_chg_evnt_sched(event_id, sched_id, delay, priority);
-            cmd_chg_evnt_sched(i+1, _schedule_id, i*2, 0);
+            cmd_chg_evnt_sched(i+1, _schedule_id, (uint8_t)i*2, 0);
 
             //delay(_current_ipi[i]); //Do not need this delay
 
