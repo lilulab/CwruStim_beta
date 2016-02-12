@@ -27,6 +27,9 @@ static const int IST = 0x02;  // For ICM implant - IST16 stimulation board
 
 // Upper limit of channels
 static const int STIM_CHANNEL_MAX_PERC = 8;
+static const int STIM_CHANNEL_MAX_IRS = 8;
+static const int STIM_CHANNEL_MAX_IST = 16;
+
 
 static const int STIM_SETTING_DEFAULT = 0;
 

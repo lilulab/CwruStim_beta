@@ -13,6 +13,7 @@
 
 #include <CwruStimConst.h>
 #include "StimPattern/Gait_VCK5.h" // VCK5's walking pattern
+#include "StimPattern/Gait_BAL06.h" // BAL06's walking pattern
 
 /*
   HNPv2 NTREK Embedded Controller Board(ECB) 
