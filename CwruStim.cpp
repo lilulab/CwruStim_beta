@@ -444,26 +444,32 @@ int Stim::config(int setting) {
 
     // implant stim IRS board
     case STIM_MODE_ICM|IRS:
+
+      Serial.println("IRS Setup - Start");
+
+      this->cmd_crt_sched(UECU_SYNC_MSG, 30);  // Sync signal, duration 30msec.
+      delay(UECU_DELAY_SETUP);
+
       // Send implant set msg
       this->serial_write_array ((uint8_t*)ICM_IRS_SET_0_MSG,sizeof(ICM_IRS_SET_0_MSG)/sizeof(uint8_t));
+      delay(500);
       this->serial_write_array ((uint8_t*)ICM_IRS_SET_1_MSG,sizeof(ICM_IRS_SET_1_MSG)/sizeof(uint8_t));
+      delay(500);
 
       // Setup schedules
       // TODO Add multiple scheduler
-      this->cmd_crt_sched(UECU_SYNC_MSG, 30);  // Sync signal, duration 30msec.
-      delay(UECU_DELAY_SETUP);
 
       // Setup events
       for (uint8_t i=0; i<STIM_CHANNEL_MAX_IRS; i++) {
         // Create event 
         this->cmd_crt_evnt( 
-                  i+1,  // sched_id 1 to 8
+                  1,  // sched_id 1 to 8
                   i*2,  // delay every 2ms. (0,2,4,6, ...)
                   0x80,  // priority = 0x80
                   3,  // event_type = 3, for for Stimulus Event
                   i,  // port_chn_id = 0;
                   0x64,  // pulse_width set to 0,
-                  0x08, // amplitude set to 0x26,
+                  0x04, // amplitude set to 0x26,
                   0); // zone not implemented;
         // setup dalay
         delay(UECU_DELAY_SETUP);
@@ -471,29 +477,38 @@ int Stim::config(int setting) {
 
       // Send Sync msg
       this->cmd_sync_msg(UECU_SYNC_MSG); // Sent Sync_message to start schedule.
+      delay(UECU_DELAY_SETUP);
 
       // Send RF power events msg
       this->serial_write_array ((uint8_t*)ICM_RFPWR_EVNT_0,sizeof(ICM_RFPWR_EVNT_0)/sizeof(uint8_t));
+      delay(500);
       this->serial_write_array ((uint8_t*)ICM_RFPWR_EVNT_1,sizeof(ICM_RFPWR_EVNT_1)/sizeof(uint8_t));
+      delay(500);
+
+      Serial.println("IRS Setup - Finished");
 
       break;
 
     // implant stim IST board
     case STIM_MODE_ICM|IST:
-      // Send implant set msg
-      this->serial_write_array ((uint8_t*)ICM_IST_SET_0_MSG,sizeof(ICM_IST_SET_0_MSG)/sizeof(uint8_t));
-      this->serial_write_array ((uint8_t*)ICM_IST_SET_1_MSG,sizeof(ICM_IST_SET_1_MSG)/sizeof(uint8_t));
-      
+
       // Setup schedules
       // TODO Add multiple scheduler
       this->cmd_crt_sched(UECU_SYNC_MSG, 30);  // Sync signal, duration 30msec.
       delay(UECU_DELAY_SETUP);
+      
+      // Send implant set msg
+      this->serial_write_array ((uint8_t*)ICM_IST_SET_0_MSG,sizeof(ICM_IST_SET_0_MSG)/sizeof(uint8_t));
+      delay(500);
+      this->serial_write_array ((uint8_t*)ICM_IST_SET_1_MSG,sizeof(ICM_IST_SET_1_MSG)/sizeof(uint8_t));
+      delay(500);
+
 
       // Setup events
       for (uint8_t i=0; i<STIM_CHANNEL_MAX_IST; i++) {
         // Create event 
         this->cmd_crt_evnt( 
-                  i+1,  // sched_id 1 to 8
+                  1,  // sched_id 1 to 8
                   i*2,  // delay every 2ms. (0,2,4,6, ...)
                   0x80,  // priority = 0x80
                   3,  // event_type = 3, for for Stimulus Event
@@ -507,10 +522,13 @@ int Stim::config(int setting) {
 
       // Send Sync msg
       this->cmd_sync_msg(UECU_SYNC_MSG); // Sent Sync_message to start schedule.
+      delay(UECU_DELAY_SETUP);
 
       // Send RF power events msg
       this->serial_write_array ((uint8_t*)ICM_RFPWR_EVNT_0,sizeof(ICM_RFPWR_EVNT_0)/sizeof(uint8_t));
+      delay(500);
       this->serial_write_array ((uint8_t*)ICM_RFPWR_EVNT_1,sizeof(ICM_RFPWR_EVNT_1)/sizeof(uint8_t));
+      delay(500);
 
       break;
 
@@ -524,7 +542,7 @@ int Stim::start(uint8_t sync_signal) {
 
   // Send Sync to start
   //this->cmd_sync_msg(0xAA); // Sent Sync_message 0xAA to start schedule.
-  this->cmd_sync_msg(sync_signal); // Sent Sync_message to start schedule.
+  //this->cmd_sync_msg(sync_signal); // Sent Sync_message to start schedule.
 }
 
 // Start multiple scheduler

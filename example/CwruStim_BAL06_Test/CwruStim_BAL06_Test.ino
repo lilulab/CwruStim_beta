@@ -29,9 +29,9 @@ uint16_t PP_increment = (uint16_t)(10000/PP_step);
 void setup() {
 
   // // initialize Serial0 for debug.
-  // Serial.begin(115200);
+  Serial.begin(115200);
   // #if defined(DEBUG_ON)
-  //   Serial.print("Program Start ...");
+    Serial.println("Program Start ...");
   // #endif  
   // //Serial.println("Start CwruStim Program Setup");
 
