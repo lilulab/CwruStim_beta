@@ -397,8 +397,11 @@ int Stim::config(int setting) {
 
       // Create 3 fixed schedule for 30,50,60 ms IPI.
       this->cmd_crt_sched(UECU_SYNC_MSG, FIXED_SCHED_ID1_IPI);  // Sync signal, duration 30msec.
+      delay(UECU_DELAY_SETUP);
       this->cmd_crt_sched(UECU_SYNC_MSG, FIXED_SCHED_ID2_IPI);  // Sync signal, duration 50msec.
+      delay(UECU_DELAY_SETUP);
       this->cmd_crt_sched(UECU_SYNC_MSG, FIXED_SCHED_ID3_IPI);  // Sync signal, duration 60msec.
+      delay(UECU_DELAY_SETUP);
 
       // // Create 8 schedules
       // for (uint8_t i=0; i<STIM_CHANNEL_MAX_PERC; i++) {
@@ -727,6 +730,7 @@ int Stim::update(int type, int pattern, uint16_t cycle_percentage) {
             // Need to use ChangeEventSchedMsg
             // cmd_chg_evnt_sched(event_id, sched_id, delay, priority);
             cmd_chg_evnt_sched(i+1, _schedule_id, (uint8_t)i*2, 0);
+            delay(1); // add 1ms delay
 
             //delay(_current_ipi[i]); //Do not need this delay
 
