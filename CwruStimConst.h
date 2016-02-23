@@ -1,6 +1,12 @@
 #ifndef CwruStimConst_h
 #define CwruStimConst_h
 
+// TODO
+// Hack up preset for update function
+// Needs to set those two value to correct num of channels based on Stim board.
+#define BRD1_MAX_CHN 16
+#define BRD2_MAX_CHN 4
+
 // UART Channel Setting
 static const int STIM_CHANNEL_UART0 = 0;
 static const int STIM_CHANNEL_UART1 = 1;
@@ -29,6 +35,7 @@ static const int IST = 0x02;  // For ICM implant - IST16 stimulation board
 static const int STIM_CHANNEL_MAX_PERC = 8;
 static const int STIM_CHANNEL_MAX_IRS = 8;
 static const int STIM_CHANNEL_MAX_IST = 16;
+static const int STIM_CHANNEL_MAX_SURF = 4;
 
 
 static const int STIM_SETTING_DEFAULT = 0;
@@ -107,6 +114,9 @@ static const int GAIT_VCK5_BOARD2 = 1;
 
 static const int VCK5_BRD1 = 0<<8;
 static const int VCK5_BRD2 = 1<<8;
+
+static const int BRD1 = 0<<8;
+static const int BRD2 = 1<<8;
 
 static const int IPI = 1;
 static const int AMP = 2;

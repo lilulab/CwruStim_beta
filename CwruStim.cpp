@@ -9,9 +9,9 @@
 #include "Arduino.h"
 #include "CwruStim.h"
 
-// #define DEBUG_ON 1 //Comment this out if want to disenable all debug serial printing.
-// #define DEBUG_STIM_UPDATE 1;
-// #define DEBUG_STIM_RAMPING 1;
+#define DEBUG_ON 1 //Comment this out if want to disenable all debug serial printing.
+#define DEBUG_STIM_UPDATE 1;
+#define DEBUG_STIM_RAMPING 1;
 
 // Stim constructor and UART selector
 Stim::Stim(int uart_channel_id) {
@@ -84,6 +84,33 @@ int Stim::init(int mode) {
 
   delay(50); //wait UECU power up
 
+  // switch (mode) {
+
+  //   case STIM_MODE_SURF:
+  //     _max_channels = STIM_CHANNEL_MAX_SURF; 
+  //     break;
+
+  //   // For Perc board
+  //   case STIM_MODE_PERC:
+  //   // multi scheduler for percutaneous stimulation board
+  //   case STIM_MODE_PERC_8CH_MULTI_SCHEDULE:
+  //     _max_channels = STIM_CHANNEL_MAX_PERC;
+  //     break;
+
+  //   // implant stim IRS board
+  //   case STIM_MODE_ICM|IRS:
+  //     _max_channels = STIM_CHANNEL_MAX_IRS;
+  //     break;
+
+  //   // implant stim IST board
+  //   case STIM_MODE_ICM|IST:
+  //     _max_channels = STIM_CHANNEL_MAX_IST;
+  //     break;
+
+  //   default: 
+  //     return -1;
+  // } //end switch case
+
   switch (mode) {
     // surface stim
     case STIM_MODE_SURF:
@@ -91,28 +118,40 @@ int Stim::init(int mode) {
       MSG_DES_ADDR = MSG_DES_ADDR_SURF;
         // Reset Halt Message to reset Stim board
       this->cmd_halt_rset(UECU_RESET);
+      delay(UECU_DELAY_SETUP);
+
+      // set num of channels
+      _max_channels = STIM_CHANNEL_MAX_SURF; 
 
       // Delete Schedule
-      this->cmd_del_sched(1); // Delete schedule 1
+      //this->cmd_del_sched(1); // Delete schedule 1
+      // delay(UECU_DELAY_SETUP);
       break;
 
     // perc stim
     case STIM_MODE_PERC:
-      // Do nothing, since Perc board don't need to channel setup
-      // Set message destination address
-      MSG_DES_ADDR = MSG_DES_ADDR_PERC;
-      break;
-
     case STIM_MODE_PERC_8CH_MULTI_SCHEDULE:   
+      // Set message destination address
       // same as Perc normal
       MSG_DES_ADDR = MSG_DES_ADDR_PERC;
+
+      // set num of channels
+      _max_channels = STIM_CHANNEL_MAX_PERC; 
       break;
 
     // implant stim, both IRS and IST board
     case STIM_MODE_ICM|IRS:
+      // Set message destination address
+      MSG_DES_ADDR = MSG_DES_ADDR_ICM;
+      // set num of channels
+      _max_channels = STIM_CHANNEL_MAX_IRS; 
+      break;
+
     case STIM_MODE_ICM|IST:
       // Set message destination address
       MSG_DES_ADDR = MSG_DES_ADDR_ICM;
+      // set num of channels
+      _max_channels = STIM_CHANNEL_MAX_IST;
       break;
 
     case STIM_MODE_DEFAULT:
@@ -155,6 +194,7 @@ int Stim::config(int setting) {
                 100,  // ip_delay = 100usec
                 0x11,   // asp_ratio = 1:1
                 0x01);  //anode = 0, cathode = 1, for bipolar mode);
+      delay(UECU_DELAY_SETUP);
 
       // Bipolar 23
       this->cmd_chan_set( 1,    // port_chn_id =  0
@@ -163,6 +203,7 @@ int Stim::config(int setting) {
                 100,  // ip_delay = 100usec
                 0x11,   // asp_ratio = 1:1
                 0x23);  //anode = 2, cathode = 3, for bipolar mode);
+      delay(UECU_DELAY_SETUP);
 
       // Bipolar 45
       this->cmd_chan_set( 2,    // port_chn_id =  0
@@ -171,6 +212,7 @@ int Stim::config(int setting) {
                 100,  // ip_delay = 100usec
                 0x11,   // asp_ratio = 1:1
                 0x45);  //anode = 0, cathode = 1, for bipolar mode);
+      delay(UECU_DELAY_SETUP);
 
       // Bipolar 67
       this->cmd_chan_set( 3,    // port_chn_id =  0
@@ -179,13 +221,13 @@ int Stim::config(int setting) {
                 100,  // ip_delay = 100usec
                 0x11,   // asp_ratio = 1:1
                 0x67);  //anode = 0, cathode = 1, for bipolar mode);
-
+      delay(UECU_DELAY_SETUP);
 
 
       // Create Schedule
       // this->cmd_crt_sched(sync_signal, duration);
-      this->cmd_crt_sched(UECU_SYNC_MSG, 29); // Sync signal = 0xAA, duration 29msec.
-
+      this->cmd_crt_sched(UECU_SYNC_MSG, 50); // Sync signal = 0xAA, duration 50msec.
+      delay(UECU_DELAY_SETUP);
       // Create Events
       // this->cmd_crt_evnt(sched_id, delay, priority, event_type, port_chn_id);
 
@@ -199,39 +241,44 @@ int Stim::config(int setting) {
                 0,  // pulse_width set to 0,
                 0,  // amplitude set to 0,
                 0); // zone not implemented;
+      delay(UECU_DELAY_SETUP);
 
       // Create Event 2 for port_chn_id 0 in sched_id 1 
       this->cmd_crt_evnt( 
                 1,  // sched_id = 1
-                0,  // delay = 0msec
+                2,  // delay = 0msec
                 0,  // priority = 0
                 3,  // event_type = 3, for for Stimulus Event
                 1,  // port_chn_id = 1;
                 0,  // pulse_width set to 0,
                 0,  // amplitude set to 0,
                 0); // zone not implemented;
+      delay(UECU_DELAY_SETUP);
 
       // Create Event 3 for port_chn_id 0 in sched_id 1 
       this->cmd_crt_evnt( 
                 1,  // sched_id = 1
-                0,  // delay = 0msec
+                4,  // delay = 0msec
                 0,  // priority = 0
                 3,  // event_type = 3, for for Stimulus Event
                 2,  // port_chn_id = 2;
                 0,  // pulse_width set to 0,
                 0,  // amplitude set to 0,
                 0); // zone not implemented;
+      delay(UECU_DELAY_SETUP);
 
       // Create Event 4 for port_chn_id 0 in sched_id 1 
       this->cmd_crt_evnt( 
                 1,  // sched_id = 1
-                0,  // delay = 0msec
+                6,  // delay = 0msec
                 0,  // priority = 0
                 3,  // event_type = 3, for for Stimulus Event
                 3,  // port_chn_id = 3;
                 0,  // pulse_width set to 0,
                 0,  // amplitude set to 0,
                 0); // zone not implemented;
+      delay(UECU_DELAY_SETUP);
+
       return 1;
       break;
 
@@ -542,7 +589,7 @@ int Stim::start(uint8_t sync_signal) {
 
   // Send Sync to start
   //this->cmd_sync_msg(0xAA); // Sent Sync_message 0xAA to start schedule.
-  //this->cmd_sync_msg(sync_signal); // Sent Sync_message to start schedule.
+  this->cmd_sync_msg(sync_signal); // Sent Sync_message to start schedule.
 }
 
 // Start multiple scheduler
@@ -563,12 +610,10 @@ int Stim::start_multi_schedule(void) {
 // Stim::update(type, pattern, cycle_percentage)
 int Stim::update(int type, int pattern, uint16_t cycle_percentage) {
 
-  // Pattern look up table temp holder.
-  const uint16_t (*LUT_PP)[12][8]; 
-  const uint8_t (*LUT_PW)[12][8]; 
-  const uint8_t (*LUT_IPI)[12];  
-  const uint8_t (*LUT_AMP)[12];  
 
+  // type mask
+  int board = type & 0xFF00;
+  int param = type & 0x00FF;
 
   #if defined(DEBUG_STIM_UPDATE) && defined(DEBUG_ON)
     Serial.println(" ");
@@ -583,6 +628,32 @@ int Stim::update(int type, int pattern, uint16_t cycle_percentage) {
     Serial.print(cycle_percentage);
     Serial.println(". ");
     
+  if (_uart_channel_id == STIM_CHANNEL_UART1) {
+
+    const uint16_t (*LUT_BRD1_PP)[BRD1_MAX_CHN][GAIT_LUT_RES]; 
+    const uint8_t  (*LUT_BRD1_PW)[BRD1_MAX_CHN][GAIT_LUT_RES]; 
+    const uint8_t (*LUT_BRD1_IPI)[BRD1_MAX_CHN];  
+    const uint8_t (*LUT_BRD1_AMP)[BRD1_MAX_CHN];
+
+    LUT_BRD1_PP = &gait_walk_L_B1_PP;
+
+    Serial.println(" <<<LUT BRD1>>> ");
+  }
+
+  else if (_uart_channel_id == STIM_CHANNEL_UART3) {
+
+    const uint16_t (*LUT_BRD2_PP)[BRD2_MAX_CHN][GAIT_LUT_RES]; 
+    const uint8_t  (*LUT_BRD2_PW)[BRD2_MAX_CHN][GAIT_LUT_RES]; 
+    const uint8_t (*LUT_BRD2_IPI)[BRD2_MAX_CHN];  
+    const uint8_t (*LUT_BRD2_AMP)[BRD2_MAX_CHN];
+
+    LUT_BRD2_PP = &gait_walk_L_B2_PP;
+
+    Serial.println(" >>>LUT BRD2<<< ");
+  }
+    
+
+
     //   //Test the pattern data.
     //   // print test pattern
     //   LUT_PP = &VCK5_walk_L_B1_PP; 
@@ -635,10 +706,6 @@ int Stim::update(int type, int pattern, uint16_t cycle_percentage) {
     //   Serial.println("}");
   #endif
 
-  // type mask
-  int board = type & 0xFF00;
-  int param = type & 0x00FF;
-
   int need_update = 0;
 
   #if defined(DEBUG_STIM_UPDATE) && defined(DEBUG_ON)
@@ -648,244 +715,244 @@ int Stim::update(int type, int pattern, uint16_t cycle_percentage) {
     Serial.println(param,HEX);    
   #endif
 
-  // Select update type
-  switch (param) {
-    // if need to update IPI
-    case IPI:
-      #if defined(DEBUG_STIM_UPDATE) && defined(DEBUG_ON)
-        Serial.print("IPI MODE: ");
-      #endif
-      // Select which pattern
-      need_update = 1;
-      switch (pattern) {
-        case PATTERN_NO_STIM:
-          need_update = 0;
-          break;
+  // // Select update type
+  // switch (param) {
+  //   // if need to update IPI
+  //   case IPI:
+  //     #if defined(DEBUG_STIM_UPDATE) && defined(DEBUG_ON)
+  //       Serial.print("IPI MODE: ");
+  //     #endif
+  //     // Select which pattern
+  //     need_update = 1;
+  //     switch (pattern) {
+  //       case PATTERN_NO_STIM:
+  //         need_update = 0;
+  //         break;
 
-        // IPI - Stand
-        case PATTERN_STAND:
-          #if defined(DEBUG_STIM_UPDATE) && defined(DEBUG_ON)
-            Serial.print("-- IPI - Stand ");
-          #endif
-          if (board == VCK5_BRD1) {
-            // #if defined(DEBUG_STIM_UPDATE) && defined(DEBUG_ON)
-            //   Serial.print("-- -- VCK5_BRD1 ");
-            // #endif
-            LUT_IPI = &VCK5_stand_B1_IPI;
-          } else if (board == VCK5_BRD2) {
-            // #if defined(DEBUG_STIM_UPDATE) && defined(DEBUG_ON)
-            //   Serial.print("-- -- VCK5_BRD2 ");
-            // #endif
-            LUT_IPI = &VCK5_stand_B2_IPI;
-          } else {
-            _stim_error |= STIM_ERROR_UPDATE_PATTERN_ERROR;
-          }
-          break;
+  //       // IPI - Stand
+  //       case PATTERN_STAND:
+  //         #if defined(DEBUG_STIM_UPDATE) && defined(DEBUG_ON)
+  //           Serial.print("-- IPI - Stand ");
+  //         #endif
+  //         if (board == BRD1) {
+  //           // #if defined(DEBUG_STIM_UPDATE) && defined(DEBUG_ON)
+  //           //   Serial.print("-- -- BRD1 ");
+  //           // #endif
+  //           LUT_IPI = &gait_stand_B1_IPI;
+  //         } else if (board == BRD2) {
+  //           // #if defined(DEBUG_STIM_UPDATE) && defined(DEBUG_ON)
+  //           //   Serial.print("-- -- BRD2 ");
+  //           // #endif
+  //           LUT_IPI = &gait_stand_B2_IPI;
+  //         } else {
+  //           _stim_error |= STIM_ERROR_UPDATE_PATTERN_ERROR;
+  //         }
+  //         break;
 
-        // IPI - SIT
-        case PATTERN_SIT:
-          #if defined(DEBUG_STIM_UPDATE) && defined(DEBUG_ON)
-            Serial.print("-- IPI - SIT ");
-          #endif
-          if (board == VCK5_BRD1) {
-            LUT_IPI = &VCK5_sit_B1_IPI;
-          } else if (board == VCK5_BRD2) {
-            LUT_IPI = &VCK5_sit_B2_IPI;
-          } else {
-            _stim_error |= STIM_ERROR_UPDATE_PATTERN_ERROR;
-          }
-          break;
+  //       // IPI - SIT
+  //       case PATTERN_SIT:
+  //         #if defined(DEBUG_STIM_UPDATE) && defined(DEBUG_ON)
+  //           Serial.print("-- IPI - SIT ");
+  //         #endif
+  //         if (board == BRD1) {
+  //           LUT_IPI = &gait_sit_B1_IPI;
+  //         } else if (board == BRD2) {
+  //           LUT_IPI = &gait_sit_B2_IPI;
+  //         } else {
+  //           _stim_error |= STIM_ERROR_UPDATE_PATTERN_ERROR;
+  //         }
+  //         break;
 
-        // IPI - LSTEP
-        case PATTERN_LSETP:
-          #if defined(DEBUG_STIM_UPDATE) && defined(DEBUG_ON)
-            Serial.print("-- IPI - LSTEP ");
-          #endif
-          if (board == VCK5_BRD1) {
-            LUT_IPI = &VCK5_walk_L_B1_IPI;
-          } else if (board == VCK5_BRD2) {
-            LUT_IPI = &VCK5_walk_L_B2_IPI;
-          } else {
-            _stim_error |= STIM_ERROR_UPDATE_PATTERN_ERROR;
-          }
-          break;
+  //       // IPI - LSTEP
+  //       case PATTERN_LSETP:
+  //         #if defined(DEBUG_STIM_UPDATE) && defined(DEBUG_ON)
+  //           Serial.print("-- IPI - LSTEP ");
+  //         #endif
+  //         if (board == BRD1) {
+  //           LUT_IPI = &gait_walk_L_B1_IPI;
+  //         } else if (board == BRD2) {
+  //           LUT_IPI = &gait_walk_L_B2_IPI;
+  //         } else {
+  //           _stim_error |= STIM_ERROR_UPDATE_PATTERN_ERROR;
+  //         }
+  //         break;
 
-        // IPI - RSTEP
-        case PATTERN_RSETP:
-          #if defined(DEBUG_STIM_UPDATE) && defined(DEBUG_ON)
-            Serial.print("-- IPI - RSTEP ");
-          #endif
-          if (board == VCK5_BRD1) {
-            LUT_IPI = &VCK5_walk_R_B1_IPI;
-          } else if (board == VCK5_BRD2) {
-            LUT_IPI = &VCK5_walk_R_B2_IPI;
-          } else {
-            _stim_error |= STIM_ERROR_UPDATE_PATTERN_ERROR;
-          }
-          break;
-      } // end switch (pattern)
+  //       // IPI - RSTEP
+  //       case PATTERN_RSETP:
+  //         #if defined(DEBUG_STIM_UPDATE) && defined(DEBUG_ON)
+  //           Serial.print("-- IPI - RSTEP ");
+  //         #endif
+  //         if (board == BRD1) {
+  //           LUT_IPI = &gait_walk_R_B1_IPI;
+  //         } else if (board == BRD2) {
+  //           LUT_IPI = &gait_walk_R_B2_IPI;
+  //         } else {
+  //           _stim_error |= STIM_ERROR_UPDATE_PATTERN_ERROR;
+  //         }
+  //         break;
+  //     } // end switch (pattern)
 
-      // Now update IPI 
-      if (need_update == 1) {
+  //     // Now update IPI 
+  //     if (need_update == 1) {
 
-        #if defined(DEBUG_STIM_UPDATE) && defined(DEBUG_ON)
-          Serial.print("IPI updating.\t");
-        #endif
+  //       #if defined(DEBUG_STIM_UPDATE) && defined(DEBUG_ON)
+  //         Serial.print("IPI updating.\t");
+  //       #endif
 
-        for (int i=0; i<STIM_CHANNEL_MAX_PERC; i++) {
-          _current_ipi[i] = (*LUT_IPI)[i];
-          #if defined(DEBUG_STIM_UPDATE) && defined(DEBUG_ON)
-            Serial.print(_current_ipi[i]);
-            Serial.print(",\t");
-          #endif
-          this->cmd_set_sched(i+1, UECU_SYNC_MSG, _current_ipi[i]);
-          //delay(_current_ipi[i]); //Do not need this delay
-        } // end for
-      } // end if
+  //       for (int i=0; i<_max_channels; i++) {
+  //         _current_ipi[i] = (*LUT_IPI)[i];
+  //         #if defined(DEBUG_STIM_UPDATE) && defined(DEBUG_ON)
+  //           Serial.print(_current_ipi[i]);
+  //           Serial.print(",\t");
+  //         #endif
+  //         this->cmd_set_sched(i+1, UECU_SYNC_MSG, _current_ipi[i]);
+  //         //delay(_current_ipi[i]); //Do not need this delay
+  //       } // end for
+  //     } // end if
 
-      break; // end case IPI
+  //     break; // end case IPI
 
-    // if need to update AMP
-    case AMP:
-      #if defined(DEBUG_STIM_UPDATE) && defined(DEBUG_ON)
-        Serial.print("AMP MODE: ");
-      #endif
+  //   // if need to update AMP
+  //   case AMP:
+  //     #if defined(DEBUG_STIM_UPDATE) && defined(DEBUG_ON)
+  //       Serial.print("AMP MODE: ");
+  //     #endif
 
-      if (board == VCK5_BRD1) {
-        LUT_AMP = &VCK5_B1_AMP;
-      } else if (board == VCK5_BRD2) {
-        LUT_AMP = &VCK5_B2_AMP;
-      } else {
-        _stim_error |= STIM_ERROR_UPDATE_PATTERN_ERROR;
-      }        
+  //     if (board == BRD1) {
+  //       LUT_AMP = &gait_B1_AMP;
+  //     } else if (board == BRD2) {
+  //       LUT_AMP = &gait_B2_AMP;
+  //     } else {
+  //       _stim_error |= STIM_ERROR_UPDATE_PATTERN_ERROR;
+  //     }        
 
-      // Now update AMP 
-      for (int i=0; i<STIM_CHANNEL_MAX_PERC; i++) {
-        if (pattern == PATTERN_NO_STIM) {
-          _current_amplitude[i] = 0;
-        } else {
-          _current_amplitude[i] = (*LUT_AMP)[i];
-        }
-        #if defined(DEBUG_STIM_UPDATE) && defined(DEBUG_ON)
-          Serial.print(_current_amplitude[i]);
-          Serial.print(",\t");
-        #endif
+  //     // Now update AMP 
+  //     for (int i=0; i<_max_channels; i++) {
+  //       if (pattern == PATTERN_NO_STIM) {
+  //         _current_amplitude[i] = 0;
+  //       } else {
+  //         _current_amplitude[i] = (*LUT_AMP)[i];
+  //       }
+  //       #if defined(DEBUG_STIM_UPDATE) && defined(DEBUG_ON)
+  //         Serial.print(_current_amplitude[i]);
+  //         Serial.print(",\t");
+  //       #endif
 
-        // do not set event here, since need to set after PW
-        //this->cmd_set_evnt(i+1, _current_pulse_width[i], _current_amplitude[i], 0); // Change Event i for port_chn_id i in sched_id 1  
-      } // end for   
-      break; // end case AMP
+  //       // do not set event here, since need to set after PW
+  //       //this->cmd_set_evnt(i+1, _current_pulse_width[i], _current_amplitude[i], 0); // Change Event i for port_chn_id i in sched_id 1  
+  //     } // end for   
+  //     break; // end case AMP
 
-    // if need to update PW
-    case PW:
-      #if defined(DEBUG_STIM_UPDATE) && defined(DEBUG_ON)
-        Serial.print("PW MODE: ");
-      #endif
-      // Select which pattern
-      need_update = 1;
-      switch (pattern) {
-        case PATTERN_NO_STIM:
-          // do nothing here, set all 0 at the cmd_set_evnt in the end
-          break;
+  //   // if need to update PW
+  //   case PW:
+  //     #if defined(DEBUG_STIM_UPDATE) && defined(DEBUG_ON)
+  //       Serial.print("PW MODE: ");
+  //     #endif
+  //     // Select which pattern
+  //     need_update = 1;
+  //     switch (pattern) {
+  //       case PATTERN_NO_STIM:
+  //         // do nothing here, set all 0 at the cmd_set_evnt in the end
+  //         break;
 
-        // PW - Stand
-        case PATTERN_STAND:
-          #if defined(DEBUG_STIM_UPDATE) && defined(DEBUG_ON)
-            Serial.print("-- PW - Stand ");
-          #endif
-          if (board == VCK5_BRD1) {
-            LUT_PP = &VCK5_stand_B1_PP;
-            LUT_PW = &VCK5_stand_B1_PW;
-          } else if (board == VCK5_BRD2) {
-            LUT_PP = &VCK5_stand_B2_PP;
-            LUT_PW = &VCK5_stand_B2_PW;
-          } else {
-            _stim_error |= STIM_ERROR_UPDATE_PATTERN_ERROR;
-          }
-          break;
+  //       // PW - Stand
+  //       case PATTERN_STAND:
+  //         #if defined(DEBUG_STIM_UPDATE) && defined(DEBUG_ON)
+  //           Serial.print("-- PW - Stand ");
+  //         #endif
+  //         if (board == BRD1) {
+  //           LUT_PP = &gait_stand_B1_PP;
+  //           LUT_PW = &gait_stand_B1_PW;
+  //         } else if (board == BRD2) {
+  //           LUT_PP = &gait_stand_B2_PP;
+  //           LUT_PW = &gait_stand_B2_PW;
+  //         } else {
+  //           _stim_error |= STIM_ERROR_UPDATE_PATTERN_ERROR;
+  //         }
+  //         break;
 
-        // PW - SIT
-        case PATTERN_SIT:
-          #if defined(DEBUG_STIM_UPDATE) && defined(DEBUG_ON)
-            Serial.print("-- PW - SIT ");
-          #endif
-          if (board == VCK5_BRD1) {
-            LUT_PP = &VCK5_sit_B1_PP;
-            LUT_PW = &VCK5_sit_B1_PW;
-          } else if (board == VCK5_BRD2) {
-            LUT_PP = &VCK5_sit_B2_PP;
-            LUT_PW = &VCK5_sit_B2_PW;
-          } else {
-            _stim_error |= STIM_ERROR_UPDATE_PATTERN_ERROR;
-          }
-          break;
+  //       // PW - SIT
+  //       case PATTERN_SIT:
+  //         #if defined(DEBUG_STIM_UPDATE) && defined(DEBUG_ON)
+  //           Serial.print("-- PW - SIT ");
+  //         #endif
+  //         if (board == BRD1) {
+  //           LUT_PP = &gait_sit_B1_PP;
+  //           LUT_PW = &gait_sit_B1_PW;
+  //         } else if (board == BRD2) {
+  //           LUT_PP = &gait_sit_B2_PP;
+  //           LUT_PW = &gait_sit_B2_PW;
+  //         } else {
+  //           _stim_error |= STIM_ERROR_UPDATE_PATTERN_ERROR;
+  //         }
+  //         break;
 
-        // PW - LSTEP
-        case PATTERN_LSETP:
-          #if defined(DEBUG_STIM_UPDATE) && defined(DEBUG_ON)
-            Serial.print("-- PW - LSTEP ");
-          #endif
-          if (board == VCK5_BRD1) {
-            LUT_PP = &VCK5_walk_L_B1_PP;
-            LUT_PW = &VCK5_walk_L_B1_PW;
-          } else if (board == VCK5_BRD2) {
-            LUT_PP = &VCK5_walk_L_B2_PP;
-            LUT_PW = &VCK5_walk_L_B2_PW;
-          } else {
-            _stim_error |= STIM_ERROR_UPDATE_PATTERN_ERROR;
-          }
-          break;
+  //       // PW - LSTEP
+  //       case PATTERN_LSETP:
+  //         #if defined(DEBUG_STIM_UPDATE) && defined(DEBUG_ON)
+  //           Serial.print("-- PW - LSTEP ");
+  //         #endif
+  //         if (board == BRD1) {
+  //           LUT_PP = &gait_walk_L_B1_PP;
+  //           LUT_PW = &gait_walk_L_B1_PW;
+  //         } else if (board == BRD2) {
+  //           LUT_PP = &gait_walk_L_B2_PP;
+  //           LUT_PW = &gait_walk_L_B2_PW;
+  //         } else {
+  //           _stim_error |= STIM_ERROR_UPDATE_PATTERN_ERROR;
+  //         }
+  //         break;
 
-        // PW - RSTEP
-        case PATTERN_RSETP:
-          #if defined(DEBUG_STIM_UPDATE) && defined(DEBUG_ON)
-            Serial.print("-- PW - RSTEP ");
-          #endif
-          if (board == VCK5_BRD1) {
-            LUT_PP = &VCK5_walk_R_B1_PP;
-            LUT_PW = &VCK5_walk_R_B1_PW;
-          } else if (board == VCK5_BRD2) {
-            LUT_PP = &VCK5_walk_R_B2_PP;
-            LUT_PW = &VCK5_walk_R_B2_PW;
-          } else {
-            _stim_error |= STIM_ERROR_UPDATE_PATTERN_ERROR;
-          }
-          break;
-      } // end switch (pattern)
+  //       // PW - RSTEP
+  //       case PATTERN_RSETP:
+  //         #if defined(DEBUG_STIM_UPDATE) && defined(DEBUG_ON)
+  //           Serial.print("-- PW - RSTEP ");
+  //         #endif
+  //         if (board == BRD1) {
+  //           LUT_PP = &gait_walk_R_B1_PP;
+  //           LUT_PW = &gait_walk_R_B1_PW;
+  //         } else if (board == BRD2) {
+  //           LUT_PP = &gait_walk_R_B2_PP;
+  //           LUT_PW = &gait_walk_R_B2_PW;
+  //         } else {
+  //           _stim_error |= STIM_ERROR_UPDATE_PATTERN_ERROR;
+  //         }
+  //         break;
+  //     } // end switch (pattern)
 
-      // Now update PW 
-      if (need_update == 1) {
-        for (int i=0; i<STIM_CHANNEL_MAX_PERC; i++) {
-          // save the previous PW value
-          uint8_t _last_pulse_width = _current_pulse_width[i];
+  //     // Now update PW 
+  //     if (need_update == 1) {
+  //       for (int i=0; i<_max_channels; i++) {
+  //         // save the previous PW value
+  //         uint8_t _last_pulse_width = _current_pulse_width[i];
 
-          if (pattern == PATTERN_NO_STIM) {
-            _current_pulse_width[i] = 0;
-          } else {
-            // ramping function
-            _current_pulse_width[i] = get_PW_ramping(i, LUT_PP, LUT_PW, cycle_percentage);
-            //_current_pulse_width[i] = (*LUT_PW)[i][STIM_CHANNEL_MAX_PERC-1];
-          }
-          #if defined(DEBUG_STIM_UPDATE) && defined(DEBUG_ON)
-            Serial.print(_current_pulse_width[i]);
-            Serial.print(",\t");
-          #endif
-          // publish if only it is diff than the previous value
-          // if ((_last_pulse_width != _current_pulse_width[i]) || (cycle_percentage == 0)) {
-          if (_last_pulse_width != _current_pulse_width[i]) {
-            this->cmd_set_evnt(i+1, _current_pulse_width[i], _current_amplitude[i], 0); // Change Event i for port_chn_id i in sched_id 1  
-          }
-        } // end for
-      } // end if
+  //         if (pattern == PATTERN_NO_STIM) {
+  //           _current_pulse_width[i] = 0;
+  //         } else {
+  //           // ramping function
+  //           _current_pulse_width[i] = get_PW_ramping(i, LUT_PP, LUT_PW, cycle_percentage);
+  //           //_current_pulse_width[i] = (*LUT_PW)[i][STIM_CHANNEL_MAX_PERC-1];
+  //         }
+  //         #if defined(DEBUG_STIM_UPDATE) && defined(DEBUG_ON)
+  //           Serial.print(_current_pulse_width[i]);
+  //           Serial.print(",\t");
+  //         #endif
+  //         // publish if only it is diff than the previous value
+  //         // if ((_last_pulse_width != _current_pulse_width[i]) || (cycle_percentage == 0)) {
+  //         if (_last_pulse_width != _current_pulse_width[i]) {
+  //           this->cmd_set_evnt(i+1, _current_pulse_width[i], _current_amplitude[i], 0); // Change Event i for port_chn_id i in sched_id 1  
+  //         }
+  //       } // end for
+  //     } // end if
 
-      break; // end case PW
+  //     break; // end case PW
 
     // Error 
-    default: 
-      _stim_error |= STIM_ERROR_UPDATE_TYPE_ERROR;
-      return -1;
-      break;
-  } // end switch (type)
+  //   default: 
+  //     _stim_error |= STIM_ERROR_UPDATE_TYPE_ERROR;
+  //     return -1;
+  //     break;
+  // } // end switch (param)
 
   #if defined(DEBUG_STIM_UPDATE) && defined(DEBUG_ON)
     Serial.print("_stim_error = ");

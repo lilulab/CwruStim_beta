@@ -15,16 +15,15 @@ const float gait_walk_R_duration = 1.5;
 const float gait_walk_L_duration = 1.37; 
 
 // Channel Amplitude 
-const uint8_t gait_IST16_AMP[16] = { 8,		7,		6,		5,		4,		3,		2,		1,		0,		8,		7,		6,		5,		4,		3,		2 };
-const uint8_t gait_SURF4_AMP[8] = { 10,		20,		30,		40 };
-
+const uint8_t gait_B1_AMP[16] = { 8,		7,		6,		5,		4,		3,		2,		1,		0,		8,		7,		6,		5,		4,		3,		2 };
+const uint8_t gait_B2_AMP[4] = { 10,		20,		30,		40 };
 
 // Board_IST16------------------
 
 // Left Step ---------
 
 // Percent Pattern
-const uint16_t gait_walk_IST16_L_PP[16][8] = { 
+const uint16_t gait_walk_L_B1_PP[16][8] = { 
 		{ 0,		1000,	1736,	1979,	6424,	7535,	9201,	10000 },
 		{ 0,		1000,	1736,	1979,	6979,	9201,	9500,	10000 },
 		{ 0,		1000,	1736,	1979,	6701,	8090,	9000,	10000 },
@@ -45,7 +44,7 @@ const uint16_t gait_walk_IST16_L_PP[16][8] = {
 
 
 // Pulse Width
-const uint8_t gait_walk_IST16_L_PW[16][8] = { 
+const uint8_t gait_walk_L_B1_PW[16][8] = { 
 		{ 100,	100,	100,	0,		0,		150,	131,	131 },
 		{ 0,		0,		0,		60,		60,		0,		0,		0 },
 		{ 60,		60,		60,		0,		0,		60,		60,		60 },
@@ -66,14 +65,14 @@ const uint8_t gait_walk_IST16_L_PW[16][8] = {
 
 
 // Inter Phase Interval
-const uint8_t gait_walk_IST16_L_IPI[16] = 
+const uint8_t gait_walk_L_B1_IPI[16] = 
 		{  50 , 50 , 50 , 50 , 50 , 50 , 50 , 50 , 50 , 50 , 50 , 50 , 50 , 50 , 50 , 50 };
 
 
 // Right Step ---------
 
 // Percent Pattern
-const uint16_t gait_walk_IST16_R_PP[16][8] = { 
+const uint16_t gait_walk_R_B1_PP[16][8] = { 
 		{ 0,		451,	1493,	5700,	7900,	8500,	9500,	10000 },
 		{ 0,		1000,	5000,	7500,	8800,	9400,	9500,	10000 },
 		{ 0,		1000,	2000,	5000,	9306,	9700,	9900,	10000 },
@@ -94,7 +93,7 @@ const uint16_t gait_walk_IST16_R_PP[16][8] = {
 
 
 // Pulse Width
-const uint8_t gait_walk_IST16_R_PW[16][8] = { 
+const uint8_t gait_walk_R_B1_PW[16][8] = { 
 		{ 131,	120,	100,	100,	100,	100,	100,	100 },
 		{ 0,		0,		0,		0,		0,		0,		0,		0 },
 		{ 60,		60,		60,		60,		60,		60,		60,		60 },
@@ -115,7 +114,7 @@ const uint8_t gait_walk_IST16_R_PW[16][8] = {
 
 
 // Inter Phase Interval
-const uint8_t gait_walk_IST16_R_IPI[16] = 
+const uint8_t gait_walk_R_B1_IPI[16] = 
 		{  50 , 50 , 50 , 50 , 50 , 50 , 50 , 50 , 50 , 50 , 50 , 50 , 50 , 50 , 50 , 50 };
 
 
@@ -125,7 +124,7 @@ const uint8_t gait_walk_IST16_R_IPI[16] =
 // Left Step ---------
 
 // Percent Pattern
-const uint16_t gait_walk_SURF4_L_PP[4][8] = { 
+const uint16_t gait_walk_L_B2_PP[4][8] = { 
 		{ 0,		2500,	5000,	7500,	8800,	9400,	9500,	10000 },
 		{ 0,		2500,	5000,	7500,	8800,	9400,	9500,	10000 },
 		{ 0,		2500,	5000,	7500,	8800,	9400,	9500,	10000 },
@@ -134,7 +133,7 @@ const uint16_t gait_walk_SURF4_L_PP[4][8] = {
 
 
 // Pulse Width
-const uint8_t gait_walk_SURF4_L_PW[4][8] = { 
+const uint8_t gait_walk_L_B2_PW[4][8] = { 
 		{ 175,	175,	175,	175,	175,	175,	175,	175 },
 		{ 150,	150,	150,	150,	150,	150,	150,	150 },
 		{ 200,	200,	200,	200,	200,	200,	200,	200 },
@@ -143,14 +142,14 @@ const uint8_t gait_walk_SURF4_L_PW[4][8] = {
 
 
 // Inter Phase Interval
-const uint8_t gait_walk_SURF4_L_IPI[4] = 
+const uint8_t gait_walk_L_B2_IPI[4] = 
 		{  50 , 50 , 50 , 50 };
 
 
 // Right Step ---------
 
 // Percent Pattern
-const uint16_t gait_walk_SURF4_R_PP[4][8] = { 
+const uint16_t gait_walk_R_B2_PP[4][8] = { 
 		{ 0,		500,	938,	1181,	8681,	8993,	9306,	10000 },
 		{ 0,		500,	938,	1181,	8681,	8993,	9306,	10000 },
 		{ 0,		500,	938,	1181,	8681,	8993,	9306,	10000 },
@@ -159,7 +158,7 @@ const uint16_t gait_walk_SURF4_R_PP[4][8] = {
 
 
 // Pulse Width
-const uint8_t gait_walk_SURF4_R_PW[4][8] = { 
+const uint8_t gait_walk_R_B2_PW[4][8] = { 
 		{ 150,	150,	150,	0,		0,		150,	150,	150 },
 		{ 0,		0,		0,		0,		0,		0,		0,		0 },
 		{ 150,	150,	150,	0,		0,		150,	150,	150 },
@@ -168,7 +167,7 @@ const uint8_t gait_walk_SURF4_R_PW[4][8] = {
 
 
 // Inter Phase Interval
-const uint8_t gait_walk_SURF4_R_IPI[4] = 
+const uint8_t gait_walk_R_B2_IPI[4] = 
 		{  50 , 50 , 50 , 50 };
 
 
@@ -183,7 +182,7 @@ const float gait_stand_duration = 2;
 // Step ---------
 
 // Percent Pattern
-const uint16_t gait_stand_IST16_PP[16][8] = { 
+const uint16_t gait_stand_B1_PP[16][8] = { 
 		{ 0,		500,	1026,	1282,	5600,	7800,	9000,	10000 },
 		{ 0,		1000,	5000,	7500,	8800,	9400,	9500,	10000 },
 		{ 0,		500,	1026,	1282,	8974,	9500,	9800,	10000 },
@@ -204,7 +203,7 @@ const uint16_t gait_stand_IST16_PP[16][8] = {
 
 
 // Pulse Width
-const uint8_t gait_stand_IST16_PW[16][8] = { 
+const uint8_t gait_stand_B1_PW[16][8] = { 
 		{ 0,		0,		0,		119,	119,	119,	119,	119 },
 		{ 0,		0,		0,		0,		0,		0,		0,		0 },
 		{ 0,		0,		0,		60,		60,		43,		36,		25 },
@@ -225,7 +224,7 @@ const uint8_t gait_stand_IST16_PW[16][8] = {
 
 
 // Inter Phase Interval
-const uint8_t gait_stand_IST16_IPI[16] = 
+const uint8_t gait_stand_B1_IPI[16] = 
 		{  50 , 50 , 50 , 50 , 50 , 50 , 50 , 50 , 50 , 50 , 50 , 50 , 50 , 50 , 50 , 50 };
 
 
@@ -235,7 +234,7 @@ const uint8_t gait_stand_IST16_IPI[16] =
 // Step ---------
 
 // Percent Pattern
-const uint16_t gait_stand_SURF4_PP[4][8] = { 
+const uint16_t gait_stand_B2_PP[4][8] = { 
 		{ 0,		500,	1026,	1282,	5600,	7800,	9500,	10000 },
 		{ 0,		1000,	5000,	7500,	8800,	9400,	9500,	10000 },
 		{ 0,		1000,	5000,	7500,	8800,	9400,	9500,	10000 },
@@ -244,7 +243,7 @@ const uint16_t gait_stand_SURF4_PP[4][8] = {
 
 
 // Pulse Width
-const uint8_t gait_stand_SURF4_PW[4][8] = { 
+const uint8_t gait_stand_B2_PW[4][8] = { 
 		{ 0,		0,		0,		25,		25,		25,		25,		25 },
 		{ 0,		0,		0,		0,		0,		0,		0,		0 },
 		{ 100,	100,	100,	100,	100,	100,	100,	100 },
@@ -253,7 +252,7 @@ const uint8_t gait_stand_SURF4_PW[4][8] = {
 
 
 // Inter Phase Interval
-const uint8_t gait_stand_SURF4_IPI[4] = 
+const uint8_t gait_stand_B2_IPI[4] = 
 		{  50 , 50 , 50 , 50 };
 
 
@@ -268,7 +267,7 @@ const float gait_sit_duration = 1.45;
 // Step ---------
 
 // Percent Pattern
-const uint16_t gait_sit_IST16_PP[16][8] = { 
+const uint16_t gait_sit_B1_PP[16][8] = { 
 		{ 0,		5000,	5500,	6000,	7500,	8800,	9400,	10000 },
 		{ 0,		1000,	5000,	7500,	8800,	9400,	9500,	10000 },
 		{ 0,		5000,	5500,	6000,	7500,	8800,	9400,	10000 },
@@ -287,9 +286,8 @@ const uint16_t gait_sit_IST16_PP[16][8] = {
 		{ 0,		1000,	5000,	8000,	9000,	9500,	9800,	10000 }
 };
 
-
 // Pulse Width
-const uint8_t gait_sit_IST16_PW[16][8] = { 
+const uint8_t gait_sit_B1_PW[16][8] = { 
 		{ 100,	50,		50,		50,		50,		26,		13,		0 },
 		{ 0,		0,		0,		0,		0,		0,		0,		0 },
 		{ 20,		10,		10,		10,		10,		5,		3,		0 },
@@ -308,37 +306,32 @@ const uint8_t gait_sit_IST16_PW[16][8] = {
 		{ 150,	150,	150,	150,	75,		38,		23,		0 }
 };
 
-
 // Inter Phase Interval
-const uint8_t gait_sit_IST16_IPI[16] = 
+const uint8_t gait_sit_B1_IPI[16] = 
 		{  50 , 50 , 50 , 50 , 50 , 50 , 50 , 50 , 50 , 50 , 50 , 50 , 50 , 50 , 50 , 50 };
-
-
 
 // Board_SURF4------------------
 
 // Step ---------
 
 // Percent Pattern
-const uint16_t gait_sit_SURF4_PP[4][8] = { 
+const uint16_t gait_sit_B2_PP[4][8] = { 
 		{ 0,		5000,	5500,	6000,	7500,	8800,	9400,	10000 },
 		{ 0,		1000,	5000,	7500,	8800,	9400,	9500,	10000 },
 		{ 0,		1000,	5000,	7500,	8800,	9400,	9500,	10000 },
 		{ 0,		1000,	5000,	7500,	8800,	9400,	9500,	10000 }
 };
 
-
 // Pulse Width
-const uint8_t gait_sit_SURF4_PW[4][8] = { 
+const uint8_t gait_sit_B2_PW[4][8] = { 
 		{ 25,		13,		13,		13,		13,		7,		3,		0 },
 		{ 50,		50,		50,		50,		50,		50,		50,		50 },
 		{ 0,		0,		0,		0,		0,		0,		0,		0 },
 		{ 100,	100,	100,	100,	100,	100,	100,	100 }
 };
 
-
 // Inter Phase Interval
-const uint8_t gait_sit_SURF4_IPI[4] = 
+const uint8_t gait_sit_B2_IPI[4] = 
 		{  50 , 50 , 50 , 50 };
 
 // File End

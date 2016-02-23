@@ -12,8 +12,10 @@
 #include <Arduino.h>
 
 #include <CwruStimConst.h>
-#include "StimPattern/Gait_VCK5.h" // VCK5's walking pattern
-#include "StimPattern/Gait_BAL06.h" // BAL06's walking pattern
+// #include "StimPattern/Gait_VCK5.h" // VCK5's walking pattern
+// #include "StimPattern/Gait_BAL06.h" // BAL-06's walking pattern
+#include "StimPattern/Gait_IST07.h" // IST-07's walking pattern
+
 
 /*
   HNPv2 NTREK Embedded Controller Board(ECB) 
@@ -95,6 +97,7 @@ class Stim
     int _mode;
     int _setting;
     int _stim_error;
+    int _max_channels;
 
     // Multi scheduler sync
     uint8_t _PERC_8CH_SYNC_MSG[STIM_CHANNEL_MAX_PERC];
