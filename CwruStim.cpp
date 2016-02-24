@@ -643,7 +643,7 @@ int Stim::update(int type, int pattern, uint16_t cycle_percentage) {
 
     int need_update = 1;
     #if defined(DEBUG_STIM_UPDATE) && defined(DEBUG_ON)
-      Serial.println("[Update]LUT BRD1");
+      Serial.println("[Update] Load LUT BRD1");
     #endif  
 
     switch (param) {
@@ -680,6 +680,23 @@ int Stim::update(int type, int pattern, uint16_t cycle_percentage) {
         } // end switch (pattern)}
 
         // update IPI here if needed
+        if (need_update == 1) {
+
+          #if defined(DEBUG_STIM_UPDATE) && defined(DEBUG_ON)
+            Serial.print("[Update] IPI updating:\t");
+          #endif
+
+          for (int i=0; i<_max_channels; i++) {
+            _current_ipi[i] = (*LUT_BRD1_IPI)[i];
+            #if defined(DEBUG_STIM_UPDATE) && defined(DEBUG_ON)
+              Serial.print(_current_ipi[i]);
+              Serial.print(",\t");
+            #endif
+            this->cmd_set_sched(i+1, UECU_SYNC_MSG, _current_ipi[i]);
+            //delay(_current_ipi[i]); //Do not need this delay
+          } // end for
+        } // end if
+
 
         break; //case IPI
 
@@ -759,7 +776,7 @@ int Stim::update(int type, int pattern, uint16_t cycle_percentage) {
 
     int need_update = 1;
     #if defined(DEBUG_STIM_UPDATE) && defined(DEBUG_ON)
-      Serial.println("[Update]LUT BRD2");
+      Serial.println("[Update] Load LUT BRD2");
     #endif  
   }
     
