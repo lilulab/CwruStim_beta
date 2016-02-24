@@ -626,7 +626,13 @@ int Stim::update(int type, int pattern, uint16_t cycle_percentage) {
     Serial.print(pattern);
     Serial.print("\tcycle_percentage = ");
     Serial.print(cycle_percentage);
-    Serial.println(". ");
+    Serial.print(".\t");
+
+    Serial.print("board = 0x");
+    Serial.print(board,HEX);
+    Serial.print("\t param = 0x");
+    Serial.println(param,HEX);    
+  #endif
     
   if (_uart_channel_id == STIM_CHANNEL_UART1) {
 
@@ -635,9 +641,113 @@ int Stim::update(int type, int pattern, uint16_t cycle_percentage) {
     const uint8_t (*LUT_BRD1_IPI)[BRD1_MAX_CHN];  
     const uint8_t (*LUT_BRD1_AMP)[BRD1_MAX_CHN];
 
-    LUT_BRD1_PP = &gait_walk_L_B1_PP;
+    int need_update = 1;
+    #if defined(DEBUG_STIM_UPDATE) && defined(DEBUG_ON)
+      Serial.println("[Update]LUT BRD1");
+    #endif  
 
-    Serial.println(" <<<LUT BRD1>>> ");
+    switch (param) {
+      case IPI:
+        switch (pattern) {
+              case PATTERN_NO_STIM:
+                need_update = 0;
+                break;
+
+              // IPI - Stand
+              case PATTERN_STAND:
+                LUT_BRD1_IPI = &gait_stand_B1_IPI;
+                break;
+
+              // IPI - SIT
+              case PATTERN_SIT:
+                LUT_BRD1_IPI = &gait_sit_B1_IPI;
+                break;
+
+              // IPI - LSTEP
+              case PATTERN_LSETP:
+                LUT_BRD1_IPI = &gait_walk_L_B1_IPI;
+                break;
+
+              // IPI - RSTEP
+              case PATTERN_RSETP:
+                LUT_BRD1_IPI = &gait_walk_R_B1_IPI;
+                break;
+
+              default:
+                _stim_error |= STIM_ERROR_UPDATE_PATTERN_ERROR;
+                return -1;
+                break;
+        } // end switch (pattern)}
+
+        // update IPI here if needed
+
+        break; //case IPI
+
+      case AMP:
+        switch (pattern) {
+              case PATTERN_NO_STIM:
+                need_update = 0;
+                break;
+              
+              case PATTERN_STAND: // AMP - Stand
+              case PATTERN_SIT:   // AMP - SIT
+              case PATTERN_LSETP: // AMP - LSTEP
+              case PATTERN_RSETP: // AMP - RSTEP
+                LUT_BRD1_AMP = &gait_B1_AMP;
+                break;
+
+              default:
+                _stim_error |= STIM_ERROR_UPDATE_PATTERN_ERROR;
+                return -1;
+                break;
+        } // end switch (pattern)}
+
+        // update AMP here if needed
+
+        break; // case AMP
+
+      case PW:
+        switch (pattern) {
+              case PATTERN_NO_STIM:
+                need_update = 0;
+                break;
+
+              // PW - Stand
+              case PATTERN_STAND:
+                LUT_BRD1_PW = &gait_stand_B1_PW;
+                break;
+
+              // PW - SIT
+              case PATTERN_SIT:
+                LUT_BRD1_PW = &gait_sit_B1_PW;
+                break;
+
+              // PW - LSTEP
+              case PATTERN_LSETP:
+                LUT_BRD1_PW = &gait_walk_L_B1_PW;
+                break;
+
+              // PW - RSTEP
+              case PATTERN_RSETP:
+                LUT_BRD1_PW = &gait_walk_R_B1_PW;
+                break;
+
+              default:
+                _stim_error |= STIM_ERROR_UPDATE_PATTERN_ERROR;
+                return -1;
+                break;
+        } // end switch (pattern)}
+
+        // update PW here if needed
+
+        break; // case PW
+
+      default: 
+        _stim_error |= STIM_ERROR_UPDATE_TYPE_ERROR;
+        return -1;
+        break;
+    }// end switch (param)
+
   }
 
   else if (_uart_channel_id == STIM_CHANNEL_UART3) {
@@ -647,9 +757,10 @@ int Stim::update(int type, int pattern, uint16_t cycle_percentage) {
     const uint8_t (*LUT_BRD2_IPI)[BRD2_MAX_CHN];  
     const uint8_t (*LUT_BRD2_AMP)[BRD2_MAX_CHN];
 
-    LUT_BRD2_PP = &gait_walk_L_B2_PP;
-
-    Serial.println(" >>>LUT BRD2<<< ");
+    int need_update = 1;
+    #if defined(DEBUG_STIM_UPDATE) && defined(DEBUG_ON)
+      Serial.println("[Update]LUT BRD2");
+    #endif  
   }
     
 
@@ -704,16 +815,6 @@ int Stim::update(int type, int pattern, uint16_t cycle_percentage) {
     //       Serial.print(",");
     //   }
     //   Serial.println("}");
-  #endif
-
-  int need_update = 0;
-
-  #if defined(DEBUG_STIM_UPDATE) && defined(DEBUG_ON)
-    Serial.print("board = 0x");
-    Serial.print(board,HEX);
-    Serial.print("\t param = 0x");
-    Serial.println(param,HEX);    
-  #endif
 
   // // Select update type
   // switch (param) {
