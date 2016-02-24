@@ -687,13 +687,20 @@ int Stim::update(int type, int pattern, uint16_t cycle_percentage) {
           #endif
 
           for (int i=0; i<_max_channels; i++) {
-            _current_ipi[i] = (*LUT_BRD1_IPI)[i];
+
+            _current_ipi[i] = (*LUT_BRD1_IPI)[i]; // update IPI from LUT
+
+            //TODO
+            // This is only for SUR and ICM, need to merge with Fixed_scheduler branch
+            this->cmd_set_sched(1, UECU_SYNC_MSG, _current_ipi[i]);
+            //delay(_current_ipi[i]); //Do not need this delay
+            //delay(1); // delay 1ms.
+
             #if defined(DEBUG_STIM_UPDATE) && defined(DEBUG_ON)
               Serial.print(_current_ipi[i]);
               Serial.print(",\t");
             #endif
-            this->cmd_set_sched(i+1, UECU_SYNC_MSG, _current_ipi[i]);
-            //delay(_current_ipi[i]); //Do not need this delay
+
           } // end for
         } // end if
 
