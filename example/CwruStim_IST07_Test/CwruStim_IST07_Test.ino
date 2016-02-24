@@ -7,7 +7,6 @@
 */
 
 // #include "StimPattern/Gait_IST07.h" // IST-07's walking pattern
-
 #include "CwruStim.h" // Stim board driver
 #include <TimerOne.h>
 

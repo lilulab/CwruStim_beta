@@ -9,8 +9,8 @@
 #include "Arduino.h"
 #include "CwruStim.h"
 
-#define DEBUG_ON 1 //Comment this out if want to disenable all debug serial printing.
-#define DEBUG_STIM_UPDATE 1;
+// #define DEBUG_ON 1 //Comment this out if want to disenable all debug serial printing.
+// #define DEBUG_STIM_UPDATE 1;
 // #define DEBUG_STIM_RAMPING 1;
 
 // Stim constructor and UART selector
