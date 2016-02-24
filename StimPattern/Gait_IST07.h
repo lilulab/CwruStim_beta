@@ -66,7 +66,7 @@ const uint8_t gait_walk_L_B1_PW[16][8] = {
 
 // Inter Phase Interval
 const uint8_t gait_walk_L_B1_IPI[16] = 
-		{  50 , 50 , 50 , 50 , 50 , 50 , 50 , 50 , 50 , 50 , 50 , 50 , 50 , 50 , 50 , 50 };
+    {  50 , 50 , 50 , 50 , 50 , 50 , 50 , 50 , 50 , 50 , 50 , 50 , 50 , 50 , 50 , 50 };
 
 
 // Right Step ---------

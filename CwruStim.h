@@ -104,18 +104,32 @@ class Stim
 
     // Pulse width
     uint8_t _current_pulse_width[STIM_CHANNEL_MAX_PERC];
+    uint8_t _BRD1_current_pulse_width[BRD1_MAX_CHN];
+    uint8_t _BRD2_current_pulse_width[BRD2_MAX_CHN];
 
     // Amplitude
     uint8_t _current_amplitude[STIM_CHANNEL_MAX_PERC];
+    uint8_t _BRD1_current_amplitude[BRD1_MAX_CHN];
+    uint8_t _BRD2_current_amplitude[BRD2_MAX_CHN];
 
     // Inter phase interval
     uint8_t _current_ipi[STIM_CHANNEL_MAX_PERC];
+    uint8_t _BRD1_current_ipi[BRD1_MAX_CHN];
+    uint8_t _BRD2_current_ipi[BRD2_MAX_CHN];
 
     uint8_t checksum(uint8_t vals[], int length);
 
     uint8_t get_PW_ramping( int channel_i,
                             const uint16_t (*LUT_PP_t)[12][8],
                             const uint8_t (*LUT_PW_t)[12][8],
+                            uint16_t cycle_pp_t);
+    uint8_t get_BRD1_PW_ramping( int channel_i,
+                            const uint16_t (*LUT_PP_t)[BRD1_MAX_CHN][8],
+                            const uint8_t (*LUT_PW_t)[BRD1_MAX_CHN][8],
+                            uint16_t cycle_pp_t);
+    uint8_t get_BRD2_PW_ramping( int channel_i,
+                            const uint16_t (*LUT_PP_t)[BRD2_MAX_CHN][8],
+                            const uint8_t (*LUT_PW_t)[BRD2_MAX_CHN][8],
                             uint16_t cycle_pp_t);
 };
 
