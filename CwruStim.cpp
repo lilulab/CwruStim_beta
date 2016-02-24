@@ -704,7 +704,6 @@ int Stim::update(int type, int pattern, uint16_t cycle_percentage) {
           } // end for
         } // end if
 
-
         break; //case IPI
 
       case AMP:
@@ -727,6 +726,20 @@ int Stim::update(int type, int pattern, uint16_t cycle_percentage) {
         } // end switch (pattern)}
 
         // update AMP here if needed
+        for (int i=0; i<_max_channels; i++) {
+          #if defined(DEBUG_STIM_UPDATE) && defined(DEBUG_ON)
+            Serial.print("[Update] AMP updating:\t");
+          #endif
+          if (pattern == PATTERN_NO_STIM) {
+            _current_amplitude[i] = 0;
+          } else {
+            _current_amplitude[i] = (*LUT_BRD1_AMP)[i];
+          }
+          #if defined(DEBUG_STIM_UPDATE) && defined(DEBUG_ON)
+            Serial.print(_current_amplitude[i]);
+            Serial.print(",\t");
+          #endif
+        } // end for
 
         break; // case AMP
 
@@ -763,6 +776,29 @@ int Stim::update(int type, int pattern, uint16_t cycle_percentage) {
         } // end switch (pattern)}
 
         // update PW here if needed
+        if (need_update == 1) {
+          for (int i=0; i<_max_channels; i++) {
+            // save the previous PW value
+            uint8_t _last_pulse_width = _current_pulse_width[i];
+
+            if (pattern == PATTERN_NO_STIM) {
+              _current_pulse_width[i] = 0;
+            } else {
+              // ramping function
+              //_current_pulse_width[i] = get_PW_ramping(i, LUT_BRD1_PP, LUT_BRD1_PW, cycle_percentage);
+              //_current_pulse_width[i] = (*LUT_PW)[i][STIM_CHANNEL_MAX_PERC-1];
+            }
+            #if defined(DEBUG_STIM_UPDATE) && defined(DEBUG_ON)
+              Serial.print(_current_pulse_width[i]);
+              Serial.print(",\t");
+            #endif
+            // publish if only it is diff than the previous value
+            // if ((_last_pulse_width != _current_pulse_width[i]) || (cycle_percentage == 0)) {
+            if (_last_pulse_width != _current_pulse_width[i]) {
+              this->cmd_set_evnt(i+1, _current_pulse_width[i], _current_amplitude[i], 0); // Change Event i for port_chn_id i in sched_id 1  
+            }
+          } // end for
+        } // end if
 
         break; // case PW
 
