@@ -116,9 +116,10 @@ int Stim::init(int mode) {
     case STIM_MODE_SURF:
       // Set message destination address
       MSG_DES_ADDR = MSG_DES_ADDR_SURF;
-        // Reset Halt Message to reset Stim board
-      this->cmd_halt_rset(UECU_RESET);
-      delay(UECU_DELAY_SETUP);
+      // Reset Halt Message to reset Stim board
+      // Do not need this halt cmd.
+      //this->cmd_halt_rset(UECU_RESET);
+      //delay(UECU_DELAY_SETUP);
 
       // set num of channels
       _max_channels = STIM_CHANNEL_MAX_SURF; 
