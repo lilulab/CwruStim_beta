@@ -63,7 +63,7 @@ void setup() {
 
 void loop() {
   #if defined(DEBUG_ON)
-    Serial.println("Start CwruStim Main Loop");
+    Serial.println("[Main] Start CwruStim Main Loop");
   #endif
 
   cycle_percentage_value = 0;
@@ -80,7 +80,7 @@ void loop() {
 
   stimBrd2.update(BRD2|IPI, test_pattern, cycle_percentage_value);
   stimBrd2.update(BRD2|AMP, test_pattern, cycle_percentage_value);
-  stimBrd1.update(BRD2|PW, test_pattern, cycle_percentage_value);
+  stimBrd2.update(BRD2|PW, test_pattern, cycle_percentage_value);
   stimBrd2.start(UECU_SYNC_MSG); // After set IPI, board need a Sync msg to line up the pulses.
   delay(10);
 
@@ -88,6 +88,12 @@ void loop() {
   Timer1.resume();
 
   while (1) {
+
+    #if defined(DEBUG_ON)
+      Serial.print("[Loop] New, cycle_percentage_value = ");
+      Serial.println(cycle_percentage_value);
+    #endif
+
     // test PW ramping.
     digitalWrite(led_pin, LOW);  // turn the LED on
     stimBrd1.update(BRD1|PW, test_pattern, cycle_percentage_value);
