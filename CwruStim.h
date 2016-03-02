@@ -94,6 +94,7 @@ class Stim
   private:
     // Stim board setup
     int _uart_channel_id;
+    int _msg_des_addr; //MSG_DES_ADDR
     int _mode;
     int _setting;
     int _stim_error;

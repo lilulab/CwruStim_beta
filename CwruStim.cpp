@@ -115,7 +115,7 @@ int Stim::init(int mode) {
     // surface stim
     case STIM_MODE_SURF:
       // Set message destination address
-      MSG_DES_ADDR = MSG_DES_ADDR_SURF;
+      _msg_des_addr = MSG_DES_ADDR_SURF;
       // Reset Halt Message to reset Stim board
       // Do not need this halt cmd.
       //this->cmd_halt_rset(UECU_RESET);
@@ -134,7 +134,7 @@ int Stim::init(int mode) {
     case STIM_MODE_PERC_8CH_MULTI_SCHEDULE:   
       // Set message destination address
       // same as Perc normal
-      MSG_DES_ADDR = MSG_DES_ADDR_PERC;
+      _msg_des_addr = MSG_DES_ADDR_PERC;
 
       // set num of channels
       _max_channels = STIM_CHANNEL_MAX_PERC; 
@@ -143,14 +143,14 @@ int Stim::init(int mode) {
     // implant stim, both IRS and IST board
     case STIM_MODE_ICM|IRS:
       // Set message destination address
-      MSG_DES_ADDR = MSG_DES_ADDR_ICM;
+      _msg_des_addr = MSG_DES_ADDR_ICM;
       // set num of channels
       _max_channels = STIM_CHANNEL_MAX_IRS; 
       break;
 
     case STIM_MODE_ICM|IST:
       // Set message destination address
-      MSG_DES_ADDR = MSG_DES_ADDR_ICM;
+      _msg_des_addr = MSG_DES_ADDR_ICM;
       // set num of channels
       _max_channels = STIM_CHANNEL_MAX_IST;
       break;
@@ -1679,7 +1679,8 @@ int Stim::cmd_halt_rset(uint8_t halt_flag) {
   int size = HALT_MSG_LEN + UECU_MSG_EXTRAL_LEN;
   // build message content
   uint8_t msg[HALT_MSG_LEN + UECU_MSG_EXTRAL_LEN] = 
-  {   MSG_DES_ADDR,
+  {   
+    _msg_des_addr,
     MSG_SRC_ADDR,
     HALT_MSG,
     HALT_MSG_LEN,
@@ -1701,7 +1702,8 @@ int Stim::cmd_del_sched(uint8_t sched_id) {
   int size = DELETE_SCHEDULE_MSG_LEN + UECU_MSG_EXTRAL_LEN;
   // build message content
   uint8_t msg[DELETE_SCHEDULE_MSG_LEN + UECU_MSG_EXTRAL_LEN] = 
-  {   MSG_DES_ADDR,
+  {   
+    _msg_des_addr,
     MSG_SRC_ADDR,
     DELETE_SCHEDULE_MSG,
     DELETE_SCHEDULE_MSG_LEN,
@@ -1722,7 +1724,8 @@ int Stim::cmd_crt_sched(uint8_t sync_signal, uint16_t duration) {
   int size = CREATE_SCHEDULE_MSG_LEN + UECU_MSG_EXTRAL_LEN;
   // build message content
   uint8_t msg[CREATE_SCHEDULE_MSG_LEN + UECU_MSG_EXTRAL_LEN] = 
-  {   MSG_DES_ADDR,
+  {   
+    _msg_des_addr,
     MSG_SRC_ADDR,
     CREATE_SCHEDULE_MSG,
     CREATE_SCHEDULE_MSG_LEN,
@@ -1750,7 +1753,8 @@ int Stim::cmd_chan_set( uint8_t port_chn_id,
   int size = CHANNEL_SETUP_MSG_LEN + UECU_MSG_EXTRAL_LEN;
   // build message content
   uint8_t msg[CHANNEL_SETUP_MSG_LEN + UECU_MSG_EXTRAL_LEN] = 
-  {   MSG_DES_ADDR,
+  {   
+    _msg_des_addr,
     MSG_SRC_ADDR,
     CHANNEL_SETUP_MSG,
     CHANNEL_SETUP_MSG_LEN,
@@ -1784,7 +1788,8 @@ int Stim::cmd_crt_evnt( uint8_t sched_id,
   int size = CREATE_EVENT_MSG_LEN + UECU_MSG_EXTRAL_LEN;
   // build message content
   uint8_t msg[CREATE_EVENT_MSG_LEN + UECU_MSG_EXTRAL_LEN] = 
-  {   MSG_DES_ADDR,
+  {   
+    _msg_des_addr,
     MSG_SRC_ADDR,
     CREATE_EVENT_MSG,
     CREATE_EVENT_MSG_LEN,
@@ -1815,7 +1820,8 @@ int Stim::cmd_set_evnt( uint8_t event_id,
   int size = CHANGE_EVENT_PARAMS_MSG_LEN + UECU_MSG_EXTRAL_LEN;
   // build message content
   uint8_t msg[CHANGE_EVENT_PARAMS_MSG_LEN + UECU_MSG_EXTRAL_LEN] = 
-  {   MSG_DES_ADDR,
+  {   
+    _msg_des_addr,
     MSG_SRC_ADDR,
     CHANGE_EVENT_PARAMS_MSG,
     CHANGE_EVENT_PARAMS_MSG_LEN,
@@ -1849,7 +1855,8 @@ int Stim::cmd_set_sched( uint8_t sched_id,
   int size = CHANGE_SCHEDULE_MSG_LEN + UECU_MSG_EXTRAL_LEN;
   // build message content
   uint8_t msg[CHANGE_SCHEDULE_MSG_LEN + UECU_MSG_EXTRAL_LEN] = 
-  {   MSG_DES_ADDR,
+  {   
+    _msg_des_addr,
     MSG_SRC_ADDR,
     CHANGE_SCHEDULE_MSG,
     CHANGE_SCHEDULE_MSG_LEN,
@@ -1873,7 +1880,8 @@ int Stim::cmd_sync_msg( uint8_t sync_signal) {
   int size = SYNC_MSG_LEN + UECU_MSG_EXTRAL_LEN;
   // build message content
   uint8_t msg[SYNC_MSG_LEN + UECU_MSG_EXTRAL_LEN] = 
-  {   MSG_DES_ADDR,
+  {   
+    _msg_des_addr,
     MSG_SRC_ADDR,
     SYNC_MSG,
     SYNC_MSG_LEN,

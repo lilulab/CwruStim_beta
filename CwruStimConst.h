@@ -48,7 +48,6 @@ static const int STIM_ERROR_UPDATE_PATTERN_ERROR = 1<<3;
 static const int STIM_ERROR_UPDATE_RAMPING_ERROR = 1<<4;
 
 // UECU Message Header
-static int MSG_DES_ADDR; 
 static const int MSG_DES_ADDR_SURF = 0x04;
 static const int MSG_DES_ADDR_PERC = 0x01;
 static const int MSG_DES_ADDR_ICM = 0x0A;
