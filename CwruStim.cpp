@@ -657,6 +657,7 @@ int Stim::update(int type, int pattern, uint16_t cycle_percentage) {
     const uint8_t (*LUT_BRD1_AMP)[BRD1_MAX_CHN];
 
     int need_update = 1;
+
     #if defined(DEBUG_STIM_UPDATE) && defined(DEBUG_ON)
       Serial.println("[Update] Load LUT BRD1");
     #endif  
@@ -669,7 +670,7 @@ int Stim::update(int type, int pattern, uint16_t cycle_percentage) {
       #endif 
         switch (pattern) {
               case PATTERN_NO_STIM:
-                need_update = 0;
+                // do nothing, the update code will handle it
                 break;
 
               // IPI - Stand
@@ -740,7 +741,7 @@ int Stim::update(int type, int pattern, uint16_t cycle_percentage) {
       #endif 
         switch (pattern) {
               case PATTERN_NO_STIM:
-                need_update = 0;
+                // do nothing, the update code will handle it
                 break;
               
               case PATTERN_STAND: // AMP - Stand
@@ -780,7 +781,7 @@ int Stim::update(int type, int pattern, uint16_t cycle_percentage) {
       #endif 
         switch (pattern) {
               case PATTERN_NO_STIM:
-                need_update = 0;
+                // do nothing, the update code will handle it
                 break;
 
               // PW - Stand
@@ -861,6 +862,7 @@ int Stim::update(int type, int pattern, uint16_t cycle_percentage) {
     const uint8_t (*LUT_BRD2_AMP)[BRD2_MAX_CHN];
 
     int need_update = 1;
+
     #if defined(DEBUG_STIM_UPDATE) && defined(DEBUG_ON)
       Serial.println("[Update] Load LUT BRD2");
     #endif  
@@ -873,7 +875,7 @@ int Stim::update(int type, int pattern, uint16_t cycle_percentage) {
       #endif 
         switch (pattern) {
               case PATTERN_NO_STIM:
-                need_update = 0;
+                // do nothing, the update code will handle it
                 break;
 
               // IPI - Stand
@@ -944,7 +946,7 @@ int Stim::update(int type, int pattern, uint16_t cycle_percentage) {
       #endif 
         switch (pattern) {
               case PATTERN_NO_STIM:
-                need_update = 0;
+                // do nothing, the update code will handle it
                 break;
               
               case PATTERN_STAND: // AMP - Stand
@@ -984,7 +986,7 @@ int Stim::update(int type, int pattern, uint16_t cycle_percentage) {
       #endif 
         switch (pattern) {
               case PATTERN_NO_STIM:
-                need_update = 0;
+                // do nothing, the update code will handle it
                 break;
 
               // PW - Stand
