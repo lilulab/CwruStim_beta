@@ -499,10 +499,10 @@ int Stim::config(int setting) {
       delay(UECU_DELAY_SETUP);
 
       // Send implant set msg
-      //this->serial_write_array ((uint8_t*)ICM_IRS_SET_0_MSG,sizeof(ICM_IRS_SET_0_MSG)/sizeof(uint8_t));
-      //delay(500);
-      this->serial_write_array ((uint8_t*)ICM_IRS_SET_1_MSG,sizeof(ICM_IRS_SET_1_MSG)/sizeof(uint8_t));
+      this->serial_write_array ((uint8_t*)ICM_IRS_SET_0_MSG,sizeof(ICM_IRS_SET_0_MSG)/sizeof(uint8_t));
       delay(500);
+      // this->serial_write_array ((uint8_t*)ICM_IRS_SET_1_MSG,sizeof(ICM_IRS_SET_1_MSG)/sizeof(uint8_t));
+      // delay(500);
 
       // Setup schedules
       // TODO Add multiple scheduler
@@ -528,10 +528,10 @@ int Stim::config(int setting) {
       delay(UECU_DELAY_SETUP);
 
       // Send RF power events msg
-      //this->serial_write_array ((uint8_t*)ICM_RFPWR_EVNT_0,sizeof(ICM_RFPWR_EVNT_0)/sizeof(uint8_t));
-      //delay(500);
-      this->serial_write_array ((uint8_t*)ICM_RFPWR_EVNT_1,sizeof(ICM_RFPWR_EVNT_1)/sizeof(uint8_t));
+      this->serial_write_array ((uint8_t*)ICM_RFPWR_EVNT_0,sizeof(ICM_RFPWR_EVNT_0)/sizeof(uint8_t));
       delay(500);
+      // this->serial_write_array ((uint8_t*)ICM_RFPWR_EVNT_1,sizeof(ICM_RFPWR_EVNT_1)/sizeof(uint8_t));
+      // delay(500);
 
       Serial.println("IRS Setup - Finished");
 

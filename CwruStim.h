@@ -13,8 +13,8 @@
 
 #include <CwruStimConst.h>
 // #include "StimPattern/Gait_VCK5.h" // VCK5's walking pattern
-// #include "StimPattern/Gait_BAL06.h" // BAL-06's walking pattern
-#include "StimPattern/Gait_IST07.h" // IST-07's walking pattern
+#include "StimPattern/Gait_BAL06.h" // BAL-06's walking pattern
+//#include "StimPattern/Gait_IST07.h" // IST-07's walking pattern
 
 
 /*

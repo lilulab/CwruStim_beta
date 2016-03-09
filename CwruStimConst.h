@@ -5,7 +5,7 @@
 // Hack up preset for update function
 // Needs to set those two value to correct num of channels based on Stim board.
 #define BRD1_MAX_CHN 16
-#define BRD2_MAX_CHN 4
+#define BRD2_MAX_CHN 8
 
 // UART Channel Setting
 static const int STIM_CHANNEL_UART0 = 0;
