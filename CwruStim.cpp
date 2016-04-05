@@ -1,7 +1,8 @@
 /*
   CwruStim.cpp - Library for muscle stim board for HNPv2 Project.
   Created by Lu Li (lxl361@case), Aug, 2015.
-  Version 1.1
+  Version 1.2
+  Branch: dynamic_pw
   Online Doc: https://goo.gl/s20iH4
   Repo: https://github.com/lilulab/CwruStim_beta
 */
@@ -451,6 +452,10 @@ int Stim::config(int setting) {
                   0,  // pulse_width set to 0,
                   0x26, // amplitude set to 0x26,
                   0); // zone not implemented;
+
+        // Dynamic PW control
+        // set gain to 1 for all channels
+        this->set_chan_pw_gain(i,1);
 
         #if defined(DEBUG_STIM_UPDATE_IPI) && defined(DEBUG_ON)
           Serial.print("[cr.E");
@@ -923,7 +928,11 @@ int Stim::update(int type, int pattern, uint16_t cycle_percentage) {
           // publish if only it is diff than the previous value
           // if ((_last_pulse_width != _current_pulse_width[i]) || (cycle_percentage == 0)) {
           if (_last_pulse_width != _current_pulse_width[i]) {
-            this->cmd_set_evnt(i+1, _current_pulse_width[i], _current_amplitude[i], 0); // Change Event i for port_chn_id i in sched_id 1  
+            // Change Event i+1 for port_chn_id i 
+            this->cmd_set_evnt( i+1, 
+                                this->exe_chan_pw_gain(i), // calulate gain * _current_pulse_width[i]
+                                _current_amplitude[i],
+                                 0); 
           }
         } // end for
       } // end if
@@ -1096,6 +1105,39 @@ uint8_t Stim::get_PW_ramping( int channel_i,
   #endif
   // return the ramped PW value;
   return pw_ramping_val;
+
+}
+
+// channel pw gains for dynamic gait control
+// related var: float _current_pw_gains[STIM_CHANNEL_MAX_PERC];
+int Stim::set_chan_pw_gain(uint8_t channel, float gain) {
+  // set command, update the gain array
+
+  // fault proof
+  if (channel>STIM_CHANNEL_MAX_PERC) return -1;
+  if (gain<=0) return -1;
+
+  _current_pw_gains[channel] = gain;
+  return 1;
+}
+
+float Stim::get_chan_pw_gain(uint8_t channel) {
+  // get command, do nothing here, just return value
+  return _current_pw_gains[channel];
+}
+
+// execute command, apply the gain to _current_pulse_width[], but not save;
+uint8_t Stim::exe_chan_pw_gain(uint8_t channel) {
+  float pw_cal = _current_pw_gains[channel] * (float)_current_pulse_width[channel];
+  
+  // when result is [0,MAX] publish, otherwise remain the same
+  if (pw_cal < 0) {
+    return 0; // min limit
+  } else if (pw_cal>PW_MAX_PERC) {
+    return PW_MAX_PERC; // max limit
+  } else {
+    return (uint8_t) pw_cal; // output = pw * gain
+  }
 
 }
 
