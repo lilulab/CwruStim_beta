@@ -10,10 +10,11 @@
 #include "Arduino.h"
 #include "CwruStim.h"
 
-// #define DEBUG_ON 1 //Comment this out if want to disenable all debug serial printing.
+#define DEBUG_ON 1 //Comment this out if want to disenable all debug serial printing.
 // #define DEBUG_STIM_UPDATE 1;
 // #define DEBUG_STIM_UPDATE_IPI 1;
 // #define DEBUG_STIM_RAMPING 1;
+// #define DEBUG_STIM_DYN_PW 1;
 
 // Stim constructor and UART selector
 Stim::Stim(int uart_channel_id) {
@@ -1111,17 +1112,35 @@ uint8_t Stim::get_PW_ramping( int channel_i,
 // channel pw gains for dynamic gait control
 // related var: float _current_pw_gains[STIM_CHANNEL_MAX_PERC];
 int Stim::set_chan_pw_gain(uint8_t channel, float gain) {
-  // set command, update the gain array
-
+  
+  // Debug
+  #if defined(DEBUG_ON) && defined(DEBUG_STIM_DYN_PW)
+    Serial.print("[BR");  Serial.print(_uart_channel_id);  Serial.print("]");
+    Serial.print("[DYN_PW] set_chan_pw_gain(). \t");
+    Serial.print("channel="); Serial.print(channel);Serial.print("\t");
+    Serial.print("gain="); Serial.print(gain);
+    Serial.println(".");
+  #endif
   // fault proof
   if (channel>STIM_CHANNEL_MAX_PERC) return -1;
   if (gain<=0) return -1;
 
+  // set command, update the gain array
   _current_pw_gains[channel] = gain;
   return 1;
 }
 
 float Stim::get_chan_pw_gain(uint8_t channel) {
+
+  // Debug
+  #if defined(DEBUG_ON) && defined(DEBUG_STIM_DYN_PW)
+    Serial.print("[BR");  Serial.print(_uart_channel_id);  Serial.print("]");
+    Serial.print("[DYN_PW] get_chan_pw_gain(). \t");
+    Serial.print("channel="); Serial.print(channel);Serial.print("\t");
+    Serial.print("gain="); Serial.print(_current_pw_gains[channel]);
+    Serial.println(".");
+  #endif
+
   // get command, do nothing here, just return value
   return _current_pw_gains[channel];
 }
@@ -1130,6 +1149,16 @@ float Stim::get_chan_pw_gain(uint8_t channel) {
 uint8_t Stim::exe_chan_pw_gain(uint8_t channel) {
   float pw_cal = _current_pw_gains[channel] * (float)_current_pulse_width[channel];
   
+  #if defined(DEBUG_ON) && defined(DEBUG_STIM_DYN_PW)
+    Serial.print("[BR");  Serial.print(_uart_channel_id);  Serial.print("]");
+    Serial.print("[DYN_PW] exe_chan_pw_gain(). \t");
+    Serial.print("channel="); Serial.print(channel);  Serial.print("\t");
+    Serial.print("pw="); Serial.print(_current_pulse_width[channel]); Serial.print("\t");
+    Serial.print("gain="); Serial.print(_current_pw_gains[channel]);  Serial.print("\t");
+    Serial.print("pw_cal="); Serial.print(pw_cal);
+    Serial.println(".");
+  #endif
+
   // when result is [0,MAX] publish, otherwise remain the same
   if (pw_cal < 0) {
     return 0; // min limit
