@@ -1228,8 +1228,8 @@ uint8_t Stim::exe_chan_amp_gain(uint8_t channel) {
   // when result is [0,MAX] publish, otherwise remain the same
   if (amp_cal < 0) {
     return 0; // min limit
-  } else if (amp_cal>PW_MAX_PERC) {
-    return PW_MAX_PERC; // max limit
+  } else if (amp_cal>AMP_MAX_PERC) {
+    return AMP_MAX_PERC; // max limit
   } else {
     return (uint8_t) amp_cal; // output = amp * gain
   }

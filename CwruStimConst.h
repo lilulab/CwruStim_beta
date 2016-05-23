@@ -123,5 +123,6 @@ static const int FIXED_SCHED_ID3_IPI = 60;
 
 // PW limiter
 #define PW_MAX_PERC 255 
+#define AMP_MAX_PERC 100 
 
 #endif
