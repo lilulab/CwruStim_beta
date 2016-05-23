@@ -15,6 +15,7 @@
 // #define DEBUG_STIM_UPDATE_IPI 1;
 // #define DEBUG_STIM_RAMPING 1;
 // #define DEBUG_STIM_DYN_PW 1;
+// #define DEBUG_STIM_DYN_AMP 1;
 
 // Stim constructor and UART selector
 Stim::Stim(int uart_channel_id) {
