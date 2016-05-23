@@ -123,6 +123,7 @@ void loop() {
 
       // Dynamic pulse width control!!!
       demo_dynamic_pw_control();
+      demo_dynamic_amp_control();
 
       stimBrd1.update(VCK5_BRD1|PW, current_pattern, cycle_percentage_value);
 
@@ -177,6 +178,38 @@ void demo_dynamic_pw_control(void){
   stimBrd2.set_chan_pw_gain(5,1.5);   // Channel 5, pw increase 1/2 value
   stimBrd2.set_chan_pw_gain(6,2.0);   // Channel 6, pw x2 times larger than original
   stimBrd2.set_chan_pw_gain(7,3.0);   // Channel 7, pw x3 times larger than original
+}
+
+// Dynamic pulse width control!!!
+void demo_dynamic_amp_control(void){
+
+  // call this function right before update the amp.
+  // this will set a gain factor for each channel's amp.
+  // Output_PW = Original_PW * gain; 
+  // (range of Output_PW limited by PW_MAX_PERC@CwruStimConst.h)
+  
+  // Stim.set_chan_amp_gain(uint8_t channel_id, float gain)
+  // Board 1
+  stimBrd1.set_chan_amp_gain(0,1.0);   // Channel 0, amp remain the same
+  stimBrd1.set_chan_amp_gain(1,0.75);  // Channel 1, amp reduce to 3/4 value
+  stimBrd1.set_chan_amp_gain(2,0.5);   // Channel 2, amp reduce to 1/2 value
+  stimBrd1.set_chan_amp_gain(3,0.25);  // Channel 3, amp reduce to 1/4 value
+
+  stimBrd1.set_chan_amp_gain(4,1.25);  // Channel 4, amp increase 1/4 value
+  stimBrd1.set_chan_amp_gain(5,1.5);   // Channel 5, amp increase 1/2 value
+  stimBrd1.set_chan_amp_gain(6,2.0);   // Channel 6, amp x2 times larger than original
+  stimBrd1.set_chan_amp_gain(7,3.0);   // Channel 7, amp x3 times larger than original
+
+  // Board 2
+  stimBrd2.set_chan_amp_gain(0,1.0);   // Channel 0, amp remain the same
+  stimBrd2.set_chan_amp_gain(1,0.75);  // Channel 1, amp reduce to 3/4 value
+  stimBrd2.set_chan_amp_gain(2,0.5);   // Channel 2, amp reduce to 1/2 value
+  stimBrd2.set_chan_amp_gain(3,0.25);  // Channel 3, amp reduce to 1/4 value
+
+  stimBrd2.set_chan_amp_gain(4,1.25);  // Channel 4, amp increase 1/4 value
+  stimBrd2.set_chan_amp_gain(5,1.5);   // Channel 5, amp increase 1/2 value
+  stimBrd2.set_chan_amp_gain(6,2.0);   // Channel 6, amp x2 times larger than original
+  stimBrd2.set_chan_amp_gain(7,3.0);   // Channel 7, amp x3 times larger than original
 }
 
 void timerOneIsr()

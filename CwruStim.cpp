@@ -10,12 +10,12 @@
 #include "Arduino.h"
 #include "CwruStim.h"
 
-#define DEBUG_ON 1 //Comment this out if want to disenable all debug serial printing.
+// #define DEBUG_ON 1 //Comment this out if want to disenable all debug serial printing.
 // #define DEBUG_STIM_UPDATE 1;
 // #define DEBUG_STIM_UPDATE_IPI 1;
 // #define DEBUG_STIM_RAMPING 1;
 // #define DEBUG_STIM_DYN_PW 1;
-#define DEBUG_STIM_DYN_AMP 1;
+// #define DEBUG_STIM_DYN_AMP 1;
 
 // Stim constructor and UART selector
 Stim::Stim(int uart_channel_id) {
@@ -458,6 +458,10 @@ int Stim::config(int setting) {
         // Dynamic PW control
         // set gain to 1 for all channels
         this->set_chan_pw_gain(i,1);
+
+        // Dynamic AMP control
+        // set gain to 1 for all channels
+        this->set_chan_amp_gain(i,1);
 
         #if defined(DEBUG_STIM_UPDATE_IPI) && defined(DEBUG_ON)
           Serial.print("[cr.E");
@@ -933,7 +937,7 @@ int Stim::update(int type, int pattern, uint16_t cycle_percentage) {
             // Change Event i+1 for port_chn_id i 
             this->cmd_set_evnt( i+1, 
                                 this->exe_chan_pw_gain(i), // calulate gain * _current_pulse_width[i]
-                                _current_amplitude[i],
+                                this->exe_chan_amp_gain(i), // calulate gain * _current_amplitude[i]
                                  0); 
           }
         } // end for
@@ -1217,7 +1221,7 @@ uint8_t Stim::exe_chan_amp_gain(uint8_t channel) {
     Serial.print("channel="); Serial.print(channel);  Serial.print("\t");
     Serial.print("amp="); Serial.print(_current_amplitude[channel]); Serial.print("\t");
     Serial.print("gain="); Serial.print(_current_amp_gains[channel]);  Serial.print("\t");
-    Serial.print("amp_cal="); Serial.print(amp_cal);
+    Serial.print("amp_cal="); Serial.print((uint8_t)amp_cal);
     Serial.println(".");
   #endif
 
