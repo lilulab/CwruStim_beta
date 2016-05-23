@@ -15,7 +15,7 @@
 // #define DEBUG_STIM_UPDATE_IPI 1;
 // #define DEBUG_STIM_RAMPING 1;
 // #define DEBUG_STIM_DYN_PW 1;
-// #define DEBUG_STIM_DYN_AMP 1;
+#define DEBUG_STIM_DYN_AMP 1;
 
 // Stim constructor and UART selector
 Stim::Stim(int uart_channel_id) {
@@ -1167,6 +1167,67 @@ uint8_t Stim::exe_chan_pw_gain(uint8_t channel) {
     return PW_MAX_PERC; // max limit
   } else {
     return (uint8_t) pw_cal; // output = pw * gain
+  }
+
+}
+
+// channel amp gains for dynamic gait control
+// related var: float _current_amp_gains[STIM_CHANNEL_MAX_PERC];
+int Stim::set_chan_amp_gain(uint8_t channel, float gain) {
+  
+  // Debug
+  #if defined(DEBUG_ON) && defined(DEBUG_STIM_DYN_AMP)
+    Serial.print("[BR");  Serial.print(_uart_channel_id);  Serial.print("]");
+    Serial.print("[DYN_AMP] set_chan_amp_gain(). \t");
+    Serial.print("channel="); Serial.print(channel);Serial.print("\t");
+    Serial.print("gain="); Serial.print(gain);
+    Serial.println(".");
+  #endif
+  // fault proof
+  if (channel>STIM_CHANNEL_MAX_PERC) return -1;
+  if (gain<=0) return -1;
+
+  // set command, update the gain array
+  _current_amp_gains[channel] = gain;
+  return 1;
+}
+
+float Stim::get_chan_amp_gain(uint8_t channel) {
+
+  // Debug
+  #if defined(DEBUG_ON) && defined(DEBUG_STIM_DYN_AMP)
+    Serial.print("[BR");  Serial.print(_uart_channel_id);  Serial.print("]");
+    Serial.print("[DYN_AMP] get_chan_amp_gain(). \t");
+    Serial.print("channel="); Serial.print(channel);Serial.print("\t");
+    Serial.print("gain="); Serial.print(_current_amp_gains[channel]);
+    Serial.println(".");
+  #endif
+
+  // get command, do nothing here, just return value
+  return _current_amp_gains[channel];
+}
+
+// execute command, apply the gain to _current_amplitude[], but not save;
+uint8_t Stim::exe_chan_amp_gain(uint8_t channel) {
+  float amp_cal = _current_amp_gains[channel] * (float)_current_amplitude[channel];
+  
+  #if defined(DEBUG_ON) && defined(DEBUG_STIM_DYN_AMP)
+    Serial.print("[BR");  Serial.print(_uart_channel_id);  Serial.print("]");
+    Serial.print("[DYN_AMP] exe_chan_amp_gain(). \t");
+    Serial.print("channel="); Serial.print(channel);  Serial.print("\t");
+    Serial.print("amp="); Serial.print(_current_amplitude[channel]); Serial.print("\t");
+    Serial.print("gain="); Serial.print(_current_amp_gains[channel]);  Serial.print("\t");
+    Serial.print("amp_cal="); Serial.print(amp_cal);
+    Serial.println(".");
+  #endif
+
+  // when result is [0,MAX] publish, otherwise remain the same
+  if (amp_cal < 0) {
+    return 0; // min limit
+  } else if (amp_cal>PW_MAX_PERC) {
+    return PW_MAX_PERC; // max limit
+  } else {
+    return (uint8_t) amp_cal; // output = amp * gain
   }
 
 }
