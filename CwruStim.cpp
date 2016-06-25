@@ -549,10 +549,10 @@ int Stim::update(int type, int pattern, uint16_t cycle_percentage) {
     
     //   //Test the pattern data.
     //   // print test pattern
-    //   LUT_PP = &VCK5_walk_L_B1_PP; 
-    //   LUT_PW = &VCK5_walk_L_B1_PW; 
-    //   LUT_IPI = &VCK5_walk_L_B1_IPI;
-    //   LUT_AMP = &VCK5_B1_AMP;
+    //   LUT_PP = &gait_walk_L_B1_PP; 
+    //   LUT_PW = &gait_walk_L_B1_PW; 
+    //   LUT_IPI = &gait_walk_L_B1_IPI;
+    //   LUT_AMP = &gait_B1_AMP;
 
     //   // print PP
     //   for (int i=0; i<STIM_CHANNEL_MAX_PERC; i++) {
@@ -590,7 +590,7 @@ int Stim::update(int type, int pattern, uint16_t cycle_percentage) {
     //   Serial.println("}");
 
     //   // print AMP
-    //   Serial.println("VCK5_B1_AMP array = ");
+    //   Serial.println("gait_B1_AMP array = ");
     //   Serial.print("{");  
     //   for (int i=0; i<12; i++) {
     //       Serial.print((*LUT_AMP)[i]);
@@ -635,12 +635,12 @@ int Stim::update(int type, int pattern, uint16_t cycle_percentage) {
             // #if defined(DEBUG_STIM_UPDATE_IPI) && defined(DEBUG_ON)
             //   Serial.print("-- -- VCK5_BRD1 ");
             // #endif
-            LUT_IPI = &VCK5_stand_B1_IPI;
+            LUT_IPI = &gait_stand_B1_IPI;
           } else if (board == VCK5_BRD2) {
             // #if defined(DEBUG_STIM_UPDATE_IPI) && defined(DEBUG_ON)
             //   Serial.print("-- -- VCK5_BRD2 ");
             // #endif
-            LUT_IPI = &VCK5_stand_B2_IPI;
+            LUT_IPI = &gait_stand_B2_IPI;
           } else {
             _stim_error |= STIM_ERROR_UPDATE_PATTERN_ERROR;
           }
@@ -652,9 +652,9 @@ int Stim::update(int type, int pattern, uint16_t cycle_percentage) {
             Serial.print("-- IPI - SIT ");
           #endif
           if (board == VCK5_BRD1) {
-            LUT_IPI = &VCK5_sit_B1_IPI;
+            LUT_IPI = &gait_sit_B1_IPI;
           } else if (board == VCK5_BRD2) {
-            LUT_IPI = &VCK5_sit_B2_IPI;
+            LUT_IPI = &gait_sit_B2_IPI;
           } else {
             _stim_error |= STIM_ERROR_UPDATE_PATTERN_ERROR;
           }
@@ -666,9 +666,9 @@ int Stim::update(int type, int pattern, uint16_t cycle_percentage) {
             Serial.print("-- IPI - LSTEP ");
           #endif
           if (board == VCK5_BRD1) {
-            LUT_IPI = &VCK5_walk_L_B1_IPI;
+            LUT_IPI = &gait_walk_L_B1_IPI;
           } else if (board == VCK5_BRD2) {
-            LUT_IPI = &VCK5_walk_L_B2_IPI;
+            LUT_IPI = &gait_walk_L_B2_IPI;
           } else {
             _stim_error |= STIM_ERROR_UPDATE_PATTERN_ERROR;
           }
@@ -680,13 +680,55 @@ int Stim::update(int type, int pattern, uint16_t cycle_percentage) {
             Serial.print("-- IPI - RSTEP ");
           #endif
           if (board == VCK5_BRD1) {
-            LUT_IPI = &VCK5_walk_R_B1_IPI;
+            LUT_IPI = &gait_walk_R_B1_IPI;
           } else if (board == VCK5_BRD2) {
-            LUT_IPI = &VCK5_walk_R_B2_IPI;
+            LUT_IPI = &gait_walk_R_B2_IPI;
           } else {
             _stim_error |= STIM_ERROR_UPDATE_PATTERN_ERROR;
           }
           break;
+
+        // IPI - MISC1
+        case PATTERN_MISC1:
+          #if defined(DEBUG_STIM_UPDATE_IPI) && defined(DEBUG_ON)
+            Serial.print("-- IPI - MISC1 ");
+          #endif
+          if (board == VCK5_BRD1) {
+            LUT_IPI = &gait_misc1_B1_IPI;
+          } else if (board == VCK5_BRD2) {
+            LUT_IPI = &gait_misc1_B2_IPI;
+          } else {
+            _stim_error |= STIM_ERROR_UPDATE_PATTERN_ERROR;
+          }
+          break;
+
+        // IPI - MISC2
+        case PATTERN_MISC2:
+          #if defined(DEBUG_STIM_UPDATE_IPI) && defined(DEBUG_ON)
+            Serial.print("-- IPI - MISC2 ");
+          #endif
+          if (board == VCK5_BRD1) {
+            LUT_IPI = &gait_misc2_B1_IPI;
+          } else if (board == VCK5_BRD2) {
+            LUT_IPI = &gait_misc2_B2_IPI;
+          } else {
+            _stim_error |= STIM_ERROR_UPDATE_PATTERN_ERROR;
+          }
+          break;  
+
+        // IPI - MISC3
+        case PATTERN_MISC3:
+          #if defined(DEBUG_STIM_UPDATE_IPI) && defined(DEBUG_ON)
+            Serial.print("-- IPI - MISC3 ");
+          #endif
+          if (board == VCK5_BRD1) {
+            LUT_IPI = &gait_misc3_B1_IPI;
+          } else if (board == VCK5_BRD2) {
+            LUT_IPI = &gait_misc3_B2_IPI;
+          } else {
+            _stim_error |= STIM_ERROR_UPDATE_PATTERN_ERROR;
+          }
+          break;  
       } // end switch (pattern)
 
       // Now update IPI 
@@ -813,9 +855,9 @@ int Stim::update(int type, int pattern, uint16_t cycle_percentage) {
       #endif
 
       if (board == VCK5_BRD1) {
-        LUT_AMP = &VCK5_B1_AMP;
+        LUT_AMP = &gait_B1_AMP;
       } else if (board == VCK5_BRD2) {
-        LUT_AMP = &VCK5_B2_AMP;
+        LUT_AMP = &gait_B2_AMP;
       } else {
         _stim_error |= STIM_ERROR_UPDATE_PATTERN_ERROR;
       }        
@@ -855,11 +897,11 @@ int Stim::update(int type, int pattern, uint16_t cycle_percentage) {
             Serial.print("-- PW - Stand ");
           #endif
           if (board == VCK5_BRD1) {
-            LUT_PP = &VCK5_stand_B1_PP;
-            LUT_PW = &VCK5_stand_B1_PW;
+            LUT_PP = &gait_stand_B1_PP;
+            LUT_PW = &gait_stand_B1_PW;
           } else if (board == VCK5_BRD2) {
-            LUT_PP = &VCK5_stand_B2_PP;
-            LUT_PW = &VCK5_stand_B2_PW;
+            LUT_PP = &gait_stand_B2_PP;
+            LUT_PW = &gait_stand_B2_PW;
           } else {
             _stim_error |= STIM_ERROR_UPDATE_PATTERN_ERROR;
           }
@@ -871,11 +913,11 @@ int Stim::update(int type, int pattern, uint16_t cycle_percentage) {
             Serial.print("-- PW - SIT ");
           #endif
           if (board == VCK5_BRD1) {
-            LUT_PP = &VCK5_sit_B1_PP;
-            LUT_PW = &VCK5_sit_B1_PW;
+            LUT_PP = &gait_sit_B1_PP;
+            LUT_PW = &gait_sit_B1_PW;
           } else if (board == VCK5_BRD2) {
-            LUT_PP = &VCK5_sit_B2_PP;
-            LUT_PW = &VCK5_sit_B2_PW;
+            LUT_PP = &gait_sit_B2_PP;
+            LUT_PW = &gait_sit_B2_PW;
           } else {
             _stim_error |= STIM_ERROR_UPDATE_PATTERN_ERROR;
           }
@@ -887,11 +929,11 @@ int Stim::update(int type, int pattern, uint16_t cycle_percentage) {
             Serial.print("-- PW - LSTEP ");
           #endif
           if (board == VCK5_BRD1) {
-            LUT_PP = &VCK5_walk_L_B1_PP;
-            LUT_PW = &VCK5_walk_L_B1_PW;
+            LUT_PP = &gait_walk_L_B1_PP;
+            LUT_PW = &gait_walk_L_B1_PW;
           } else if (board == VCK5_BRD2) {
-            LUT_PP = &VCK5_walk_L_B2_PP;
-            LUT_PW = &VCK5_walk_L_B2_PW;
+            LUT_PP = &gait_walk_L_B2_PP;
+            LUT_PW = &gait_walk_L_B2_PW;
           } else {
             _stim_error |= STIM_ERROR_UPDATE_PATTERN_ERROR;
           }
@@ -903,11 +945,59 @@ int Stim::update(int type, int pattern, uint16_t cycle_percentage) {
             Serial.print("-- PW - RSTEP ");
           #endif
           if (board == VCK5_BRD1) {
-            LUT_PP = &VCK5_walk_R_B1_PP;
-            LUT_PW = &VCK5_walk_R_B1_PW;
+            LUT_PP = &gait_walk_R_B1_PP;
+            LUT_PW = &gait_walk_R_B1_PW;
           } else if (board == VCK5_BRD2) {
-            LUT_PP = &VCK5_walk_R_B2_PP;
-            LUT_PW = &VCK5_walk_R_B2_PW;
+            LUT_PP = &gait_walk_R_B2_PP;
+            LUT_PW = &gait_walk_R_B2_PW;
+          } else {
+            _stim_error |= STIM_ERROR_UPDATE_PATTERN_ERROR;
+          }
+          break;
+
+        // PW - MISC1
+        case PATTERN_MISC1:
+          #if defined(DEBUG_STIM_UPDATE) && defined(DEBUG_ON)
+            Serial.print("-- PW - MISC1 ");
+          #endif
+          if (board == VCK5_BRD1) {
+            LUT_PP = &gait_misc1_B1_PP;
+            LUT_PW = &gait_misc1_B1_PW;
+          } else if (board == VCK5_BRD2) {
+            LUT_PP = &gait_misc1_B2_PP;
+            LUT_PW = &gait_misc1_B2_PW;
+          } else {
+            _stim_error |= STIM_ERROR_UPDATE_PATTERN_ERROR;
+          }
+          break;
+
+        // PW - MISC2
+        case PATTERN_MISC2:
+          #if defined(DEBUG_STIM_UPDATE) && defined(DEBUG_ON)
+            Serial.print("-- PW - MISC2 ");
+          #endif
+          if (board == VCK5_BRD1) {
+            LUT_PP = &gait_misc2_B1_PP;
+            LUT_PW = &gait_misc2_B1_PW;
+          } else if (board == VCK5_BRD2) {
+            LUT_PP = &gait_misc2_B2_PP;
+            LUT_PW = &gait_misc2_B2_PW;
+          } else {
+            _stim_error |= STIM_ERROR_UPDATE_PATTERN_ERROR;
+          }
+          break;
+
+        // PW - MISC3
+        case PATTERN_MISC3:
+          #if defined(DEBUG_STIM_UPDATE) && defined(DEBUG_ON)
+            Serial.print("-- PW - MISC3 ");
+          #endif
+          if (board == VCK5_BRD1) {
+            LUT_PP = &gait_misc3_B1_PP;
+            LUT_PW = &gait_misc3_B1_PW;
+          } else if (board == VCK5_BRD2) {
+            LUT_PP = &gait_misc3_B2_PP;
+            LUT_PW = &gait_misc3_B2_PW;
           } else {
             _stim_error |= STIM_ERROR_UPDATE_PATTERN_ERROR;
           }
@@ -1241,53 +1331,53 @@ int Stim::gait_LUT_builder(void) {
 
   // Board 1
   // STAND
-  // _Gait_LUT_VCK5[GAIT_VCK5_BOARD1][PATTERN_STAND][PATTERN_PARAM_PP] = (uint16_t) &VCK5_stand_B1_PP;
-  // _Gait_LUT_VCK5[GAIT_VCK5_BOARD1][PATTERN_STAND][PATTERN_PARAM_PW] = &VCK5_stand_B1_PW;
-  // _Gait_LUT_VCK5[GAIT_VCK5_BOARD1][PATTERN_STAND][PATTERN_PARAM_AMP] = &VCK5_B1_AMP; //Same cross board
-  // _Gait_LUT_VCK5[GAIT_VCK5_BOARD1][PATTERN_STAND][PATTERN_PARAM_IPI] = &VCK5_stand_B1_IPI;
+  // _Gait_LUT_VCK5[GAIT_VCK5_BOARD1][PATTERN_STAND][PATTERN_PARAM_PP] = (uint16_t) &gait_stand_B1_PP;
+  // _Gait_LUT_VCK5[GAIT_VCK5_BOARD1][PATTERN_STAND][PATTERN_PARAM_PW] = &gait_stand_B1_PW;
+  // _Gait_LUT_VCK5[GAIT_VCK5_BOARD1][PATTERN_STAND][PATTERN_PARAM_AMP] = &gait_B1_AMP; //Same cross board
+  // _Gait_LUT_VCK5[GAIT_VCK5_BOARD1][PATTERN_STAND][PATTERN_PARAM_IPI] = &gait_stand_B1_IPI;
 
  //  // SIT
-  // *_Gait_LUT_VCK5[GAIT_VCK5_BOARD1][PATTERN_SIT][PATTERN_PARAM_PP] = &VCK5_sit_B1_PP;
-  // *_Gait_LUT_VCK5[GAIT_VCK5_BOARD1][PATTERN_SIT][PATTERN_PARAM_PW] = &VCK5_sit_B1_PW;
-  // *_Gait_LUT_VCK5[GAIT_VCK5_BOARD1][PATTERN_SIT][PATTERN_PARAM_AMP] = &VCK5_B1_AMP; //Same cross board
-  // *_Gait_LUT_VCK5[GAIT_VCK5_BOARD1][PATTERN_SIT][PATTERN_PARAM_IPI] = &VCK5_sit_B1_IPI;  
+  // *_Gait_LUT_VCK5[GAIT_VCK5_BOARD1][PATTERN_SIT][PATTERN_PARAM_PP] = &gait_sit_B1_PP;
+  // *_Gait_LUT_VCK5[GAIT_VCK5_BOARD1][PATTERN_SIT][PATTERN_PARAM_PW] = &gait_sit_B1_PW;
+  // *_Gait_LUT_VCK5[GAIT_VCK5_BOARD1][PATTERN_SIT][PATTERN_PARAM_AMP] = &gait_B1_AMP; //Same cross board
+  // *_Gait_LUT_VCK5[GAIT_VCK5_BOARD1][PATTERN_SIT][PATTERN_PARAM_IPI] = &gait_sit_B1_IPI;  
 
   // // LSTEP
-  // *_Gait_LUT_VCK5[GAIT_VCK5_BOARD1][PATTERN_LSETP][PATTERN_PARAM_PP] = &VCK5_walk_L_B1_PP;
-  // *_Gait_LUT_VCK5[GAIT_VCK5_BOARD1][PATTERN_LSETP][PATTERN_PARAM_PW] = &VCK5_walk_L_B1_PW;
-  // *_Gait_LUT_VCK5[GAIT_VCK5_BOARD1][PATTERN_LSETP][PATTERN_PARAM_AMP] = &VCK5_B1_AMP; //Same cross board
-  // *_Gait_LUT_VCK5[GAIT_VCK5_BOARD1][PATTERN_LSETP][PATTERN_PARAM_IPI] = &VCK5_walk_L_B1_IPI;
+  // *_Gait_LUT_VCK5[GAIT_VCK5_BOARD1][PATTERN_LSETP][PATTERN_PARAM_PP] = &gait_walk_L_B1_PP;
+  // *_Gait_LUT_VCK5[GAIT_VCK5_BOARD1][PATTERN_LSETP][PATTERN_PARAM_PW] = &gait_walk_L_B1_PW;
+  // *_Gait_LUT_VCK5[GAIT_VCK5_BOARD1][PATTERN_LSETP][PATTERN_PARAM_AMP] = &gait_B1_AMP; //Same cross board
+  // *_Gait_LUT_VCK5[GAIT_VCK5_BOARD1][PATTERN_LSETP][PATTERN_PARAM_IPI] = &gait_walk_L_B1_IPI;
 
   // // RSTEP
-  // *_Gait_LUT_VCK5[GAIT_VCK5_BOARD1][PATTERN_RSETP][PATTERN_PARAM_PP] = &VCK5_walk_R_B1_PP;
-  // *_Gait_LUT_VCK5[GAIT_VCK5_BOARD1][PATTERN_RSETP][PATTERN_PARAM_PW] = &VCK5_walk_R_B1_PW;
-  // *_Gait_LUT_VCK5[GAIT_VCK5_BOARD1][PATTERN_RSETP][PATTERN_PARAM_AMP] = &VCK5_B1_AMP; //Same cross board
-  // *_Gait_LUT_VCK5[GAIT_VCK5_BOARD1][PATTERN_RSETP][PATTERN_PARAM_IPI] = &VCK5_walk_R_B1_IPI;
+  // *_Gait_LUT_VCK5[GAIT_VCK5_BOARD1][PATTERN_RSETP][PATTERN_PARAM_PP] = &gait_walk_R_B1_PP;
+  // *_Gait_LUT_VCK5[GAIT_VCK5_BOARD1][PATTERN_RSETP][PATTERN_PARAM_PW] = &gait_walk_R_B1_PW;
+  // *_Gait_LUT_VCK5[GAIT_VCK5_BOARD1][PATTERN_RSETP][PATTERN_PARAM_AMP] = &gait_B1_AMP; //Same cross board
+  // *_Gait_LUT_VCK5[GAIT_VCK5_BOARD1][PATTERN_RSETP][PATTERN_PARAM_IPI] = &gait_walk_R_B1_IPI;
 
  //  // Board 2
  //  // STAND
-  // *_Gait_LUT_VCK5[GAIT_VCK5_BOARD2][PATTERN_STAND][PATTERN_PARAM_PP] = &VCK5_stand_B2_PP;
-  // *_Gait_LUT_VCK5[GAIT_VCK5_BOARD2][PATTERN_STAND][PATTERN_PARAM_PW] = &VCK5_stand_B2_PW;
-  // *_Gait_LUT_VCK5[GAIT_VCK5_BOARD2][PATTERN_STAND][PATTERN_PARAM_AMP] = &VCK5_B2_AMP; //Same cross board
-  // *_Gait_LUT_VCK5[GAIT_VCK5_BOARD2][PATTERN_STAND][PATTERN_PARAM_IPI] = &VCK5_stand_B2_IPI;
+  // *_Gait_LUT_VCK5[GAIT_VCK5_BOARD2][PATTERN_STAND][PATTERN_PARAM_PP] = &gait_stand_B2_PP;
+  // *_Gait_LUT_VCK5[GAIT_VCK5_BOARD2][PATTERN_STAND][PATTERN_PARAM_PW] = &gait_stand_B2_PW;
+  // *_Gait_LUT_VCK5[GAIT_VCK5_BOARD2][PATTERN_STAND][PATTERN_PARAM_AMP] = &gait_B2_AMP; //Same cross board
+  // *_Gait_LUT_VCK5[GAIT_VCK5_BOARD2][PATTERN_STAND][PATTERN_PARAM_IPI] = &gait_stand_B2_IPI;
 
  //  // SIT
-  // *_Gait_LUT_VCK5[GAIT_VCK5_BOARD2][PATTERN_SIT][PATTERN_PARAM_PP] = &VCK5_sit_B2_PP;
-  // *_Gait_LUT_VCK5[GAIT_VCK5_BOARD2][PATTERN_SIT][PATTERN_PARAM_PW] = &VCK5_sit_B2_PW;
-  // *_Gait_LUT_VCK5[GAIT_VCK5_BOARD2][PATTERN_SIT][PATTERN_PARAM_AMP] = &VCK5_B2_AMP; //Same cross board
-  // *_Gait_LUT_VCK5[GAIT_VCK5_BOARD2][PATTERN_SIT][PATTERN_PARAM_IPI] = &VCK5_sit_B2_IPI;  
+  // *_Gait_LUT_VCK5[GAIT_VCK5_BOARD2][PATTERN_SIT][PATTERN_PARAM_PP] = &gait_sit_B2_PP;
+  // *_Gait_LUT_VCK5[GAIT_VCK5_BOARD2][PATTERN_SIT][PATTERN_PARAM_PW] = &gait_sit_B2_PW;
+  // *_Gait_LUT_VCK5[GAIT_VCK5_BOARD2][PATTERN_SIT][PATTERN_PARAM_AMP] = &gait_B2_AMP; //Same cross board
+  // *_Gait_LUT_VCK5[GAIT_VCK5_BOARD2][PATTERN_SIT][PATTERN_PARAM_IPI] = &gait_sit_B2_IPI;  
 
   // // LSTEP
-  // *_Gait_LUT_VCK5[GAIT_VCK5_BOARD2][PATTERN_LSETP][PATTERN_PARAM_PP] = &VCK5_walk_L_B2_PP;
-  // *_Gait_LUT_VCK5[GAIT_VCK5_BOARD2][PATTERN_LSETP][PATTERN_PARAM_PW] = &VCK5_walk_L_B2_PW;
-  // *_Gait_LUT_VCK5[GAIT_VCK5_BOARD2][PATTERN_LSETP][PATTERN_PARAM_AMP] = &VCK5_B2_AMP; //Same cross board
-  // *_Gait_LUT_VCK5[GAIT_VCK5_BOARD2][PATTERN_LSETP][PATTERN_PARAM_IPI] = &VCK5_walk_L_B2_IPI;
+  // *_Gait_LUT_VCK5[GAIT_VCK5_BOARD2][PATTERN_LSETP][PATTERN_PARAM_PP] = &gait_walk_L_B2_PP;
+  // *_Gait_LUT_VCK5[GAIT_VCK5_BOARD2][PATTERN_LSETP][PATTERN_PARAM_PW] = &gait_walk_L_B2_PW;
+  // *_Gait_LUT_VCK5[GAIT_VCK5_BOARD2][PATTERN_LSETP][PATTERN_PARAM_AMP] = &gait_B2_AMP; //Same cross board
+  // *_Gait_LUT_VCK5[GAIT_VCK5_BOARD2][PATTERN_LSETP][PATTERN_PARAM_IPI] = &gait_walk_L_B2_IPI;
 
   // // RSTEP
-  // *_Gait_LUT_VCK5[GAIT_VCK5_BOARD2][PATTERN_RSETP][PATTERN_PARAM_PP] = &VCK5_walk_R_B2_PP;
-  // *_Gait_LUT_VCK5[GAIT_VCK5_BOARD2][PATTERN_RSETP][PATTERN_PARAM_PW] = &VCK5_walk_R_B2_PW;
-  // *_Gait_LUT_VCK5[GAIT_VCK5_BOARD2][PATTERN_RSETP][PATTERN_PARAM_AMP] = &VCK5_B2_AMP; //Same cross board
-  // *_Gait_LUT_VCK5[GAIT_VCK5_BOARD2][PATTERN_RSETP][PATTERN_PARAM_IPI] = &VCK5_walk_R_B2_IPI;
+  // *_Gait_LUT_VCK5[GAIT_VCK5_BOARD2][PATTERN_RSETP][PATTERN_PARAM_PP] = &gait_walk_R_B2_PP;
+  // *_Gait_LUT_VCK5[GAIT_VCK5_BOARD2][PATTERN_RSETP][PATTERN_PARAM_PW] = &gait_walk_R_B2_PW;
+  // *_Gait_LUT_VCK5[GAIT_VCK5_BOARD2][PATTERN_RSETP][PATTERN_PARAM_AMP] = &gait_B2_AMP; //Same cross board
+  // *_Gait_LUT_VCK5[GAIT_VCK5_BOARD2][PATTERN_RSETP][PATTERN_PARAM_IPI] = &gait_walk_R_B2_IPI;
 
 }
 

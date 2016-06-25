@@ -98,13 +98,16 @@ static const int IPI = 1;
 static const int AMP = 2;
 static const int PW = 3;
 
-static const int NUM_PATTERN = 5;
+static const int NUM_PATTERN = 8;
 static const int PATTERN_NO_STIM = 0;
 static const int PATTERN_STAND = 1;
 static const int PATTERN_SIT = 2;
 static const int PATTERN_LSETP = 3;
 static const int PATTERN_RSETP = 4;
 
+static const int PATTERN_MISC1 = 11;
+static const int PATTERN_MISC2 = 12;
+static const int PATTERN_MISC3 = 13;
 
 static const int NUM_PATTERN_PARAM = 4;
 static const int PATTERN_PARAM_PP = 0;
